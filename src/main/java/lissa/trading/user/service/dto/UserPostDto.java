@@ -15,10 +15,12 @@ import java.math.BigDecimal;
 public class UserPostDto {
     @NotNull
     @Size(min = 1, max = 50)
+    @Column(name = "external_id", unique = true)
     private String firstName;
 
     @NotNull
     @Size(min = 1, max = 50)
+    @Column(name = "last_name")
     private String lastName;
 
     @NotNull

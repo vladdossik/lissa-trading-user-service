@@ -3,6 +3,7 @@ package lissa.trading.user.service.service;
 import lissa.trading.user.service.dto.UserMapper;
 import lissa.trading.user.service.dto.UserPostDto;
 import lissa.trading.user.service.dto.UserResponseDto;
+import lissa.trading.user.service.exception.UserNotFoundException;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponseDto updateUser(String externalId, UserPostDto userUpdates) {
         User user = userRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         userMapper.updateUserFromDto(userUpdates, user);
         User updatedUser = userRepository.save(user);
         return userMapper.toUserResponseDto(updatedUser);
@@ -47,7 +48,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void blockUserByTelegramNickname(String telegramNickname) {
         User user = userRepository.findByTelegramNickname(telegramNickname)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         user.setIsMarginTradingEnabled(false);
         userRepository.save(user);
     }
@@ -56,7 +57,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUserByExternalId(String externalId) {
         User user = userRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         userRepository.delete(user);
     }
 
@@ -64,7 +65,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserResponseDto getUserByExternalId(String externalId) {
         User user = userRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         return userMapper.toUserResponseDto(user);
     }
 

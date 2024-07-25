@@ -1,12 +1,8 @@
 package lissa.trading.user.service.controller;
 
-
 import lissa.trading.user.service.dto.UserPostDto;
 import lissa.trading.user.service.dto.UserResponseDto;
-import lissa.trading.user.service.exception.UserNotFoundException;
-import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.service.UserService;
-import lissa.trading.user.service.service.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
