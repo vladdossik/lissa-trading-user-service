@@ -1,4 +1,4 @@
-package lissa.trading.bot;
+package lissa.trading.user.service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

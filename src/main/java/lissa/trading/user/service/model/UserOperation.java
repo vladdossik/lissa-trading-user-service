@@ -1,4 +1,4 @@
-package lissa.trading.bot.model;
+package lissa.trading.user.service.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,13 +11,15 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "favorite_stocks")
+@Table(name = "user_operations")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FavoriteStock {
+public class UserOperation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,8 +31,11 @@ public class FavoriteStock {
     private User user;
 
     @NotNull
-    private String stockSymbol;
+    private String operationType;
 
     @NotNull
-    private String stockName;
+    private BigDecimal operationValue;
+
+    @NotNull
+    private LocalDateTime operationDate;
 }

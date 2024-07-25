@@ -1,4 +1,4 @@
-package lissa.trading.bot.model;
+package lissa.trading.user.service.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,15 +11,15 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.math.BigDecimal;
+
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user_operations")
+@Table(name = "posts")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserOperation {
+public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,11 +31,8 @@ public class UserOperation {
     private User user;
 
     @NotNull
-    private String operationType;
+    private String content;
 
     @NotNull
-    private BigDecimal operationValue;
-
-    @NotNull
-    private LocalDateTime operationDate;
+    private LocalDateTime postDate;
 }

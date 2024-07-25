@@ -1,6 +1,6 @@
-package lissa.trading.bot.repository;
+package lissa.trading.user.service.repository;
 
-import lissa.trading.bot.model.User;
+import lissa.trading.user.service.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

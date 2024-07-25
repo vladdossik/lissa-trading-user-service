@@ -8,11 +8,11 @@
         <version>3.3.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>lissa.trading</groupId>
-    <artifactId>bot</artifactId>
+    <groupId>lissa.trading.user</groupId>
+    <artifactId>service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>LissaTradingBot</name>
-    <description>LissaTradingBot</description>
+    <name>lissa-trading-user-service</name>
+    <description>lissa-trading-user-service</description>
     <url/>
     <licenses>
         <license/>

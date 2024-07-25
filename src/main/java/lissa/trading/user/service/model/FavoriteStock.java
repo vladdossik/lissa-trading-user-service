@@ -1,4 +1,4 @@
-package lissa.trading.bot.model;
+package lissa.trading.user.service.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,14 +12,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-
 @Entity
-@Table(name = "user_positions")
+@Table(name = "favorite_stocks")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserPosition {
+public class FavoriteStock {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,8 +29,8 @@ public class UserPosition {
     private User user;
 
     @NotNull
-    private String positionName;
+    private String stockSymbol;
 
     @NotNull
-    private BigDecimal positionValue;
+    private String stockName;
 }

@@ -1,8 +1,8 @@
-package lissa.trading.bot.controller;
+package lissa.trading.user.service.controller;
 
 
-import lissa.trading.bot.model.User;
-import lissa.trading.bot.service.UserService;
+import lissa.trading.user.service.model.User;
+import lissa.trading.user.service.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

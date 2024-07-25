@@ -1,4 +1,4 @@
-package lissa.trading.bot.model;
+package lissa.trading.user.service.model;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
