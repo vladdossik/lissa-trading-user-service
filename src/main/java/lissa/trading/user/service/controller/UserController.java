@@ -1,12 +1,15 @@
 package lissa.trading.user.service.controller;
 
 
+import lissa.trading.user.service.dto.UserPostDto;
+import lissa.trading.user.service.dto.UserResponseDto;
+import lissa.trading.user.service.exception.UserNotFoundException;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.service.UserService;
+import lissa.trading.user.service.service.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -17,8 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -27,40 +28,34 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User createdUser = userService.createUser(user);
-        return ResponseEntity.ok(createdUser);
+    public UserResponseDto createUser(@RequestBody UserPostDto userPostDto) {
+        return userService.createUser(userPostDto);
     }
 
     @PatchMapping("/{externalId}")
-    public ResponseEntity<User> updateUser(@PathVariable String externalId, @RequestBody User userUpdates) {
-        User updatedUser = userService.updateUser(externalId, userUpdates);
-        return ResponseEntity.ok(updatedUser);
+    public UserResponseDto updateUser(@PathVariable String externalId, @RequestBody UserPostDto userUpdates) {
+        return userService.updateUser(externalId, userUpdates);
     }
 
     @PostMapping("/block/{telegramNickname}")
-    public ResponseEntity<Void> blockUserByTelegramNickname(@PathVariable String telegramNickname) {
+    public void blockUserByTelegramNickname(@PathVariable String telegramNickname) {
         userService.blockUserByTelegramNickname(telegramNickname);
-        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{externalId}")
-    public ResponseEntity<Void> deleteUserByExternalId(@PathVariable String externalId) {
+    public void deleteUserByExternalId(@PathVariable String externalId) {
         userService.deleteUserByExternalId(externalId);
-        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{externalId}")
-    public ResponseEntity<User> getUserByExternalId(@PathVariable String externalId) {
-        Optional<User> user = userService.getUserByExternalId(externalId);
-        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public UserResponseDto getUserByExternalId(@PathVariable String externalId) {
+        return userService.getUserByExternalId(externalId);
     }
 
     @GetMapping
-    public ResponseEntity<Page<User>> getUsersWithPaginationAndFilters(Pageable pageable,
-                                                                       @RequestParam(required = false) String firstName,
-                                                                       @RequestParam(required = false) String lastName) {
-        Page<User> users = userService.getUsersWithPaginationAndFilters(pageable, firstName, lastName);
-        return ResponseEntity.ok(users);
+    public Page<UserResponseDto> getUsersWithPaginationAndFilters(Pageable pageable,
+                                                                  @RequestParam(required = false) String firstName,
+                                                                  @RequestParam(required = false) String lastName) {
+        return userService.getUsersWithPaginationAndFilters(pageable, firstName, lastName);
     }
 }
