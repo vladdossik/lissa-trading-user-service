@@ -1,5 +1,6 @@
 package lissa.trading.user.service.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,7 +14,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "favorite_stocks")
+@Table(name = "FavoriteStocksEntity")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,8 +30,10 @@ public class FavoriteStock {
     private User user;
 
     @NotNull
+    @Column(name = "stock_symbol")
     private String stockSymbol;
 
     @NotNull
+    @Column(name = "stock_name")
     private String stockName;
 }

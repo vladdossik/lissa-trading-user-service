@@ -1,5 +1,6 @@
 package lissa.trading.user.service.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,7 +16,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "posts")
+@Table(name = "PostsEntity")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,8 +32,10 @@ public class Post {
     private User user;
 
     @NotNull
+    @Column(name = "content")
     private String content;
 
     @NotNull
+    @Column(name = "post_date")
     private LocalDateTime postDate;
 }

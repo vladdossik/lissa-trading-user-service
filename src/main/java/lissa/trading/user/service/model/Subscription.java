@@ -1,5 +1,6 @@
 package lissa.trading.user.service.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,7 +14,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "subscriptions")
+@Table(name = "SubscriptionsEntity")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,8 +30,10 @@ public class Subscription {
     private User user;
 
     @NotNull
+    @Column(name = "subscription_name")
     private String subscriptionName;
 
     @NotNull
+    @Column(name = "subscription_details")
     private String subscriptionDetails;
 }

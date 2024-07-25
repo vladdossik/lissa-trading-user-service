@@ -37,10 +37,12 @@ public class User {
 
     @NotNull
     @Size(min = 1, max = 50)
+    @Column(name = "first_name")
     private String firstName;
 
     @NotNull
     @Size(min = 1, max = 50)
+    @Column(name = "last_name")
     private String lastName;
 
     @NotNull
@@ -93,17 +95,22 @@ public class User {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Column(name = "positions")
     private List<UserPosition> positions;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Column(name = "operations")
     private List<UserOperation> operations;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Column(name = "favorite_stocks")
     private List<FavoriteStock> favoriteStocks;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Column(name = "subscriptions")
     private List<Subscription> subscriptions;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Column(name = "posts")
     private List<Post> posts;
 }

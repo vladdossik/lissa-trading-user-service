@@ -1,5 +1,6 @@
 package lissa.trading.user.service.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,7 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user_operations")
+@Table(name = "UserOperationsEntity")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,11 +32,14 @@ public class UserOperation {
     private User user;
 
     @NotNull
+    @Column(name = "operation_type")
     private String operationType;
 
     @NotNull
+    @Column(name = "operation_value")
     private BigDecimal operationValue;
 
     @NotNull
+    @Column(name = "operation_date")
     private LocalDateTime operationDate;
 }
