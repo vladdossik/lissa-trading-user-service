@@ -1,4 +1,4 @@
-package lissa.trading.user.service.entity;
+package lissa.trading.user.service.model.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

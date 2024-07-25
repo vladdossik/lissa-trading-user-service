@@ -1,4 +1,4 @@
-package lissa.trading.user.service.entity;
+package lissa.trading.user.service.model.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,12 +14,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
-@Table(name = "SubscriptionsEntity")
+@Table(name = "PostsEntity")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Subscription {
+public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,10 +33,10 @@ public class Subscription {
     private User user;
 
     @NotNull
-    @Column(name = "subscription_name")
-    private String subscriptionName;
+    @Column(name = "content")
+    private String content;
 
     @NotNull
-    @Column(name = "subscription_details")
-    private String subscriptionDetails;
+    @Column(name = "post_date")
+    private LocalDateTime postDate;
 }

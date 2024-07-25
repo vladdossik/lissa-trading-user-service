@@ -1,6 +1,6 @@
 package lissa.trading.user.service.service;
 
-import lissa.trading.user.service.dto.UserMapper;
+import lissa.trading.user.service.mapper.UserMapper;
 import lissa.trading.user.service.dto.UserPostDto;
 import lissa.trading.user.service.dto.UserResponseDto;
 import lissa.trading.user.service.exception.UserNotFoundException;

@@ -1,5 +1,7 @@
-package lissa.trading.user.service.dto;
+package lissa.trading.user.service.mapper;
 
+import lissa.trading.user.service.dto.UserPostDto;
+import lissa.trading.user.service.dto.UserResponseDto;
 import lissa.trading.user.service.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
