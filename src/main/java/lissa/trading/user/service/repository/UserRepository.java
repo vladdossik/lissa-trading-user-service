@@ -5,9 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
     Optional<User> findByTelegramNickname(String telegramNickname);
 
-    Optional<User> findByExternalId(String externalId);
+    Optional<User> findByExternalId(UUID externalId);
 }
