@@ -24,6 +24,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -38,7 +39,7 @@ public class User {
 
     @NotNull
     @Column(name = "external_id", unique = true)
-    private String externalId;
+    private UUID externalId;
 
     @NotNull
     @Size(min = 1, max = 50)
