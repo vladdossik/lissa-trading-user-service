@@ -4,9 +4,9 @@ import jakarta.validation.Valid;
 import lissa.trading.user.service.dto.UserPatchDto;
 import lissa.trading.user.service.dto.UserPostDto;
 import lissa.trading.user.service.dto.UserResponseDto;
+import lissa.trading.user.service.page.CustomPage;
 import lissa.trading.user.service.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -55,9 +55,9 @@ public class UserController {
     }
 
     @GetMapping
-    public Page<UserResponseDto> getUsersWithPaginationAndFilters(Pageable pageable,
-                                                                  @RequestParam(required = false) String firstName,
-                                                                  @RequestParam(required = false) String lastName) {
+    public CustomPage<UserResponseDto> getUsersWithPaginationAndFilters(Pageable pageable,
+                                                                        @RequestParam(required = false) String firstName,
+                                                                        @RequestParam(required = false) String lastName) {
         return userService.getUsersWithPaginationAndFilters(pageable, firstName, lastName);
     }
 }

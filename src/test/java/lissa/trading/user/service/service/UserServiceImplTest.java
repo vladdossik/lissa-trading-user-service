@@ -10,6 +10,7 @@ import lissa.trading.user.service.dto.UserPostDto;
 import lissa.trading.user.service.dto.UserResponseDto;
 import lissa.trading.user.service.mapper.UserMapper;
 import lissa.trading.user.service.model.User;
+import lissa.trading.user.service.page.CustomPage;
 import lissa.trading.user.service.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -72,30 +73,14 @@ public class UserServiceImplTest {
         userPostDto = new UserPostDto();
         userPostDto.setFirstName("John");
         userPostDto.setLastName("Doe");
-        userPostDto.setTelegramChatId(12345L);
         userPostDto.setTelegramNickname("johndoe");
         userPostDto.setTinkoffToken("token");
-        userPostDto.setCurrentBalance(new BigDecimal("100.00"));
-        userPostDto.setPercentageChangeSinceYesterday(new BigDecimal("0.01"));
-        userPostDto.setMonetaryChangeSinceYesterday(new BigDecimal("1.00"));
-        userPostDto.setAccountCount(1);
-        userPostDto.setIsMarginTradingEnabled(true);
-        userPostDto.setMarginTradingMetrics("metrics");
-        userPostDto.setTinkoffInvestmentTariff("tariff");
 
         userPatchDto = new UserPatchDto();
         userPatchDto.setFirstName(Optional.of("Jane"));
         userPatchDto.setLastName(Optional.empty());
-        userPatchDto.setTelegramChatId(Optional.of(67890L));
         userPatchDto.setTelegramNickname(Optional.of(""));
         userPatchDto.setTinkoffToken(Optional.of("newToken"));
-        userPatchDto.setCurrentBalance(Optional.of(new BigDecimal("200.00")));
-        userPatchDto.setPercentageChangeSinceYesterday(Optional.of(new BigDecimal("0.02")));
-        userPatchDto.setMonetaryChangeSinceYesterday(Optional.of(new BigDecimal("2.00")));
-        userPatchDto.setAccountCount(Optional.of(2));
-        userPatchDto.setIsMarginTradingEnabled(Optional.of(false));
-        userPatchDto.setMarginTradingMetrics(Optional.of("newMetrics"));
-        userPatchDto.setTinkoffInvestmentTariff(Optional.of("newTariff"));
     }
 
     @Test
@@ -165,7 +150,7 @@ public class UserServiceImplTest {
 
         when(userRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
 
-        Page<UserResponseDto> result = userService.getUsersWithPaginationAndFilters(pageable, "John", "Doe");
+        CustomPage<UserResponseDto> result = userService.getUsersWithPaginationAndFilters(pageable, "John", "Doe");
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
@@ -180,7 +165,7 @@ public class UserServiceImplTest {
 
         when(userRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
 
-        Page<UserResponseDto> result = userService.getUsersWithPaginationAndFilters(pageable, "John", null);
+        CustomPage<UserResponseDto> result = userService.getUsersWithPaginationAndFilters(pageable, "John", null);
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
@@ -197,16 +182,16 @@ public class UserServiceImplTest {
         assertNotNull(result);
         assertEquals("Jane", result.getFirstName());
         assertEquals("Doe", result.getLastName());
-        assertEquals(67890L, result.getTelegramChatId());
+        assertEquals(12345L, result.getTelegramChatId());
         assertNull(result.getTelegramNickname());
         assertEquals("newToken", result.getTinkoffToken());
-        assertEquals(new BigDecimal("200.00"), result.getCurrentBalance());
-        assertEquals(new BigDecimal("0.02"), result.getPercentageChangeSinceYesterday());
-        assertEquals(new BigDecimal("2.00"), result.getMonetaryChangeSinceYesterday());
-        assertEquals(2, result.getAccountCount().intValue());
-        assertFalse(result.getIsMarginTradingEnabled());
-        assertEquals("newMetrics", result.getMarginTradingMetrics());
-        assertEquals("newTariff", result.getTinkoffInvestmentTariff());
+        assertEquals(new BigDecimal("100.00"), result.getCurrentBalance());
+        assertEquals(new BigDecimal("0.01"), result.getPercentageChangeSinceYesterday());
+        assertEquals(new BigDecimal("1.00"), result.getMonetaryChangeSinceYesterday());
+        assertEquals(1, result.getAccountCount().intValue());
+        assertTrue(result.getIsMarginTradingEnabled());
+        assertEquals("metrics", result.getMarginTradingMetrics());
+        assertEquals("tariff", result.getTinkoffInvestmentTariff());
         verify(userRepository, times(1)).findByExternalId(any(UUID.class));
         verify(userRepository, times(1)).save(any(User.class));
     }
@@ -216,7 +201,7 @@ public class UserServiceImplTest {
         UserPatchDto partialUpdateDto = new UserPatchDto();
         partialUpdateDto.setFirstName(Optional.of("Jane"));
         partialUpdateDto.setLastName(Optional.of(""));
-        partialUpdateDto.setTelegramChatId(Optional.empty());
+        partialUpdateDto.setTelegramNickname(Optional.empty());
 
         when(userRepository.findByExternalId(any(UUID.class))).thenReturn(Optional.of(user));
         when(userRepository.save(any(User.class))).thenReturn(user);
@@ -252,11 +237,11 @@ public class UserServiceImplTest {
         assertNull(user.getTelegramChatId());
         assertEquals("johnny", user.getTelegramNickname());
         assertNull(user.getTinkoffToken());
-        assertEquals(BigDecimal.valueOf(1000), user.getCurrentBalance());
+        assertNull(user.getCurrentBalance());
         assertNull(user.getPercentageChangeSinceYesterday());
-        assertEquals(BigDecimal.valueOf(50), user.getMonetaryChangeSinceYesterday());
+        assertNull(user.getMonetaryChangeSinceYesterday());
         assertNull(user.getAccountCount());
-        assertTrue(user.getIsMarginTradingEnabled());
+        assertNull(user.getIsMarginTradingEnabled());
         assertNull(user.getMarginTradingMetrics());
         assertNull(user.getTinkoffInvestmentTariff());
     }
@@ -265,16 +250,8 @@ public class UserServiceImplTest {
         UserPatchDto userPatchDto = new UserPatchDto();
         userPatchDto.setFirstName(Optional.of("John"));
         userPatchDto.setLastName(Optional.empty());
-        userPatchDto.setTelegramChatId(Optional.empty());
         userPatchDto.setTelegramNickname(Optional.of("johnny"));
-        userPatchDto.setTinkoffToken(Optional.empty());
-        userPatchDto.setCurrentBalance(Optional.of(BigDecimal.valueOf(1000)));
-        userPatchDto.setPercentageChangeSinceYesterday(Optional.empty());
-        userPatchDto.setMonetaryChangeSinceYesterday(Optional.of(BigDecimal.valueOf(50)));
-        userPatchDto.setAccountCount(Optional.empty());
-        userPatchDto.setIsMarginTradingEnabled(Optional.of(true));
-        userPatchDto.setMarginTradingMetrics(Optional.empty());
-        userPatchDto.setTinkoffInvestmentTariff(Optional.of(""));
+        userPatchDto.setTinkoffToken(Optional.of(""));
         return userPatchDto;
     }
 

@@ -12,13 +12,12 @@ import lissa.trading.user.service.dto.UserPatchDto;
 import lissa.trading.user.service.dto.UserPostDto;
 import lissa.trading.user.service.dto.UserResponseDto;
 import lissa.trading.user.service.exception.UserNotFoundException;
+import lissa.trading.user.service.page.CustomPage;
 import lissa.trading.user.service.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -43,16 +42,8 @@ public class UserControllerTest {
         return new UserPostDto(
                 "John",
                 "Doe",
-                123456789L,
                 "john_doe",
-                "tinkoff-token-123",
-                BigDecimal.valueOf(1000.00),
-                BigDecimal.valueOf(2.5),
-                BigDecimal.valueOf(25.00),
-                2,
-                true,
-                "metrics",
-                "tariff"
+                "tinkoff-token-123"
         );
     }
 
@@ -158,7 +149,7 @@ public class UserControllerTest {
     public void testGetUsersWithPaginationAndFilters() throws Exception {
         UUID externalId = UUID.randomUUID();
         UserResponseDto userResponseDto = getUserResponseDto(externalId);
-        Page<UserResponseDto> users = new PageImpl<>(Collections.singletonList(userResponseDto), PageRequest.of(0, 10), 1);
+        CustomPage<UserResponseDto> users = new CustomPage<>(Collections.singletonList(userResponseDto), 0, 10, 1, true);
         when(userService.getUsersWithPaginationAndFilters(any(PageRequest.class), anyString(), anyString())).thenReturn(users);
 
         mockMvc.perform(get("/api/users")
@@ -174,7 +165,7 @@ public class UserControllerTest {
 
     @Test
     public void testGetUsersWithPaginationAndFiltersEmpty() throws Exception {
-        Page<UserResponseDto> emptyPage = new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0);
+        CustomPage<UserResponseDto> emptyPage = new CustomPage<>(Collections.emptyList(), 0, 10, 0, true);
         when(userService.getUsersWithPaginationAndFilters(any(PageRequest.class), anyString(), anyString())).thenReturn(emptyPage);
 
         mockMvc.perform(get("/api/users")

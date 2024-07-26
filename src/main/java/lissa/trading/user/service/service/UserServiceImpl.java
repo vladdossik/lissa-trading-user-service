@@ -2,7 +2,6 @@ package lissa.trading.user.service.service;
 
 import jakarta.validation.Valid;
 import lissa.trading.user.service.dto.UserPatchDto;
-import lissa.trading.user.service.mapper.PageMapper;
 import lissa.trading.user.service.mapper.UserMapper;
 import lissa.trading.user.service.dto.UserPostDto;
 import lissa.trading.user.service.dto.UserResponseDto;
@@ -35,28 +34,19 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponseDto createUser(@Valid UserPostDto userPostDto) {
-        log.info("Creating user with details: {}", userPostDto);
-        User user = userMapper.toUser(userPostDto);
-        User savedUser = userRepository.save(user);
-        log.info("User created with ID: {}", savedUser.getId());
-        return userMapper.toUserResponseDto(savedUser);
+        return userMapper.toUserResponseDto(userRepository.save(userMapper.toUser(userPostDto)));
     }
 
     @Override
     @Transactional
     public UserResponseDto updateUser(UUID externalId, @Valid UserPatchDto userUpdates) {
-        log.info("Updating user with external ID: {}", externalId);
-        User user = findUserByExternalId(externalId);
-        userMapper.updateUserFromDto(userUpdates, user);
-        User updatedUser = userRepository.save(user);
-        log.info("User updated with ID: {}", updatedUser.getId());
-        return userMapper.toUserResponseDto(updatedUser);
+        return userMapper.toUserResponseDto(userRepository.save(
+                userMapper.updateUserFromDto(userUpdates, findUserByExternalId(externalId))));
     }
 
     @Override
     @Transactional
     public void blockUserByTelegramNickname(String telegramNickname) {
-        log.info("Blocking user with Telegram nickname: {}", telegramNickname);
         User user = findUserByTelegramNickname(telegramNickname);
         user.setIsMarginTradingEnabled(false);
         userRepository.save(user);
@@ -66,36 +56,28 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deleteUserByExternalId(UUID externalId) {
-        log.info("Deleting user with external ID: {}", externalId);
-        User user = findUserByExternalId(externalId);
-        userRepository.delete(user);
+        userRepository.delete(findUserByExternalId(externalId));
         log.info("User with external ID {} deleted", externalId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public UserResponseDto getUserByExternalId(UUID externalId) {
-        log.info("Fetching user with external ID: {}", externalId);
-        User user = findUserByExternalId(externalId);
-        log.info("User fetched with external ID: {}", externalId);
-        return userMapper.toUserResponseDto(user);
+        return userMapper.toUserResponseDto(findUserByExternalId(externalId));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<UserResponseDto> getUsersWithPaginationAndFilters(Pageable pageable, String firstName, String lastName) {
+    public CustomPage<UserResponseDto> getUsersWithPaginationAndFilters(Pageable pageable, String firstName, String lastName) {
         log.info("Fetching users with pagination and filters - firstName: {}, lastName: {}", firstName, lastName);
+
         Specification<User> specification = UserSpecification.withFilters(firstName, lastName);
         Page<User> usersPage = userRepository.findAll(specification, pageable);
 
-        List<UserResponseDto> userResponseDto = usersPage.stream()
+        List<UserResponseDto> distinctUsers = usersPage.stream()
                 .map(userMapper::toUserResponseDto)
+                .distinct()
                 .collect(Collectors.toList());
-
-        log.info("Fetched {} users before deduplication", userResponseDto.size());
-
-        List<UserResponseDto> distinctUsers = userResponseDto.stream().distinct().collect(Collectors.toList());
-        log.info("After removing duplicates, {} users remained", distinctUsers.size());
 
         CustomPage<UserResponseDto> customPage = new CustomPage<>(
                 distinctUsers,
@@ -105,9 +87,8 @@ public class UserServiceImpl implements UserService {
                 usersPage.isLast()
         );
 
-        Page<UserResponseDto> result = PageMapper.INSTANCE.toPage(customPage, pageable);
-        log.info("Fetched {} users after pagination", result.getTotalElements());
-        return result;
+        log.info("Fetched {} users after pagination", customPage.getTotalElements());
+        return customPage;
     }
 
     private User findUserByExternalId(UUID externalId) {

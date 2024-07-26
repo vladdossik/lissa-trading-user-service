@@ -22,25 +22,26 @@ public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "externalId", ignore = true)
+    @Mapping(target = "telegramChatId", ignore = true)
+    @Mapping(target = "currentBalance", ignore = true)
+    @Mapping(target = "percentageChangeSinceYesterday", ignore = true)
+    @Mapping(target = "monetaryChangeSinceYesterday", ignore = true)
+    @Mapping(target = "accountCount", ignore = true)
+    @Mapping(target = "isMarginTradingEnabled", ignore = true)
+    @Mapping(target = "marginTradingMetrics", ignore = true)
+    @Mapping(target = "tinkoffInvestmentTariff", ignore = true)
     User toUser(UserPostDto userPostDto);
 
-    @Mapping(target = "externalId", source = "user.externalId")
+    @Mapping(target = "externalId")
     UserResponseDto toUserResponseDto(User user);
 
     @AfterMapping
-    default void updateUserFromDto(UserPatchDto userPatchDto, @MappingTarget User user) {
+    default User updateUserFromDto(UserPatchDto userPatchDto, @MappingTarget User user) {
         mapOptionalValue(userPatchDto.getFirstName(), user::setFirstName);
         mapOptionalValue(userPatchDto.getLastName(), user::setLastName);
-        mapOptionalValue(userPatchDto.getTelegramChatId(), user::setTelegramChatId);
         mapOptionalValue(userPatchDto.getTelegramNickname(), user::setTelegramNickname);
         mapOptionalValue(userPatchDto.getTinkoffToken(), user::setTinkoffToken);
-        mapOptionalValue(userPatchDto.getCurrentBalance(), user::setCurrentBalance);
-        mapOptionalValue(userPatchDto.getPercentageChangeSinceYesterday(), user::setPercentageChangeSinceYesterday);
-        mapOptionalValue(userPatchDto.getMonetaryChangeSinceYesterday(), user::setMonetaryChangeSinceYesterday);
-        mapOptionalValue(userPatchDto.getAccountCount(), user::setAccountCount);
-        mapOptionalValue(userPatchDto.getIsMarginTradingEnabled(), user::setIsMarginTradingEnabled);
-        mapOptionalValue(userPatchDto.getMarginTradingMetrics(), user::setMarginTradingMetrics);
-        mapOptionalValue(userPatchDto.getTinkoffInvestmentTariff(), user::setTinkoffInvestmentTariff);
+        return user;
     }
 
     default <T> void mapOptionalValue(Optional<T> optional, Consumer<T> setter) {
@@ -48,6 +49,7 @@ public interface UserMapper {
                 value instanceof String && ((String) value).isEmpty() ? null : value
         ));
     }
+
     @AfterMapping
     default void setExternalId(@MappingTarget User user) {
         if (user.getExternalId() == null) {
