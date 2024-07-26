@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -29,7 +31,7 @@ public class UserController {
     }
 
     @PatchMapping("/{externalId}")
-    public UserResponseDto updateUser(@PathVariable String externalId, @RequestBody UserPostDto userUpdates) {
+    public UserResponseDto updateUser(@PathVariable UUID externalId, @RequestBody UserPostDto userUpdates) {
         return userService.updateUser(externalId, userUpdates);
     }
 
@@ -39,12 +41,12 @@ public class UserController {
     }
 
     @DeleteMapping("/{externalId}")
-    public void deleteUserByExternalId(@PathVariable String externalId) {
+    public void deleteUserByExternalId(@PathVariable UUID externalId) {
         userService.deleteUserByExternalId(externalId);
     }
 
     @GetMapping("/{externalId}")
-    public UserResponseDto getUserByExternalId(@PathVariable String externalId) {
+    public UserResponseDto getUserByExternalId(@PathVariable UUID externalId) {
         return userService.getUserByExternalId(externalId);
     }
 
