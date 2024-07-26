@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -93,8 +92,13 @@ public class UserServiceImpl implements UserService {
                 .map(userMapper::toUserResponseDto)
                 .collect(Collectors.toList());
 
+        log.info("Fetched {} users before deduplication", userResponseDto.size());
+
+        List<UserResponseDto> distinctUsers = userResponseDto.stream().distinct().collect(Collectors.toList());
+        log.info("After removing duplicates, {} users remained", distinctUsers.size());
+
         CustomPage<UserResponseDto> customPage = new CustomPage<>(
-                userResponseDto,
+                distinctUsers,
                 usersPage.getNumber(),
                 usersPage.getSize(),
                 usersPage.getTotalElements(),
@@ -102,7 +106,7 @@ public class UserServiceImpl implements UserService {
         );
 
         Page<UserResponseDto> result = PageMapper.INSTANCE.toPage(customPage, pageable);
-        log.info("Fetched {} users", result.getTotalElements());
+        log.info("Fetched {} users after pagination", result.getTotalElements());
         return result;
     }
 

@@ -7,3 +7,7 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: true
+
+logging:
+  level:
+    lissa.trading.user.service.aspect: INFO
