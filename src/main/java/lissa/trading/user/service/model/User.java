@@ -10,11 +10,11 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lissa.trading.user.service.model.entity.FavoriteStock;
-import lissa.trading.user.service.model.entity.Post;
-import lissa.trading.user.service.model.entity.Subscription;
-import lissa.trading.user.service.model.entity.UserOperation;
-import lissa.trading.user.service.model.entity.UserPosition;
+import lissa.trading.user.service.model.entity.FavoriteStocksEntity;
+import lissa.trading.user.service.model.entity.PostsEntity;
+import lissa.trading.user.service.model.entity.SubscriptionsEntity;
+import lissa.trading.user.service.model.entity.UserOperationsEntity;
+import lissa.trading.user.service.model.entity.UserPositionsEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -101,22 +101,17 @@ public class User {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Column(name = "positions")
-    private List<UserPosition> positions;
+    private List<UserPositionsEntity> positions;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Column(name = "operations")
-    private List<UserOperation> operations;
+    private List<UserOperationsEntity> operations;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Column(name = "favorite_stocks")
-    private List<FavoriteStock> favoriteStocks;
+    private List<FavoriteStocksEntity> favoriteStocks;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Column(name = "subscriptions")
-    private List<Subscription> subscriptions;
+    private List<SubscriptionsEntity> subscriptions;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Column(name = "posts")
-    private List<Post> posts;
+    private List<PostsEntity> posts;
 }

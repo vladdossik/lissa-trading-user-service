@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lissa.trading.user.service.dto.UserPatchDto;
 import lissa.trading.user.service.dto.UserPostDto;
 import lissa.trading.user.service.dto.UserResponseDto;
 import lissa.trading.user.service.exception.UserNotFoundException;
@@ -106,7 +107,7 @@ public class UserControllerTest {
         updatedUser.setFirstName("Jane");
         updatedUser.setLastName("Smith");
 
-        when(userService.updateUser(any(UUID.class), any(UserPostDto.class))).thenReturn(updatedUser);
+        when(userService.updateUser(any(UUID.class), any(UserPatchDto.class))).thenReturn(updatedUser);
 
         mockMvc.perform(patch("/api/users/" + externalId)
                         .contentType(MediaType.APPLICATION_JSON)

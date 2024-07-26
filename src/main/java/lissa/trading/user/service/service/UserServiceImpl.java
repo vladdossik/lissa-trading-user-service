@@ -1,5 +1,7 @@
 package lissa.trading.user.service.service;
 
+import jakarta.validation.Valid;
+import lissa.trading.user.service.dto.UserPatchDto;
 import lissa.trading.user.service.mapper.PageMapper;
 import lissa.trading.user.service.mapper.UserMapper;
 import lissa.trading.user.service.dto.UserPostDto;
@@ -15,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,6 +27,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Validated
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -31,7 +35,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserResponseDto createUser(UserPostDto userPostDto) {
+    public UserResponseDto createUser(@Valid UserPostDto userPostDto) {
         log.info("Creating user with details: {}", userPostDto);
         User user = userMapper.toUser(userPostDto);
         User savedUser = userRepository.save(user);
@@ -41,7 +45,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserResponseDto updateUser(UUID externalId, UserPostDto userUpdates) {
+    public UserResponseDto updateUser(UUID externalId, @Valid UserPatchDto userUpdates) {
         log.info("Updating user with external ID: {}", externalId);
         User user = findUserByExternalId(externalId);
         userMapper.updateUserFromDto(userUpdates, user);

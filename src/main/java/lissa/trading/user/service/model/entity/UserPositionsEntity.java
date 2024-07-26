@@ -14,14 +14,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 @Entity
-@Table(name = "PostsEntity")
+@Table(name = "user_positions")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Post {
+public class UserPositionsEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,10 +33,10 @@ public class Post {
     private User user;
 
     @NotNull
-    @Column(name = "content")
-    private String content;
+    @Column(name = "position_name")
+    private String positionName;
 
     @NotNull
-    @Column(name = "post_date")
-    private LocalDateTime postDate;
+    @Column(name = "position_value")
+    private BigDecimal positionValue;
 }

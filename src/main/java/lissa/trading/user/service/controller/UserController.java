@@ -1,11 +1,14 @@
 package lissa.trading.user.service.controller;
 
+import jakarta.validation.Valid;
+import lissa.trading.user.service.dto.UserPatchDto;
 import lissa.trading.user.service.dto.UserPostDto;
 import lissa.trading.user.service.dto.UserResponseDto;
 import lissa.trading.user.service.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -21,17 +24,18 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@Validated
 public class UserController {
 
     private final UserService userService;
 
     @PostMapping
-    public UserResponseDto createUser(@RequestBody UserPostDto userPostDto) {
+    public UserResponseDto createUser(@Valid @RequestBody UserPostDto userPostDto) {
         return userService.createUser(userPostDto);
     }
 
     @PatchMapping("/{externalId}")
-    public UserResponseDto updateUser(@PathVariable UUID externalId, @RequestBody UserPostDto userUpdates) {
+    public UserResponseDto updateUser(@PathVariable UUID externalId, @Valid @RequestBody UserPatchDto userUpdates) {
         return userService.updateUser(externalId, userUpdates);
     }
 

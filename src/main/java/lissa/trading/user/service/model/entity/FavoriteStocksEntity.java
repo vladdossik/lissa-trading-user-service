@@ -14,14 +14,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-
 @Entity
-@Table(name = "UserPositionsEntity")
+@Table(name = "user_favorite_stocks")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserPosition {
+public class FavoriteStocksEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,10 +31,10 @@ public class UserPosition {
     private User user;
 
     @NotNull
-    @Column(name = "position_name")
-    private String positionName;
+    @Column(name = "stock_symbol")
+    private String stockSymbol;
 
     @NotNull
-    @Column(name = "position_value")
-    private BigDecimal positionValue;
+    @Column(name = "stock_name")
+    private String stockName;
 }

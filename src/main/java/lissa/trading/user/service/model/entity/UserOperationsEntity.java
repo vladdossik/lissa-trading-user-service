@@ -17,11 +17,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "UserOperationsEntity")
+@Table(name = "user_operations")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserOperation {
+public class UserOperationsEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -15,11 +15,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "FavoriteStocksEntity")
+@Table(name = "user_subscriptions")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FavoriteStock {
+public class SubscriptionsEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,10 +31,10 @@ public class FavoriteStock {
     private User user;
 
     @NotNull
-    @Column(name = "stock_symbol")
-    private String stockSymbol;
+    @Column(name = "subscription_name")
+    private String subscriptionName;
 
     @NotNull
-    @Column(name = "stock_name")
-    private String stockName;
+    @Column(name = "subscription_details")
+    private String subscriptionDetails;
 }
