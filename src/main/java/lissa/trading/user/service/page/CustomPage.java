@@ -2,7 +2,6 @@ package lissa.trading.user.service.page;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
