@@ -12,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 import java.util.UUID;
 
 public class InitializationClass {
@@ -55,10 +54,10 @@ public class InitializationClass {
         userPostDto.setTinkoffToken("token");
 
         userPatchDto = new UserPatchDto();
-        userPatchDto.setFirstName(Optional.of("Jane"));
-        userPatchDto.setLastName(Optional.empty());
-        userPatchDto.setTelegramNickname(Optional.of(""));
-        userPatchDto.setTinkoffToken(Optional.of("newToken"));
+        userPatchDto.setFirstName("Jane");
+        userPatchDto.setLastName(null);
+        userPatchDto.setTelegramNickname("");
+        userPatchDto.setTinkoffToken("newToken");
 
         externalId = UUID.randomUUID();
 

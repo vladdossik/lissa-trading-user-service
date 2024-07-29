@@ -150,10 +150,10 @@ public class UserServiceImplTest extends InitializationClass {
     @Test
     void testUpdateUserWithPatchDto_PartialUpdate() {
         UserPatchDto partialUpdateDto = new UserPatchDto();
-        partialUpdateDto.setFirstName(Optional.of("Jane"));
-        partialUpdateDto.setLastName(Optional.of(""));
-        partialUpdateDto.setTelegramNickname(Optional.empty());
-        partialUpdateDto.setTinkoffToken(Optional.of("token"));
+        partialUpdateDto.setFirstName("Jane");
+        partialUpdateDto.setLastName("");
+        partialUpdateDto.setTelegramNickname(null);
+        partialUpdateDto.setTinkoffToken("token");
 
         when(userRepository.findByExternalId(any(UUID.class))).thenReturn(Optional.of(user));
         when(userRepository.save(any(User.class))).thenReturn(user);
@@ -179,10 +179,15 @@ public class UserServiceImplTest extends InitializationClass {
 
     @Test
     void testUpdateUserFromDto_SomeFieldsNull() {
-        UserPatchDto userPatchDto = getUserPatchDto();
+
+        UserPatchDto nullUserPatchDto = new UserPatchDto();
+        nullUserPatchDto.setFirstName("John");
+        nullUserPatchDto.setLastName(null);
+        nullUserPatchDto.setTelegramNickname("johnny");
+        nullUserPatchDto.setTinkoffToken("");
 
         User user = new User();
-        userMapper.updateUserFromDto(userPatchDto, user);
+        userMapper.updateUserFromDto(nullUserPatchDto, user);
 
         assertEquals("John", user.getFirstName());
         assertNull(user.getLastName());
@@ -198,23 +203,9 @@ public class UserServiceImplTest extends InitializationClass {
         assertNull(user.getTinkoffInvestmentTariff());
     }
 
-    private static UserPatchDto getUserPatchDto() {
-        UserPatchDto userPatchDto = new UserPatchDto();
-        userPatchDto.setFirstName(Optional.of("John"));
-        userPatchDto.setLastName(Optional.empty());
-        userPatchDto.setTelegramNickname(Optional.of("johnny"));
-        userPatchDto.setTinkoffToken(Optional.of(""));
-        return userPatchDto;
-    }
-
     @Test
     void testUpdateUserFromDto_NullDto() {
-        UserPatchDto userPatchDto = null;
         User user = new User();
-
-        if (userPatchDto != null) {
-            UserMapper.INSTANCE.updateUserFromDto(userPatchDto, user);
-        }
 
         assertNull(user.getFirstName());
         assertNull(user.getLastName());
