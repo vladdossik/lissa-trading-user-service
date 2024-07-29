@@ -5,8 +5,10 @@ spring:
     password: root
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
     show-sql: true
+  liquibase:
+    enabled: true
 
 logging:
   level:
