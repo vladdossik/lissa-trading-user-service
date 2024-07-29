@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
-      id: 1
-      author: belaquaa
+      id: 24.07.29_01
+      author: belaquaa@mail.ru
       changes:
         - createTable:
             tableName: users

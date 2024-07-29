@@ -1,3 +1,4 @@
 databaseChangeLog:
   - include:
-      file: db/changesets/initial-setup.yaml
+      file: "24.07.29/db.changelog-release.yaml"
+      relativeToChangelogFile: true

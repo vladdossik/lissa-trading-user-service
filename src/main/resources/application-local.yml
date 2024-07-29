@@ -10,6 +10,9 @@ spring:
   liquibase:
     enabled: true
 
+liquibase:
+  change-log: classpath:db/changelog/db.changelog-master.yaml
+
 logging:
   level:
     lissa.trading.user.service.aspect: INFO
