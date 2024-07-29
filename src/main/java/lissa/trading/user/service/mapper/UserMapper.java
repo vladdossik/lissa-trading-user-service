@@ -9,16 +9,16 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-@Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.ERROR,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface UserMapper {
-
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "externalId", ignore = true)
@@ -30,6 +30,13 @@ public interface UserMapper {
     @Mapping(target = "isMarginTradingEnabled", ignore = true)
     @Mapping(target = "marginTradingMetrics", ignore = true)
     @Mapping(target = "tinkoffInvestmentTariff", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "positions", ignore = true)
+    @Mapping(target = "operations", ignore = true)
+    @Mapping(target = "favoriteStocks", ignore = true)
+    @Mapping(target = "subscriptions", ignore = true)
+    @Mapping(target = "posts", ignore = true)
     User toUser(UserPostDto userPostDto);
 
     @Mapping(target = "externalId")

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface PageMapper {
 
     static <T, U> CustomPage<U> toCustomPage(Page<T> page, Function<T, U> mapper) {

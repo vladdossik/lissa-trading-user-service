@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import lissa.trading.user.service.dto.UserPatchDto;
 import lissa.trading.user.service.dto.UserResponseDto;
-import lissa.trading.user.service.mapper.UserMapper;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.page.CustomPage;
 import org.junit.jupiter.api.Test;
@@ -32,7 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceImplTest extends InitializationClass {
+public class UserServiceImplTest extends ServiceInitializationClass {
 
     @Test
     void testCreateUser() {
@@ -153,7 +152,7 @@ public class UserServiceImplTest extends InitializationClass {
         partialUpdateDto.setFirstName("Jane");
         partialUpdateDto.setLastName("");
         partialUpdateDto.setTelegramNickname(null);
-        partialUpdateDto.setTinkoffToken("token");
+//        partialUpdateDto.setTinkoffToken("token"); - Если не передадим в качестве параметра
 
         when(userRepository.findByExternalId(any(UUID.class))).thenReturn(Optional.of(user));
         when(userRepository.save(any(User.class))).thenReturn(user);
