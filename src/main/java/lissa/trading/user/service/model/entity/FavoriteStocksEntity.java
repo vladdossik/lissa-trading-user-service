@@ -15,7 +15,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "user_favorite_stocks")
+@Table(name = "favorite_stocks")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
