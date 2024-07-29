@@ -13,8 +13,9 @@ import lissa.trading.user.service.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "operations")
@@ -42,5 +43,5 @@ public class UserOperationsEntity {
 
     @NotNull
     @Column(name = "operation_date")
-    private LocalDateTime operationDate;
+    private OffsetDateTime operationDate;
 }
