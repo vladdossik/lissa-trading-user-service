@@ -6,18 +6,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 import lissa.trading.user.service.dto.UserPatchDto;
-import lissa.trading.user.service.dto.UserPostDto;
 import lissa.trading.user.service.dto.UserResponseDto;
 import lissa.trading.user.service.mapper.UserMapper;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.page.CustomPage;
-import lissa.trading.user.service.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -38,50 +32,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceImplTest {
-
-    @Mock
-    private UserRepository userRepository;
-
-    @InjectMocks
-    private UserServiceImpl userService;
-
-    private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
-
-    private User user;
-    private UserPostDto userPostDto;
-    private UserPatchDto userPatchDto;
-
-    @BeforeEach
-    void setUp() {
-        user = new User();
-        user.setId(1L);
-        user.setExternalId(UUID.randomUUID());
-        user.setFirstName("John");
-        user.setLastName("Doe");
-        user.setTelegramChatId(12345L);
-        user.setTelegramNickname("johndoe");
-        user.setTinkoffToken("token");
-        user.setCurrentBalance(new BigDecimal("100.00"));
-        user.setPercentageChangeSinceYesterday(new BigDecimal("0.01"));
-        user.setMonetaryChangeSinceYesterday(new BigDecimal("1.00"));
-        user.setAccountCount(1);
-        user.setIsMarginTradingEnabled(true);
-        user.setMarginTradingMetrics("metrics");
-        user.setTinkoffInvestmentTariff("tariff");
-
-        userPostDto = new UserPostDto();
-        userPostDto.setFirstName("John");
-        userPostDto.setLastName("Doe");
-        userPostDto.setTelegramNickname("johndoe");
-        userPostDto.setTinkoffToken("token");
-
-        userPatchDto = new UserPatchDto();
-        userPatchDto.setFirstName(Optional.of("Jane"));
-        userPatchDto.setLastName(Optional.empty());
-        userPatchDto.setTelegramNickname(Optional.of(""));
-        userPatchDto.setTinkoffToken(Optional.of("newToken"));
-    }
+public class UserServiceImplTest extends InitializationClass {
 
     @Test
     void testCreateUser() {
@@ -202,6 +153,7 @@ public class UserServiceImplTest {
         partialUpdateDto.setFirstName(Optional.of("Jane"));
         partialUpdateDto.setLastName(Optional.of(""));
         partialUpdateDto.setTelegramNickname(Optional.empty());
+        partialUpdateDto.setTinkoffToken(Optional.of("token"));
 
         when(userRepository.findByExternalId(any(UUID.class))).thenReturn(Optional.of(user));
         when(userRepository.save(any(User.class))).thenReturn(user);
