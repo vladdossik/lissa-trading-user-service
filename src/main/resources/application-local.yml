@@ -3,6 +3,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: root
+    driver: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: none
