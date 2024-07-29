@@ -12,5 +12,5 @@ public class CustomPage<T> {
     private int pageNumber;
     private int pageSize;
     private long totalElements;
-    private boolean last;
+    private String sort;
 }

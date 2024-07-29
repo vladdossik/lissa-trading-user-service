@@ -2,6 +2,7 @@ package lissa.trading.user.service.service;
 
 import jakarta.validation.Valid;
 import lissa.trading.user.service.dto.UserPatchDto;
+import lissa.trading.user.service.mapper.PageMapper;
 import lissa.trading.user.service.mapper.UserMapper;
 import lissa.trading.user.service.dto.UserPostDto;
 import lissa.trading.user.service.dto.UserResponseDto;
@@ -74,18 +75,7 @@ public class UserServiceImpl implements UserService {
         Specification<User> specification = UserSpecification.withFilters(firstName, lastName);
         Page<User> usersPage = userRepository.findAll(specification, pageable);
 
-        List<UserResponseDto> distinctUsers = usersPage.stream()
-                .map(userMapper::toUserResponseDto)
-                .distinct()
-                .collect(Collectors.toList());
-
-        CustomPage<UserResponseDto> customPage = new CustomPage<>(
-                distinctUsers,
-                usersPage.getNumber(),
-                usersPage.getSize(),
-                usersPage.getTotalElements(),
-                usersPage.isLast()
-        );
+        CustomPage<UserResponseDto> customPage = PageMapper.toCustomPage(usersPage, userMapper::toUserResponseDto);
 
         log.info("Fetched {} users after pagination", customPage.getTotalElements());
         return customPage;
