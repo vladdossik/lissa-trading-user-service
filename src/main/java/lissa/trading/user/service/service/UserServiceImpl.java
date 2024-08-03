@@ -9,6 +9,7 @@ import lissa.trading.user.service.dto.UserResponseDto;
 import lissa.trading.user.service.exception.UserNotFoundException;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.page.CustomPage;
+import lissa.trading.user.service.repository.UserRegRepository;
 import lissa.trading.user.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,12 +29,13 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserRegRepository userRegRepository;
     private final UserMapper userMapper;
 
     @Override
     @Transactional
     public UserResponseDto createUser(@Valid UserPostDto userPostDto) {
-        return userMapper.toUserResponseDto(userRepository.save(userMapper.toUser(userPostDto)));
+        return userMapper.toUserResponseDto(userRegRepository.save(userMapper.toUserReg(userPostDto)));
     }
 
     @Override

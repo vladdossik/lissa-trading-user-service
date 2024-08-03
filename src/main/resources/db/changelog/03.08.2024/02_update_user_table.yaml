@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 24.07.2024_02
+      author: belaquaa@mail.ru
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: user_reg_id
+                  type: BIGINT
+                  constraints:
+                    nullable: true
