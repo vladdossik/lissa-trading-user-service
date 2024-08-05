@@ -26,6 +26,7 @@ public class UserSpecificationTest {
     private CriteriaBuilder cb;
 
     @BeforeEach
+    @SuppressWarnings("unchecked")
     void setUp() {
         root = mock(Root.class);
         query = mock(CriteriaQuery.class);

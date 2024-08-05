@@ -3,16 +3,14 @@ spring:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: root
-    driver: org.postgresql.Driver
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: none
     show-sql: true
   liquibase:
     enabled: true
-
-liquibase:
-  change-log: classpath:db/changelog/db.changelog-master.yaml
+    change-log: classpath:db/changelog/db.changelog-master.yaml
 
 logging:
   level:

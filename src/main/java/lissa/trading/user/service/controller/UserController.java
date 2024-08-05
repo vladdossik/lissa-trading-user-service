@@ -1,9 +1,11 @@
 package lissa.trading.user.service.controller;
 
 import jakarta.validation.Valid;
-import lissa.trading.user.service.dto.UserPatchDto;
-import lissa.trading.user.service.dto.UserPostDto;
-import lissa.trading.user.service.dto.UserResponseDto;
+import lissa.trading.user.service.dto.patch.UserPatchDto;
+import lissa.trading.user.service.dto.post.TempUserRegPostDto;
+import lissa.trading.user.service.dto.post.UserPostDto;
+import lissa.trading.user.service.dto.response.TempUserRegResponseDto;
+import lissa.trading.user.service.dto.response.UserResponseDto;
 import lissa.trading.user.service.page.CustomPage;
 import lissa.trading.user.service.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -29,9 +31,14 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping
-    public UserResponseDto createUser(@Valid @RequestBody UserPostDto userPostDto) {
-        return userService.createUser(userPostDto);
+    @PostMapping("/temp")
+    public TempUserRegResponseDto createTempUser(@Valid @RequestBody TempUserRegPostDto tempUserRegPostDto) {
+        return userService.createTempUser(tempUserRegPostDto);
+    }
+
+    @PostMapping("/temp/{externalId}/finalize")
+    public UserResponseDto createUserFromTempUser(@PathVariable UUID externalId, @Valid @RequestBody UserPostDto userPostDto) {
+        return userService.createUserFromTempUser(externalId, userPostDto);
     }
 
     @PatchMapping("/{externalId}")
@@ -61,3 +68,4 @@ public class UserController {
         return userService.getUsersWithPaginationAndFilters(pageable, firstName, lastName);
     }
 }
+

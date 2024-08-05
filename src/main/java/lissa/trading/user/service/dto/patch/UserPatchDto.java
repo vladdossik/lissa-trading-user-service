@@ -1,4 +1,4 @@
-package lissa.trading.user.service.dto;
+package lissa.trading.user.service.dto.patch;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;

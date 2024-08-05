@@ -1,8 +1,8 @@
 package lissa.trading.user.service.mapper;
 
-import lissa.trading.user.service.dto.UserPatchDto;
-import lissa.trading.user.service.dto.UserPostDto;
-import lissa.trading.user.service.dto.UserResponseDto;
+import lissa.trading.user.service.dto.patch.UserPatchDto;
+import lissa.trading.user.service.dto.post.UserPostDto;
+import lissa.trading.user.service.dto.response.UserResponseDto;
 import lissa.trading.user.service.model.User;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -64,5 +64,3 @@ public interface UserMapper {
         }
     }
 }
-
-
