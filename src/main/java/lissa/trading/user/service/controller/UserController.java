@@ -1,5 +1,7 @@
 package lissa.trading.user.service.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
 import lissa.trading.user.service.dto.post.TempUserRegPostDto;
@@ -27,40 +29,48 @@ import java.util.UUID;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @Validated
+@Tag(name = "User Controller", description = "API для управления пользователями")
 public class UserController {
 
     private final UserService userService;
 
+    @Operation(summary = "Создание временного пользователя")
     @PostMapping("/temp")
     public TempUserRegResponseDto createTempUser(@Valid @RequestBody TempUserRegPostDto tempUserRegPostDto) {
         return userService.createTempUser(tempUserRegPostDto);
     }
 
+    @Operation(summary = "Создание пользователя из временного пользователя")
     @PostMapping("/temp/{externalId}/finalize")
     public UserResponseDto createUserFromTempUser(@PathVariable UUID externalId, @Valid @RequestBody UserPostDto userPostDto) {
         return userService.createUserFromTempUser(externalId, userPostDto);
     }
 
+    @Operation(summary = "Обновление пользователя")
     @PatchMapping("/{externalId}")
     public UserResponseDto updateUser(@PathVariable UUID externalId, @Valid @RequestBody UserPatchDto userUpdates) {
         return userService.updateUser(externalId, userUpdates);
     }
 
+    @Operation(summary = "Блокировка пользователя по Telegram никнейму")
     @PostMapping("/block/{telegramNickname}")
     public void blockUserByTelegramNickname(@PathVariable String telegramNickname) {
         userService.blockUserByTelegramNickname(telegramNickname);
     }
 
+    @Operation(summary = "Удаление пользователя по внешнему идентификатору")
     @DeleteMapping("/{externalId}")
     public void deleteUserByExternalId(@PathVariable UUID externalId) {
         userService.deleteUserByExternalId(externalId);
     }
 
+    @Operation(summary = "Получение пользователя по внешнему идентификатору")
     @GetMapping("/{externalId}")
     public UserResponseDto getUserByExternalId(@PathVariable UUID externalId) {
         return userService.getUserByExternalId(externalId);
     }
 
+    @Operation(summary = "Получение пользователей с пагинацией и фильтрацией")
     @GetMapping
     public CustomPage<UserResponseDto> getUsersWithPaginationAndFilters(Pageable pageable,
                                                                         @RequestParam(required = false) String firstName,
@@ -68,4 +78,3 @@ public class UserController {
         return userService.getUsersWithPaginationAndFilters(pageable, firstName, lastName);
     }
 }
-
