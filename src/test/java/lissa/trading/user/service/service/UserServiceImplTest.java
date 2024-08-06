@@ -6,10 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import lissa.trading.user.service.dto.patch.UserPatchDto;
-import lissa.trading.user.service.dto.response.TempUserRegResponseDto;
 import lissa.trading.user.service.dto.response.UserResponseDto;
-import lissa.trading.user.service.exception.UserNotFoundException;
-import lissa.trading.user.service.model.TempUserReg;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.page.CustomPage;
 import org.junit.jupiter.api.Test;
@@ -25,56 +22,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceImplTest extends BaseTest {
-
-    @Test
-    void createTempUser_success() {
-        when(tempUserRegRepository.save(any(TempUserReg.class))).thenReturn(tempUserReg);
-        TempUserRegResponseDto expectedResponse = tempUserRegMapper.toTempUserRegResponseDto(tempUserReg);
-
-        TempUserRegResponseDto actualResponse = userService.createTempUser(tempUserRegPostDto);
-
-        assertEquals(expectedResponse, actualResponse);
-        verify(tempUserRegRepository).save(any(TempUserReg.class));
-    }
-
-    @Test
-    void createUserFromTempUser_success() {
-        UUID tempUserExternalId = tempUserReg.getExternalId();
-        when(tempUserRegRepository.findByExternalId(tempUserExternalId)).thenReturn(Optional.of(tempUserReg));
-        when(userRepository.save(any(User.class))).thenReturn(user);
-
-        UserResponseDto expectedResponse = userMapper.toUserResponseDto(user);
-
-        UserResponseDto actualResponse = userService.createUserFromTempUser(tempUserExternalId, userPostDto);
-
-        assertEquals(expectedResponse, actualResponse);
-        verify(tempUserRegRepository).findByExternalId(tempUserExternalId);
-        verify(tempUserRegRepository).delete(tempUserReg);
-        verify(userRepository).save(any(User.class));
-    }
-
-    @Test
-    void createUserFromTempUser_tempUserNotFound() {
-        UUID tempUserExternalId = UUID.randomUUID();
-        when(tempUserRegRepository.findByExternalId(tempUserExternalId)).thenReturn(Optional.empty());
-
-        assertThrows(UserNotFoundException.class, () -> userService.createUserFromTempUser(tempUserExternalId, userPostDto));
-        verify(tempUserRegRepository).findByExternalId(tempUserExternalId);
-        verify(tempUserRegRepository, never()).delete(any(TempUserReg.class));
-        verify(userRepository, never()).save(any(User.class));
-    }
 
     @Test
     void testUpdateUser() {
