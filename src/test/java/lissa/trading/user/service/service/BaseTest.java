@@ -1,9 +1,13 @@
 package lissa.trading.user.service.service;
 
-import lissa.trading.user.service.dto.UserPatchDto;
-import lissa.trading.user.service.dto.UserPostDto;
+import lissa.trading.user.service.dto.patch.UserPatchDto;
+import lissa.trading.user.service.dto.post.TempUserRegPostDto;
+import lissa.trading.user.service.dto.post.UserPostDto;
+import lissa.trading.user.service.mapper.TempUserRegMapper;
 import lissa.trading.user.service.mapper.UserMapper;
+import lissa.trading.user.service.model.TempUserReg;
 import lissa.trading.user.service.model.User;
+import lissa.trading.user.service.repository.TempUserRegRepository;
 import lissa.trading.user.service.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.mapstruct.factory.Mappers;
@@ -12,22 +16,28 @@ import org.mockito.Mock;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public class ServiceInitializationClass {
-
+public class BaseTest {
     @Mock
     protected UserRepository userRepository;
 
+    @Mock
+    protected TempUserRegRepository tempUserRegRepository;
+
     protected UserServiceImpl userService;
     protected UserMapper userMapper;
+    protected TempUserRegMapper tempUserRegMapper;
 
     protected User user;
+    protected TempUserReg tempUserReg;
     protected UserPostDto userPostDto;
+    protected TempUserRegPostDto tempUserRegPostDto;
     protected UserPatchDto userPatchDto;
 
     @BeforeEach
     void setUp() {
         userMapper = Mappers.getMapper(UserMapper.class);
-        userService = new UserServiceImpl(userRepository, userMapper);
+        tempUserRegMapper = Mappers.getMapper(TempUserRegMapper.class);
+        userService = new UserServiceImpl(userRepository, tempUserRegRepository, userMapper, tempUserRegMapper);
 
         user = new User();
         user.setId(1L);
@@ -45,11 +55,23 @@ public class ServiceInitializationClass {
         user.setMarginTradingMetrics("metrics");
         user.setTinkoffInvestmentTariff("tariff");
 
+        tempUserReg = new TempUserReg();
+        tempUserReg.setId(1L);
+        tempUserReg.setExternalId(UUID.randomUUID());
+        tempUserReg.setFirstName("John");
+        tempUserReg.setLastName("Doe");
+        tempUserReg.setTelegramNickname("johndoe");
+
         userPostDto = new UserPostDto();
         userPostDto.setFirstName("John");
         userPostDto.setLastName("Doe");
         userPostDto.setTelegramNickname("johndoe");
         userPostDto.setTinkoffToken("token");
+
+        tempUserRegPostDto = new TempUserRegPostDto();
+        tempUserRegPostDto.setFirstName("John");
+        tempUserRegPostDto.setLastName("Doe");
+        tempUserRegPostDto.setTelegramNickname("johndoe");
 
         userPatchDto = new UserPatchDto();
         userPatchDto.setFirstName("Jane");

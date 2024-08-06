@@ -1,11 +1,10 @@
 package lissa.trading.user.service.service;
 
 import jakarta.validation.Valid;
-import lissa.trading.user.service.dto.UserPatchDto;
+import lissa.trading.user.service.dto.patch.UserPatchDto;
 import lissa.trading.user.service.mapper.PageMapper;
 import lissa.trading.user.service.mapper.UserMapper;
-import lissa.trading.user.service.dto.UserPostDto;
-import lissa.trading.user.service.dto.UserResponseDto;
+import lissa.trading.user.service.dto.response.UserResponseDto;
 import lissa.trading.user.service.exception.UserNotFoundException;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.page.CustomPage;
@@ -29,12 +28,6 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-
-    @Override
-    @Transactional
-    public UserResponseDto createUser(@Valid UserPostDto userPostDto) {
-        return userMapper.toUserResponseDto(userRepository.save(userMapper.toUser(userPostDto)));
-    }
 
     @Override
     @Transactional

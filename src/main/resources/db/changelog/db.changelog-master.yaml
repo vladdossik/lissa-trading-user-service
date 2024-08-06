@@ -2,3 +2,6 @@ databaseChangeLog:
   - include:
       file: "24.07.2024/db.changelog-release.yaml"
       relativeToChangelogFile: true
+  - include:
+      file: "05.08.2024/db.changelog-release.yaml"
+      relativeToChangelogFile: true

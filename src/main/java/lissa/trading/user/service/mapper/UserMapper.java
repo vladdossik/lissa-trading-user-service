@@ -1,8 +1,8 @@
 package lissa.trading.user.service.mapper;
 
-import lissa.trading.user.service.dto.UserPatchDto;
-import lissa.trading.user.service.dto.UserPostDto;
-import lissa.trading.user.service.dto.UserResponseDto;
+import lissa.trading.user.service.dto.patch.UserPatchDto;
+import lissa.trading.user.service.dto.response.UserResponseDto;
+import lissa.trading.user.service.model.TempUserReg;
 import lissa.trading.user.service.model.User;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -20,8 +20,9 @@ import java.util.function.Consumer;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface UserMapper {
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "externalId", ignore = true)
+    @Mapping(target = "externalId")
+    UserResponseDto toUserResponseDto(User user);
+
     @Mapping(target = "telegramChatId", ignore = true)
     @Mapping(target = "currentBalance", ignore = true)
     @Mapping(target = "percentageChangeSinceYesterday", ignore = true)
@@ -30,17 +31,12 @@ public interface UserMapper {
     @Mapping(target = "isMarginTradingEnabled", ignore = true)
     @Mapping(target = "marginTradingMetrics", ignore = true)
     @Mapping(target = "tinkoffInvestmentTariff", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "positions", ignore = true)
     @Mapping(target = "operations", ignore = true)
     @Mapping(target = "favoriteStocks", ignore = true)
     @Mapping(target = "subscriptions", ignore = true)
     @Mapping(target = "posts", ignore = true)
-    User toUser(UserPostDto userPostDto);
-
-    @Mapping(target = "externalId")
-    UserResponseDto toUserResponseDto(User user);
+    User toUserFromTempUserReg(TempUserReg tempUserReg);
 
     @AfterMapping
     default User updateUserFromDto(UserPatchDto userPatchDto, @MappingTarget User user) {
@@ -64,5 +60,3 @@ public interface UserMapper {
         }
     }
 }
-
-

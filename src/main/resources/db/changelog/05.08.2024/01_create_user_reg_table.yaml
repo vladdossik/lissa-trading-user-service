@@ -1,10 +1,10 @@
 databaseChangeLog:
   - changeSet:
-      id: 24.07.29_01
+      id: 05.08.2024_02
       author: belaquaa@mail.ru
       changes:
         - createTable:
-            tableName: users
+            tableName: temp_user_reg
             columns:
               - column:
                   name: id
@@ -30,12 +30,6 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: telegram_chat_id
-                  type: BIGINT
-                  constraints:
-                    nullable: false
-                    unique: true
-              - column:
                   name: telegram_nickname
                   type: VARCHAR(50)
                   constraints:
@@ -43,41 +37,6 @@ databaseChangeLog:
                     unique: true
               - column:
                   name: tinkoff_token
-                  type: VARCHAR(255)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: current_balance
-                  type: DECIMAL(19, 2)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: percentage_change_since_yesterday
-                  type: DECIMAL(5, 2)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: monetary_change_since_yesterday
-                  type: DECIMAL(19, 2)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: account_count
-                  type: INTEGER
-                  constraints:
-                    nullable: false
-              - column:
-                  name: is_margin_trading_enabled
-                  type: BOOLEAN
-                  constraints:
-                    nullable: false
-              - column:
-                  name: margin_trading_metrics
-                  type: TEXT
-                  constraints:
-                    nullable: false
-              - column:
-                  name: tinkoff_investment_tariff
                   type: VARCHAR(255)
                   constraints:
                     nullable: false
