@@ -47,6 +47,10 @@ public class TempUserReg {
     @Column(name = "telegram_nickname", unique = true)
     private String telegramNickname;
 
+    @NotNull
+    @Column(name = "tinkoff_token")
+    private String tinkoffToken;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;

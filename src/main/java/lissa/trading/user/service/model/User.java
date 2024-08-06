@@ -19,21 +19,19 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.List;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class User extends UserReg {
+
+    // TODO: переопределить toString (?) в связанных энтити, иначе выкидывается ошибка при попытке получить user
 
     @NotNull
     @Column(name = "telegram_chat_id", unique = true)
     private Long telegramChatId;
-
-    @NotNull
-    @Column(name = "tinkoff_token")
-    private String tinkoffToken;
 
     @NotNull
     @Column(name = "current_balance")

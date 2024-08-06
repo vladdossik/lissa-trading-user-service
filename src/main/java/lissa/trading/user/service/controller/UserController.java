@@ -4,9 +4,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
-import lissa.trading.user.service.dto.post.TempUserRegPostDto;
-import lissa.trading.user.service.dto.post.UserPostDto;
-import lissa.trading.user.service.dto.response.TempUserRegResponseDto;
 import lissa.trading.user.service.dto.response.UserResponseDto;
 import lissa.trading.user.service.page.CustomPage;
 import lissa.trading.user.service.service.UserService;
@@ -33,18 +30,6 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
-
-    @Operation(summary = "Создание временного пользователя")
-    @PostMapping("/temp")
-    public TempUserRegResponseDto createTempUser(@Valid @RequestBody TempUserRegPostDto tempUserRegPostDto) {
-        return userService.createTempUser(tempUserRegPostDto);
-    }
-
-    @Operation(summary = "Создание пользователя из временного пользователя")
-    @PostMapping("/temp/{externalId}/finalize")
-    public UserResponseDto createUserFromTempUser(@PathVariable UUID externalId, @Valid @RequestBody UserPostDto userPostDto) {
-        return userService.createUserFromTempUser(externalId, userPostDto);
-    }
 
     @Operation(summary = "Обновление пользователя")
     @PatchMapping("/{externalId}")

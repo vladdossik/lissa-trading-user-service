@@ -13,12 +13,12 @@ public class TempUserRegPostDto {
     @NotNull
     @Size(min = 1, max = 50)
     private String firstName;
-
     @NotNull
     @Size(min = 1, max = 50)
     private String lastName;
-
     @NotNull
     @Size(min = 1, max = 50)
     private String telegramNickname;
+    @NotNull
+    private String tinkoffToken;
 }

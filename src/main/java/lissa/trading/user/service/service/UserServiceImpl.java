@@ -2,18 +2,12 @@ package lissa.trading.user.service.service;
 
 import jakarta.validation.Valid;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
-import lissa.trading.user.service.dto.post.TempUserRegPostDto;
-import lissa.trading.user.service.dto.response.TempUserRegResponseDto;
 import lissa.trading.user.service.mapper.PageMapper;
-import lissa.trading.user.service.mapper.TempUserRegMapper;
 import lissa.trading.user.service.mapper.UserMapper;
-import lissa.trading.user.service.dto.post.UserPostDto;
 import lissa.trading.user.service.dto.response.UserResponseDto;
 import lissa.trading.user.service.exception.UserNotFoundException;
-import lissa.trading.user.service.model.TempUserReg;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.page.CustomPage;
-import lissa.trading.user.service.repository.TempUserRegRepository;
 import lissa.trading.user.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,29 +27,7 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final TempUserRegRepository tempUserRegRepository;
     private final UserMapper userMapper;
-    private final TempUserRegMapper tempUserRegMapper;
-
-    @Override
-    @Transactional
-    public TempUserRegResponseDto createTempUser(@Valid TempUserRegPostDto tempUserRegPostDto) {
-        TempUserReg tempUserReg = tempUserRegMapper.toTempUserReg(tempUserRegPostDto);
-        return tempUserRegMapper.toTempUserRegResponseDto(tempUserRegRepository.save(tempUserReg));
-    }
-
-    @Override
-    @Transactional
-    public UserResponseDto createUserFromTempUser(UUID externalId, @Valid UserPostDto userPostDto) {
-        TempUserReg tempUserReg = findTempUserRegByExternalId(externalId);
-        User user = userMapper.toUser(userPostDto);
-        user.setExternalId(tempUserReg.getExternalId());
-        user.setFirstName(tempUserReg.getFirstName());
-        user.setLastName(tempUserReg.getLastName());
-        user.setTelegramNickname(tempUserReg.getTelegramNickname());
-        tempUserRegRepository.delete(tempUserReg);
-        return userMapper.toUserResponseDto(userRepository.save(user));
-    }
 
     @Override
     @Transactional
@@ -103,11 +75,6 @@ public class UserServiceImpl implements UserService {
     private User findUserByExternalId(UUID externalId) {
         return userRepository.findByExternalId(externalId)
                 .orElseThrow(() -> new UserNotFoundException("User with external id " + externalId + " not found"));
-    }
-
-    private TempUserReg findTempUserRegByExternalId(UUID externalId) {
-        return tempUserRegRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new UserNotFoundException("Temporary user with external id " + externalId + " not found"));
     }
 
     private User findUserByTelegramNickname(String telegramNickname) {

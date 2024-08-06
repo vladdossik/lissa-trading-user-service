@@ -15,6 +15,7 @@ public class TempUserRegResponseDto {
     private String firstName;
     private String lastName;
     private String telegramNickname;
+    private String tinkoffToken;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
 }
