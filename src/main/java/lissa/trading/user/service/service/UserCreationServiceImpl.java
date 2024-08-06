@@ -1,5 +1,6 @@
 package lissa.trading.user.service.service;
 
+import lissa.trading.user.service.exception.UserCreationException;
 import lissa.trading.user.service.mapper.UserMapper;
 import lissa.trading.user.service.model.TempUserReg;
 import lissa.trading.user.service.model.User;
@@ -19,13 +20,13 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class UserCreationServiceImpl implements UserCreationService {
 
     private final UserRepository userRepository;
     private final TempUserRegRepository tempUserRegRepository;
     private final UserMapper userMapper;
 
+    @Transactional
     @Override
     public void createUserFromTempUserReg(TempUserReg tempUserReg) {
         try {
@@ -42,9 +43,10 @@ public class UserCreationServiceImpl implements UserCreationService {
             log.info("TempUserReg deleted: {}", tempUserReg);
         } catch (Exception e) {
             log.error("Error creating user from temp user: {}", e.getMessage(), e);
-            throw new RuntimeException("Error creating user from temp user", e); // Откат транзакции
+            throw new UserCreationException("Error creating user from temp user", e); // Откат транзакции
         }
     }
+
 
     private void initializeDefaultValues(User user) {
         // TODO: получение данных из Tinkoff-API
