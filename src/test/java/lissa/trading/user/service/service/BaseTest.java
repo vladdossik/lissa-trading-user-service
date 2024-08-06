@@ -12,6 +12,8 @@ import lissa.trading.user.service.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -23,9 +25,11 @@ public class BaseTest {
     @Mock
     protected TempUserRegRepository tempUserRegRepository;
 
-    protected UserServiceImpl userService;
     protected UserMapper userMapper;
-    protected TempUserRegMapper tempUserRegMapper;
+    protected UserService userService;
+    protected TempUserRegService tempUserRegService;
+    protected UserCreationService userCreationService;
+    protected TempUserRegServiceImpl tempUserRegServiceImpl;
 
     protected User user;
     protected TempUserReg tempUserReg;
@@ -33,11 +37,20 @@ public class BaseTest {
     protected TempUserRegPostDto tempUserRegPostDto;
     protected UserPatchDto userPatchDto;
 
+    @Mock
+    protected TempUserRegMapper tempUserRegMapper;
+
+    @Mock
+    protected ApplicationEventPublisher eventPublisher;
+
     @BeforeEach
     void setUp() {
         userMapper = Mappers.getMapper(UserMapper.class);
-        tempUserRegMapper = Mappers.getMapper(TempUserRegMapper.class);
-        userService = new UserServiceImpl(userRepository, tempUserRegRepository, userMapper, tempUserRegMapper);
+        userService = new UserServiceImpl(userRepository, userMapper);
+        tempUserRegService = new TempUserRegServiceImpl(tempUserRegRepository, tempUserRegMapper, eventPublisher);
+        userCreationService = new UserCreationServiceImpl(userRepository, tempUserRegRepository, userMapper);
+
+        tempUserRegServiceImpl = new TempUserRegServiceImpl(tempUserRegRepository, tempUserRegMapper, eventPublisher);
 
         user = new User();
         user.setId(1L);
@@ -72,6 +85,7 @@ public class BaseTest {
         tempUserRegPostDto.setFirstName("John");
         tempUserRegPostDto.setLastName("Doe");
         tempUserRegPostDto.setTelegramNickname("johndoe");
+        tempUserRegPostDto.setTinkoffToken("token");
 
         userPatchDto = new UserPatchDto();
         userPatchDto.setFirstName("Jane");
