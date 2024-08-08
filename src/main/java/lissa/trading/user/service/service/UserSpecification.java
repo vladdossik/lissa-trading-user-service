@@ -8,7 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 public class UserSpecification {
 
     private UserSpecification() {
-        throw new IllegalStateException("Utility class");
+        throw new IllegalStateException("Instantiation of 'UserSpecification' is not allowed.");
     }
 
     public static Specification<User> firstNameContains(String firstName) {

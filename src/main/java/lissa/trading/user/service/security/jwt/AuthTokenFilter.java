@@ -9,19 +9,20 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class AuthTokenFilter extends OncePerRequestFilter {
 
-    @NonNull
     private final AuthServiceClient authServiceClient;
 
     @Override
@@ -37,14 +38,22 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         try {
             String token = parseJwt(request);
 
-            if (token == null || !authServiceClient.validateToken("Bearer " + token)) {
+            if (token == null || !authServiceClient.validateToken(token)) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
                 return;
             }
 
-            SecurityContextHolder.getContext().setAuthentication(
-                    new UsernamePasswordAuthenticationToken(token, null, new ArrayList<>())
-            );
+            List<String> roles = authServiceClient.getUserRoles(token);
+
+            List<SimpleGrantedAuthority> authorities = roles.stream()
+                    .map(SimpleGrantedAuthority::new)
+                    .toList();
+
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    token, null, authorities);
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
         } catch (Exception ex) {
             log.error("Cannot set user authentication: {}", ex.getMessage());
@@ -61,7 +70,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         if (headerAuth != null && headerAuth.startsWith("Bearer ")) {
             return headerAuth.substring(7);
         }
-        log.error("Invalid token format, missing 'Bearer ' prefix");
-        return null;
+        log.info("Invalid token format, missing 'Bearer ' prefix. Token: {}", headerAuth);
+        return headerAuth;
     }
 }
