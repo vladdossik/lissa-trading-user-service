@@ -49,7 +49,7 @@ public interface UserMapper {
 
     default <T> void mapOptionalValue(Optional<T> optional, Consumer<T> setter) {
         optional.ifPresent(value -> setter.accept(
-                value instanceof String && ((String) value).isEmpty() ? null : value
+                value instanceof String string && string.isEmpty() ? null : value
         ));
     }
 

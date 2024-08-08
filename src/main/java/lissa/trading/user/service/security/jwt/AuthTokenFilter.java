@@ -28,6 +28,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+        if (path.startsWith("/v3/api-docs") || path.startsWith("/swagger-ui") || path.equals("/swagger-ui.html")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try {
             String token = parseJwt(request);
 
@@ -42,6 +48,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
         } catch (Exception ex) {
             log.error("Cannot set user authentication: {}", ex.getMessage());
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed");
+            return;
         }
 
         filterChain.doFilter(request, response);
@@ -53,6 +61,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         if (headerAuth != null && headerAuth.startsWith("Bearer ")) {
             return headerAuth.substring(7);
         }
+        log.error("Invalid token format, missing 'Bearer ' prefix");
         return null;
     }
 }

@@ -7,6 +7,10 @@ import org.springframework.data.jpa.domain.Specification;
 @Slf4j
 public class UserSpecification {
 
+    private UserSpecification() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static Specification<User> firstNameContains(String firstName) {
         return (root, query, cb) -> {
             if (firstName == null) {
