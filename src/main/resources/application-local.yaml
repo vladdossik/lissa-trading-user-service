@@ -1,17 +1,27 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:5432/lissa-trading-db
     username: postgres
     password: root
     driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: none
     show-sql: true
+    properties:
+      hibernate:
+        default_schema: user_service_db
+
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
+    default-schema: user_service_db
 
 logging:
   level:
     lissa.trading.user.service.aspect: INFO
+
+auth:
+  service:
+    url: http://localhost:8081

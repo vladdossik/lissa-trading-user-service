@@ -9,6 +9,7 @@ import lissa.trading.user.service.page.CustomPage;
 import lissa.trading.user.service.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,35 +32,40 @@ public class UserController {
 
     private final UserService userService;
 
-    @Operation(summary = "Обновление пользователя")
-    @PatchMapping("/{externalId}")
-    public UserResponseDto updateUser(@PathVariable UUID externalId, @Valid @RequestBody UserPatchDto userUpdates) {
-        return userService.updateUser(externalId, userUpdates);
-    }
-
-    @Operation(summary = "Блокировка пользователя по Telegram никнейму")
-    @PostMapping("/block/{telegramNickname}")
-    public void blockUserByTelegramNickname(@PathVariable String telegramNickname) {
-        userService.blockUserByTelegramNickname(telegramNickname);
-    }
-
-    @Operation(summary = "Удаление пользователя по внешнему идентификатору")
-    @DeleteMapping("/{externalId}")
-    public void deleteUserByExternalId(@PathVariable UUID externalId) {
-        userService.deleteUserByExternalId(externalId);
-    }
-
-    @Operation(summary = "Получение пользователя по внешнему идентификатору")
-    @GetMapping("/{externalId}")
-    public UserResponseDto getUserByExternalId(@PathVariable UUID externalId) {
-        return userService.getUserByExternalId(externalId);
-    }
-
     @Operation(summary = "Получение пользователей с пагинацией и фильтрацией")
     @GetMapping
+    @PreAuthorize("hasRole('VIP') or hasRole('ADMIN')")
     public CustomPage<UserResponseDto> getUsersWithPaginationAndFilters(Pageable pageable,
                                                                         @RequestParam(required = false) String firstName,
                                                                         @RequestParam(required = false) String lastName) {
         return userService.getUsersWithPaginationAndFilters(pageable, firstName, lastName);
+    }
+
+    @Operation(summary = "Получение пользователя по внешнему идентификатору")
+    @GetMapping("/{externalId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public UserResponseDto getUserByExternalId(@PathVariable UUID externalId) {
+        return userService.getUserByExternalId(externalId);
+    }
+
+    @Operation(summary = "Обновление пользователя")
+    @PatchMapping("/{externalId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public UserResponseDto updateUser(@PathVariable UUID externalId, @Valid @RequestBody UserPatchDto userUpdates) {
+        return userService.updateUser(externalId, userUpdates);
+    }
+
+    @Operation(summary = "Удаление пользователя по внешнему идентификатору")
+    @DeleteMapping("/{externalId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteUserByExternalId(@PathVariable UUID externalId) {
+        userService.deleteUserByExternalId(externalId);
+    }
+
+    @Operation(summary = "Блокировка пользователя по Telegram никнейму")
+    @PostMapping("/block/{telegramNickname}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void blockUserByTelegramNickname(@PathVariable String telegramNickname) {
+        userService.blockUserByTelegramNickname(telegramNickname);
     }
 }

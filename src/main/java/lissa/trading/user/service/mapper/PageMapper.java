@@ -14,7 +14,7 @@ public interface PageMapper {
     static <T, U> CustomPage<U> toCustomPage(Page<T> page, Function<T, U> mapper) {
         List<U> content = page.getContent().stream()
                 .map(mapper)
-                .collect(Collectors.toList());
+                .toList();
 
         String sort = page.getSort().stream()
                 .map(order -> order.getProperty() + " " + order.getDirection())

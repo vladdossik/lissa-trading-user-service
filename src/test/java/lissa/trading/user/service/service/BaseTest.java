@@ -10,20 +10,29 @@ import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.repository.TempUserRegRepository;
 import lissa.trading.user.service.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public class BaseTest {
+@ExtendWith(MockitoExtension.class)
+public abstract class BaseTest {
+
     @Mock
     protected UserRepository userRepository;
 
     @Mock
     protected TempUserRegRepository tempUserRegRepository;
+
+    @Mock
+    protected TempUserRegMapper tempUserRegMapper;
+
+    @Mock
+    protected ApplicationEventPublisher eventPublisher;
 
     protected UserMapper userMapper;
     protected UserService userService;
@@ -37,22 +46,23 @@ public class BaseTest {
     protected TempUserRegPostDto tempUserRegPostDto;
     protected UserPatchDto userPatchDto;
 
-    @Mock
-    protected TempUserRegMapper tempUserRegMapper;
-
-    @Mock
-    protected ApplicationEventPublisher eventPublisher;
-
     @BeforeEach
     void setUp() {
         userMapper = Mappers.getMapper(UserMapper.class);
         userService = new UserServiceImpl(userRepository, userMapper);
         tempUserRegService = new TempUserRegServiceImpl(tempUserRegRepository, tempUserRegMapper, eventPublisher);
         userCreationService = new UserCreationServiceImpl(userRepository, tempUserRegRepository, userMapper);
-
         tempUserRegServiceImpl = new TempUserRegServiceImpl(tempUserRegRepository, tempUserRegMapper, eventPublisher);
 
-        user = new User();
+        user = createUser();
+        tempUserReg = createTempUserReg();
+        userPostDto = createUserPostDto();
+        tempUserRegPostDto = createTempUserRegPostDto();
+        userPatchDto = createUserPatchDto();
+    }
+
+    private User createUser() {
+        User user = new User();
         user.setId(1L);
         user.setExternalId(UUID.randomUUID());
         user.setFirstName("John");
@@ -67,30 +77,43 @@ public class BaseTest {
         user.setIsMarginTradingEnabled(true);
         user.setMarginTradingMetrics("metrics");
         user.setTinkoffInvestmentTariff("tariff");
+        return user;
+    }
 
-        tempUserReg = new TempUserReg();
+    private TempUserReg createTempUserReg() {
+        TempUserReg tempUserReg = new TempUserReg();
         tempUserReg.setId(1L);
         tempUserReg.setExternalId(UUID.randomUUID());
         tempUserReg.setFirstName("John");
         tempUserReg.setLastName("Doe");
         tempUserReg.setTelegramNickname("johndoe");
+        return tempUserReg;
+    }
 
-        userPostDto = new UserPostDto();
-        userPostDto.setFirstName("John");
-        userPostDto.setLastName("Doe");
-        userPostDto.setTelegramNickname("johndoe");
-        userPostDto.setTinkoffToken("token");
+    private UserPostDto createUserPostDto() {
+        UserPostDto dto = new UserPostDto();
+        dto.setFirstName("John");
+        dto.setLastName("Doe");
+        dto.setTelegramNickname("johndoe");
+        dto.setTinkoffToken("token");
+        return dto;
+    }
 
-        tempUserRegPostDto = new TempUserRegPostDto();
-        tempUserRegPostDto.setFirstName("John");
-        tempUserRegPostDto.setLastName("Doe");
-        tempUserRegPostDto.setTelegramNickname("johndoe");
-        tempUserRegPostDto.setTinkoffToken("token");
+    private TempUserRegPostDto createTempUserRegPostDto() {
+        TempUserRegPostDto dto = new TempUserRegPostDto();
+        dto.setFirstName("John");
+        dto.setLastName("Doe");
+        dto.setTelegramNickname("johndoe");
+        dto.setTinkoffToken("token");
+        return dto;
+    }
 
-        userPatchDto = new UserPatchDto();
-        userPatchDto.setFirstName("Jane");
-        userPatchDto.setLastName(null);
-        userPatchDto.setTelegramNickname("");
-        userPatchDto.setTinkoffToken("newToken");
+    private UserPatchDto createUserPatchDto() {
+        UserPatchDto dto = new UserPatchDto();
+        dto.setFirstName("Jane");
+        dto.setLastName(null);
+        dto.setTelegramNickname("");
+        dto.setTinkoffToken("newToken");
+        return dto;
     }
 }

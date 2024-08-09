@@ -1,0 +1,93 @@
+databaseChangeLog:
+  - changeSet:
+      id: 24.07.2024_01
+      author: belaquaa@mail.ru
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: external_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: first_name
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: telegram_chat_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: telegram_nickname
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: tinkoff_token
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: current_balance
+                  type: DECIMAL(19, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: percentage_change_since_yesterday
+                  type: DECIMAL(5, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: monetary_change_since_yesterday
+                  type: DECIMAL(19, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: account_count
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_margin_trading_enabled
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+              - column:
+                  name: margin_trading_metrics
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tinkoff_investment_tariff
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
