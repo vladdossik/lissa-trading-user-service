@@ -9,9 +9,6 @@ import java.util.List;
 @FeignClient(name = "auth-service", url = "${auth.service.url}")
 public interface AuthServiceClient {
 
-    @PostMapping("/api/auth/validate")
-    boolean validateToken(@RequestHeader("Authorization") String token);
-
     @PostMapping("/api/auth/roles")
     List<String> getUserRoles(@RequestHeader("Authorization") String token);
 }
