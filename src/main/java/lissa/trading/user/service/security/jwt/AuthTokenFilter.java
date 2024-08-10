@@ -1,12 +1,5 @@
 package lissa.trading.user.service.security.jwt;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,16 +8,15 @@ import lissa.trading.user.service.security.AuthServiceClient;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.security.Key;
 import java.util.List;
 
 @Slf4j
@@ -32,18 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthTokenFilter extends OncePerRequestFilter {
 
-    @Value("${security.jwt.secret}")
-    private String jwtSecret;
-
-    private Key key;
-
     private final AuthServiceClient authServiceClient;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    @PostConstruct
-    private void init() {
-        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
-    }
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
@@ -59,7 +40,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             String token = parseJwt(request);
             List<String> roles = authServiceClient.getUserRoles("Bearer " + token);
 
-            if (token == null || roles == null || roles.isEmpty()) {
+            if (token == null || CollectionUtils.isEmpty(roles)) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
                 return;
             }
