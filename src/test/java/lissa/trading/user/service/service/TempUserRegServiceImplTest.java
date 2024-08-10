@@ -5,8 +5,6 @@ import lissa.trading.user.service.dto.response.TempUserRegResponseDto;
 import lissa.trading.user.service.handler.TempUserCreatedEvent;
 import lissa.trading.user.service.model.TempUserReg;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,8 +17,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-public class TempUserRegServiceImplTest extends BaseTest {
+class TempUserRegServiceImplTest extends BaseTest {
 
     @Test
     void createTempUser_success() {

@@ -10,8 +10,6 @@ import lissa.trading.user.service.dto.response.UserResponseDto;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.page.CustomPage;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -30,8 +28,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-public class UserServiceImplTest extends BaseTest {
+class UserServiceImplTest extends BaseTest {
 
     @Test
     void testUpdateUser() {
