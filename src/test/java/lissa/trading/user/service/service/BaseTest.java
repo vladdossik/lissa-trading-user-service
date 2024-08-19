@@ -2,6 +2,7 @@ package lissa.trading.user.service.service;
 
 import lissa.trading.user.service.dto.patch.UserPatchDto;
 import lissa.trading.user.service.dto.post.TempUserRegPostDto;
+import lissa.trading.user.service.dto.post.UserAuthInfoDto;
 import lissa.trading.user.service.dto.post.UserPostDto;
 import lissa.trading.user.service.mapper.TempUserRegMapper;
 import lissa.trading.user.service.mapper.UserMapper;
@@ -38,13 +39,14 @@ public abstract class BaseTest {
     protected UserService userService;
     protected TempUserRegService tempUserRegService;
     protected UserCreationService userCreationService;
-    protected TempUserRegServiceImpl tempUserRegServiceImpl;
+    protected FirstInteractionUserReg firstInteractionUserReg;
 
     protected User user;
     protected TempUserReg tempUserReg;
     protected UserPostDto userPostDto;
     protected TempUserRegPostDto tempUserRegPostDto;
     protected UserPatchDto userPatchDto;
+    protected UserAuthInfoDto userAuthInfoDto;
 
     @BeforeEach
     void setUp() {
@@ -52,13 +54,14 @@ public abstract class BaseTest {
         userService = new UserServiceImpl(userRepository, userMapper);
         tempUserRegService = new TempUserRegServiceImpl(tempUserRegRepository, tempUserRegMapper, eventPublisher);
         userCreationService = new UserCreationServiceImpl(userRepository, tempUserRegRepository, userMapper);
-        tempUserRegServiceImpl = new TempUserRegServiceImpl(tempUserRegRepository, tempUserRegMapper, eventPublisher);
+        firstInteractionUserReg = new FirstInteractionUserRegImpl(tempUserRegService, userRepository);
 
         user = createUser();
         tempUserReg = createTempUserReg();
         userPostDto = createUserPostDto();
         tempUserRegPostDto = createTempUserRegPostDto();
         userPatchDto = createUserPatchDto();
+        userAuthInfoDto = createUserAuthInfoDto();
     }
 
     private User createUser() {
@@ -114,6 +117,15 @@ public abstract class BaseTest {
         dto.setLastName(null);
         dto.setTelegramNickname("");
         dto.setTinkoffToken("newToken");
+        return dto;
+    }
+
+    private UserAuthInfoDto createUserAuthInfoDto() {
+        UserAuthInfoDto dto = new UserAuthInfoDto();
+        dto.setFirstName("John");
+        dto.setLastName("Doe");
+        dto.setTelegramNickname("johndoe");
+        dto.setTinkoffToken("token");
         return dto;
     }
 }

@@ -10,6 +10,7 @@ import lissa.trading.user.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -26,24 +27,24 @@ public class UserCreationServiceImpl implements UserCreationService {
     private final TempUserRegRepository tempUserRegRepository;
     private final UserMapper userMapper;
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public void createUserFromTempUserReg(TempUserReg tempUserReg) {
         try {
-            User user = userMapper.toUserFromTempUserReg(tempUserReg);
+            log.info("Starting to create user from TempUserReg: {}", tempUserReg);
 
+            User user = userMapper.toUserFromTempUserReg(tempUserReg);
             initializeDefaultValues(user);
 
             userRepository.save(user);
-            log.info("User saved: {}", user);
+            log.info("User saved successfully: {}", user);
 
-            // Удаляем временного пользователя после создания основного
             tempUserRegRepository.delete(tempUserReg);
+            log.info("TempUserReg deleted successfully: {}", tempUserReg);
 
-            log.info("TempUserReg deleted: {}", tempUserReg);
         } catch (Exception e) {
-            log.error("Error creating user from temp user: {}", e.getMessage(), e);
-            throw new UserCreationException("Error creating user from temp user", e); // Откат транзакции
+            log.error("Error creating user from TempUserReg: {}", tempUserReg, e);
+            throw new UserCreationException("Error creating user from TempUserReg", e);
         }
     }
 

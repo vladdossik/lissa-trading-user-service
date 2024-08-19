@@ -1,6 +1,6 @@
 package lissa.trading.user.service.mapper;
 
-import lissa.trading.user.service.dto.post.TempUserRegPostDto;
+import lissa.trading.user.service.dto.post.UserAuthInfoDto;
 import lissa.trading.user.service.dto.response.TempUserRegResponseDto;
 import lissa.trading.user.service.model.TempUserReg;
 import org.mapstruct.AfterMapping;
@@ -21,7 +21,7 @@ public interface TempUserRegMapper {
     @Mapping(target = "externalId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    TempUserReg toTempUserReg(TempUserRegPostDto tempUserRegPostDto);
+    TempUserReg toTempUserReg(UserAuthInfoDto userAuthInfoDto);
 
     @Mapping(target = "externalId")
     TempUserRegResponseDto toTempUserRegResponseDto(TempUserReg tempUserReg);

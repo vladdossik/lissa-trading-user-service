@@ -1,5 +1,6 @@
 package lissa.trading.user.service.handler;
 
+import lissa.trading.user.service.event.TempUserSavedEvent;
 import lissa.trading.user.service.model.TempUserReg;
 import lissa.trading.user.service.service.UserCreationService;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,8 @@ public class TempUserCreatedEventListener {
     private final UserCreationService userCreationService;
 
     @EventListener
-    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-    public void handleTempUserCreatedEvent(TempUserCreatedEvent event) {
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleTempUserCreatedEvent(TempUserSavedEvent event) {
         TempUserReg tempUserReg = event.getTempUserReg();
         try {
             userCreationService.createUserFromTempUserReg(tempUserReg);

@@ -4,10 +4,15 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lissa.trading.user.service.dto.post.UserAuthInfoDto;
+import lissa.trading.user.service.event.UserAuthenticatedEvent;
 import lissa.trading.user.service.security.AuthServiceClient;
+import lissa.trading.user.service.service.FirstInteractionUserReg;
+import lissa.trading.user.service.service.TempUserRegService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +30,7 @@ import java.util.List;
 public class AuthTokenFilter extends OncePerRequestFilter {
 
     private final AuthServiceClient authServiceClient;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
@@ -38,19 +44,21 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
         try {
             String token = parseJwt(request);
-            List<String> roles = authServiceClient.getUserRoles("Bearer " + token);
+            UserAuthInfoDto userAuthInfo = authServiceClient.getUserInfo("Bearer " + token);
 
-            if (token == null || CollectionUtils.isEmpty(roles)) {
+            if (token == null || CollectionUtils.isEmpty(userAuthInfo.getRole())) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
                 return;
             }
 
-            List<SimpleGrantedAuthority> authorities = roles.stream()
+            eventPublisher.publishEvent(new UserAuthenticatedEvent(this, userAuthInfo));
+
+            List<SimpleGrantedAuthority> authorities = userAuthInfo.getRole().stream()
                     .map(SimpleGrantedAuthority::new)
                     .toList();
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    token, null, authorities);
+                    userAuthInfo, null, authorities);
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -74,3 +82,4 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         return null;
     }
 }
+

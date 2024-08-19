@@ -1,9 +1,7 @@
 package lissa.trading.user.service.service;
 
-import jakarta.validation.Valid;
-import lissa.trading.user.service.dto.post.TempUserRegPostDto;
-import lissa.trading.user.service.dto.response.TempUserRegResponseDto;
-import lissa.trading.user.service.handler.TempUserCreatedEvent;
+import lissa.trading.user.service.dto.post.UserAuthInfoDto;
+import lissa.trading.user.service.event.TempUserSavedEvent;
 import lissa.trading.user.service.mapper.TempUserRegMapper;
 import lissa.trading.user.service.model.TempUserReg;
 import lissa.trading.user.service.repository.TempUserRegRepository;
@@ -25,14 +23,14 @@ public class TempUserRegServiceImpl implements TempUserRegService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public TempUserRegResponseDto createTempUser(@Valid TempUserRegPostDto tempUserRegPostDto) {
-        TempUserReg tempUserReg = tempUserRegMapper.toTempUserReg(tempUserRegPostDto);
+    public void createTempUser(UserAuthInfoDto userAuthInfo) {
+        log.info("Creating temp user with info: {}", userAuthInfo);
+
+        TempUserReg tempUserReg = tempUserRegMapper.toTempUserReg(userAuthInfo);
         TempUserReg savedTempUser = tempUserRegRepository.save(tempUserReg);
+        log.info("Temp user saved: {}", savedTempUser);
 
-        // Публикуем событие после успешного сохранения
-        // TODO: получить данные от Tinkoff-API
-        eventPublisher.publishEvent(new TempUserCreatedEvent(savedTempUser));
-
-        return tempUserRegMapper.toTempUserRegResponseDto(savedTempUser);
+        // Публикация кастомного события после успешного сохранения
+        eventPublisher.publishEvent(new TempUserSavedEvent(this, savedTempUser));
     }
 }

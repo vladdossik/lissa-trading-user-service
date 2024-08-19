@@ -35,7 +35,7 @@ class UserCreationServiceImplTest extends BaseTest {
 
         UserCreationException thrown = assertThrows(UserCreationException.class, () -> userCreationService.createUserFromTempUserReg(tempUserReg));
 
-        assertEquals("Error creating user from temp user", thrown.getMessage());
+        assertEquals("Error creating user from TempUserReg", thrown.getMessage());
         verify(userRepository, times(1)).save(any(User.class));
         verify(tempUserRegRepository, never()).delete(any(TempUserReg.class));
     }
