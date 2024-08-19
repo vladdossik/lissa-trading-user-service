@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @Validated
-@Tag(name = "User Registration Controller", description = "API для управления пользователями")
+@Tag(name = "User Registration Controller", description = "API для регистрации пользователя")
 public class UserRegController {
 
     private final FirstInteractionUserReg firstInteractionUserReg;
