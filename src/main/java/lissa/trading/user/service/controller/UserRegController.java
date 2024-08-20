@@ -29,7 +29,7 @@ public class UserRegController {
     @ApiResponse(
             responseCode = "200",
             description = "Пользователь успешно зарегистрирован",
-            content = @Content(schema = @Schema(implementation = Void.class))
+            content = @Content()
     )
     @ApiResponse(
             responseCode = "401",

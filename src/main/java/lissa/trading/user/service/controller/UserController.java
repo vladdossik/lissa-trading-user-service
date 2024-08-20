@@ -73,7 +73,7 @@ public class UserController {
     @Operation(summary = "Удаление пользователя по внешнему идентификатору")
     @ApiResponse(
             description = "Пользователь успешно удален",
-            content = @Content(schema = @Schema(implementation = Void.class))
+            content = @Content()
     )
     @DeleteMapping("/{externalId}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -84,7 +84,7 @@ public class UserController {
     @Operation(summary = "Блокировка пользователя по Telegram никнейму")
     @ApiResponse(
             description = "Пользователь успешно заблокирован",
-            content = @Content(schema = @Schema(implementation = Void.class))
+            content = @Content()
     )
     @PostMapping("/block/{telegramNickname}")
     @PreAuthorize("hasRole('ADMIN')")

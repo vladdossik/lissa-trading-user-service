@@ -20,5 +20,5 @@ public class UserAuthInfoDto {
     @NotNull
     private String tinkoffToken;
     @NotNull
-    private List<String> role;
+    private List<String> roles;
 }

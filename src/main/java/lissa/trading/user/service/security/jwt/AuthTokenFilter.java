@@ -7,8 +7,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lissa.trading.user.service.dto.post.UserAuthInfoDto;
 import lissa.trading.user.service.event.UserAuthenticatedEvent;
 import lissa.trading.user.service.security.AuthServiceClient;
-import lissa.trading.user.service.service.FirstInteractionUserReg;
-import lissa.trading.user.service.service.TempUserRegService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,14 +44,14 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             String token = parseJwt(request);
             UserAuthInfoDto userAuthInfo = authServiceClient.getUserInfo("Bearer " + token);
 
-            if (token == null || CollectionUtils.isEmpty(userAuthInfo.getRole())) {
+            if (token == null || CollectionUtils.isEmpty(userAuthInfo.getRoles())) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
                 return;
             }
 
             eventPublisher.publishEvent(new UserAuthenticatedEvent(this, userAuthInfo));
 
-            List<SimpleGrantedAuthority> authorities = userAuthInfo.getRole().stream()
+            List<SimpleGrantedAuthority> authorities = userAuthInfo.getRoles().stream()
                     .map(SimpleGrantedAuthority::new)
                     .toList();
 
