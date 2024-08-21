@@ -4,10 +4,13 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lissa.trading.user.service.dto.post.UserInfoDto;
+import lissa.trading.user.service.event.UserAuthenticatedEvent;
 import lissa.trading.user.service.security.AuthServiceClient;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,32 +28,35 @@ import java.util.List;
 public class AuthTokenFilter extends OncePerRequestFilter {
 
     private final AuthServiceClient authServiceClient;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        String path = request.getRequestURI();
-        if (path.startsWith("/v3/api-docs") || path.startsWith("/swagger-ui") || path.equals("/swagger-ui.html")) {
+        if (shouldSkipFilter(request)) {
+            log.info("Skipping JWT filter for URI: {} in Thread: {}", request.getRequestURI(), Thread.currentThread().getName());
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
             String token = parseJwt(request);
-            List<String> roles = authServiceClient.getUserRoles("Bearer " + token);
+            UserInfoDto userInfo = authServiceClient.getUserInfo("Bearer " + token);
 
-            if (token == null || CollectionUtils.isEmpty(roles)) {
+            if (token == null || CollectionUtils.isEmpty(userInfo.getRoles())) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
                 return;
             }
 
-            List<SimpleGrantedAuthority> authorities = roles.stream()
+            eventPublisher.publishEvent(new UserAuthenticatedEvent(this, userInfo));
+
+            List<SimpleGrantedAuthority> authorities = userInfo.getRoles().stream()
                     .map(SimpleGrantedAuthority::new)
                     .toList();
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    token, null, authorities);
+                    userInfo, null, authorities);
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -72,5 +78,14 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         }
         log.info("Invalid token format, missing 'Bearer ' prefix. Token: {}", headerAuth);
         return null;
+    }
+
+    private boolean shouldSkipFilter(HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        return requestURI.equals("/api/auth/signup") ||
+                requestURI.equals("/api/auth/signin") ||
+                requestURI.equals("/api/auth/refresh-token") ||
+                requestURI.startsWith("/swagger-ui/") ||
+                requestURI.startsWith("/v3/api-docs/");
     }
 }
