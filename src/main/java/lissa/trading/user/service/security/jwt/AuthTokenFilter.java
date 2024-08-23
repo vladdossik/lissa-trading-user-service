@@ -5,12 +5,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lissa.trading.user.service.dto.post.UserInfoDto;
-import lissa.trading.user.service.event.UserAuthenticatedEvent;
 import lissa.trading.user.service.security.AuthServiceClient;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,7 +26,6 @@ import java.util.List;
 public class AuthTokenFilter extends OncePerRequestFilter {
 
     private final AuthServiceClient authServiceClient;
-    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
@@ -48,8 +45,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
                 return;
             }
-
-            eventPublisher.publishEvent(new UserAuthenticatedEvent(this, userInfo));
 
             List<SimpleGrantedAuthority> authorities = userInfo.getRoles().stream()
                     .map(SimpleGrantedAuthority::new)
