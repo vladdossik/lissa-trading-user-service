@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lissa.trading.user.service.dto.post.UserInfoDto;
 import lissa.trading.user.service.exception.UnauthorizedException;
-import lissa.trading.user.service.service.user_creation.TempUserCreationService;
+import lissa.trading.user.service.service.creation.TempUserCreationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;

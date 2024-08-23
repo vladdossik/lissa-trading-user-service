@@ -2,7 +2,7 @@ package lissa.trading.user.service.handler;
 
 import lissa.trading.user.service.event.TempUserSavedEvent;
 import lissa.trading.user.service.model.TempUserReg;
-import lissa.trading.user.service.service.user_creation.UserCreationService;
+import lissa.trading.user.service.service.creation.UserCreationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;

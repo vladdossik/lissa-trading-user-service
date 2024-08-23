@@ -1,4 +1,4 @@
-package lissa.trading.user.service.service.user_creation;
+package lissa.trading.user.service.service.creation;
 
 import lissa.trading.user.service.exception.UserCreationException;
 import lissa.trading.user.service.mapper.UserMapper;
