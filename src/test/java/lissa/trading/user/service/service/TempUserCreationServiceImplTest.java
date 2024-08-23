@@ -1,6 +1,6 @@
 package lissa.trading.user.service.service;
 
-import lissa.trading.user.service.dto.post.UserInfoDto;
+import lissa.trading.auth_security_lib.dto.UserInfoDto;
 import lissa.trading.user.service.event.TempUserSavedEvent;
 import lissa.trading.user.service.exception.UserCreationException;
 import lissa.trading.user.service.model.TempUserReg;

@@ -5,10 +5,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lissa.trading.user.service.dto.post.UserInfoDto;
+import lissa.trading.auth_security_lib.dto.UserInfoDto;
 import lissa.trading.user.service.exception.UnauthorizedException;
 import lissa.trading.user.service.service.creation.TempUserCreationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.ErrorResponse;
@@ -37,10 +38,11 @@ public class UserRegController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))
     )
     @PostMapping("/register")
-    public void registerUser(@AuthenticationPrincipal UserInfoDto userInfo) {
+    public ResponseEntity<String> registerUser(@AuthenticationPrincipal UserInfoDto userInfo) {
         if (userInfo == null) {
             throw new UnauthorizedException("User is not authenticated");
         }
         tempUserCreationService.createTempUser(userInfo);
+        return ResponseEntity.ok("User registration successful");
     }
 }
