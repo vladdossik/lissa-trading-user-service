@@ -1,6 +1,6 @@
 package lissa.trading.user.service.service;
 
-import lissa.trading.auth_security_lib.dto.UserInfoDto;
+import lissa.trading.lissa.auth.lib.dto.UserInfoDto;
 import lissa.trading.user.service.event.TempUserSavedEvent;
 import lissa.trading.user.service.exception.UserCreationException;
 import lissa.trading.user.service.model.TempUserReg;
@@ -24,9 +24,7 @@ class TempUserCreationServiceImplTest extends BaseTest {
     void createTempUser_UserAlreadyExists_ThrowsUserCreationException() {
         when(userRepository.findByTelegramNickname(userInfoDto.getTelegramNickname())).thenReturn(Optional.of(user));
 
-        UserCreationException exception = assertThrows(UserCreationException.class, () -> {
-            tempUserCreationService.createTempUser(userInfoDto);
-        });
+        UserCreationException exception = assertThrows(UserCreationException.class, () -> tempUserCreationService.createTempUser(userInfoDto));
 
         assertEquals("User with telegram nickname " + userInfoDto.getTelegramNickname() + " already exists!", exception.getMessage());
         verify(tempUserRegRepository, never()).save(any(TempUserReg.class));

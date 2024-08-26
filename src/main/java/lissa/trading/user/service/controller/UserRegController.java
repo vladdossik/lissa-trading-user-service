@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lissa.trading.auth_security_lib.dto.UserInfoDto;
+import lissa.trading.lissa.auth.lib.dto.UserInfoDto;
 import lissa.trading.user.service.exception.UnauthorizedException;
 import lissa.trading.user.service.service.creation.TempUserCreationService;
 import lombok.RequiredArgsConstructor;

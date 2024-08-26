@@ -1,6 +1,6 @@
 package lissa.trading.user.service.service;
 
-import lissa.trading.auth_security_lib.dto.UserInfoDto;
+import lissa.trading.lissa.auth.lib.dto.UserInfoDto;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
 import lissa.trading.user.service.mapper.TempUserRegMapper;
 import lissa.trading.user.service.mapper.UserMapper;

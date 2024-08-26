@@ -1,6 +1,6 @@
 package lissa.trading.user.service.mapper;
 
-import lissa.trading.auth_security_lib.dto.UserInfoDto;
+import lissa.trading.lissa.auth.lib.dto.UserInfoDto;
 import lissa.trading.user.service.dto.response.TempUserRegResponseDto;
 import lissa.trading.user.service.model.TempUserReg;
 import org.mapstruct.AfterMapping;

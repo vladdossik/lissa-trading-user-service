@@ -1,6 +1,6 @@
 package lissa.trading.user.service.service.creation;
 
-import lissa.trading.auth_security_lib.dto.UserInfoDto;
+import lissa.trading.lissa.auth.lib.dto.UserInfoDto;
 import lissa.trading.user.service.event.TempUserSavedEvent;
 import lissa.trading.user.service.exception.UserCreationException;
 import lissa.trading.user.service.mapper.TempUserRegMapper;
@@ -26,8 +26,16 @@ public class TempUserCreationServiceImpl implements TempUserCreationService {
     @Override
     @Transactional
     public void createTempUser(UserInfoDto userInfoDto) {
-        userRepository.findByTelegramNickname(userInfoDto.getTelegramNickname()).ifPresent(user -> {
-            throw new UserCreationException("User with telegram nickname " + userInfoDto.getTelegramNickname() + " already exists!");
+        String telegramNickname = userInfoDto.getTelegramNickname();
+
+        userRepository.findByTelegramNickname(telegramNickname).ifPresent(user -> {
+            log.debug("User with telegram nickname {} already exists in 'user' table.", telegramNickname);
+            throw new UserCreationException("User with telegram nickname " + telegramNickname + " already exists!");
+        });
+
+        tempUserRegRepository.findByTelegramNickname(telegramNickname).ifPresent(tempUser -> {
+            log.debug("User with telegram nickname {} already exists in 'temp_user_reg' table.", telegramNickname);
+            throw new UserCreationException("User with telegram nickname " + telegramNickname + " already exists!");
         });
 
         TempUserReg tempUserReg = tempUserRegMapper.toTempUserReg(userInfoDto);
