@@ -1,4 +1,4 @@
-package lissa.trading.user.service.service;
+package lissa.trading.user.service.service.creation;
 
 import lissa.trading.user.service.model.TempUserReg;
 

@@ -35,8 +35,20 @@ class UserCreationServiceImplTest extends BaseTest {
 
         UserCreationException thrown = assertThrows(UserCreationException.class, () -> userCreationService.createUserFromTempUserReg(tempUserReg));
 
-        assertEquals("Error creating user from temp user", thrown.getMessage());
+        assertEquals("Error creating user from TempUserReg", thrown.getMessage());
         verify(userRepository, times(1)).save(any(User.class));
         verify(tempUserRegRepository, never()).delete(any(TempUserReg.class));
+    }
+
+    @Test
+    void createUserFromTempUserReg_tempUserRegDeletionException() {
+        when(userRepository.save(any(User.class))).thenReturn(null);
+        doThrow(new DataAccessException("Error deleting TempUserReg") {}).when(tempUserRegRepository).delete(any(TempUserReg.class));
+
+        UserCreationException thrown = assertThrows(UserCreationException.class, () -> userCreationService.createUserFromTempUserReg(tempUserReg));
+
+        assertEquals("Error creating user from TempUserReg", thrown.getMessage());
+        verify(userRepository, times(1)).save(any(User.class));
+        verify(tempUserRegRepository, times(1)).delete(any(TempUserReg.class));
     }
 }

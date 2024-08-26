@@ -1,5 +1,8 @@
 package lissa.trading.user.service.controller;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -24,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/v1/users")
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "User Controller", description = "API для управления пользователями")
@@ -33,6 +36,10 @@ public class UserController {
     private final UserService userService;
 
     @Operation(summary = "Получение пользователей с пагинацией и фильтрацией")
+    @ApiResponse(
+            description = "Пользователи успешно получены с пагинацией и фильтрацией",
+            content = @Content(schema = @Schema(implementation = CustomPage.class))
+    )
     @GetMapping
     @PreAuthorize("hasRole('VIP') or hasRole('ADMIN')")
     public CustomPage<UserResponseDto> getUsersWithPaginationAndFilters(Pageable pageable,
@@ -42,6 +49,10 @@ public class UserController {
     }
 
     @Operation(summary = "Получение пользователя по внешнему идентификатору")
+    @ApiResponse(
+            description = "Пользователь успешно получен по внешнему идентификатору",
+            content = @Content(schema = @Schema(implementation = UserResponseDto.class))
+    )
     @GetMapping("/{externalId}")
     @PreAuthorize("hasRole('ADMIN')")
     public UserResponseDto getUserByExternalId(@PathVariable UUID externalId) {
@@ -49,6 +60,10 @@ public class UserController {
     }
 
     @Operation(summary = "Обновление пользователя")
+    @ApiResponse(
+            description = "Пользователь успешно обновлен",
+            content = @Content(schema = @Schema(implementation = UserResponseDto.class))
+    )
     @PatchMapping("/{externalId}")
     @PreAuthorize("hasRole('ADMIN')")
     public UserResponseDto updateUser(@PathVariable UUID externalId, @Valid @RequestBody UserPatchDto userUpdates) {
@@ -56,6 +71,10 @@ public class UserController {
     }
 
     @Operation(summary = "Удаление пользователя по внешнему идентификатору")
+    @ApiResponse(
+            description = "Пользователь успешно удален",
+            content = @Content()
+    )
     @DeleteMapping("/{externalId}")
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteUserByExternalId(@PathVariable UUID externalId) {
@@ -63,6 +82,10 @@ public class UserController {
     }
 
     @Operation(summary = "Блокировка пользователя по Telegram никнейму")
+    @ApiResponse(
+            description = "Пользователь успешно заблокирован",
+            content = @Content()
+    )
     @PostMapping("/block/{telegramNickname}")
     @PreAuthorize("hasRole('ADMIN')")
     public void blockUserByTelegramNickname(@PathVariable String telegramNickname) {
