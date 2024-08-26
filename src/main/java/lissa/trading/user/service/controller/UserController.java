@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/v1/users")
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "User Controller", description = "API для управления пользователями")
