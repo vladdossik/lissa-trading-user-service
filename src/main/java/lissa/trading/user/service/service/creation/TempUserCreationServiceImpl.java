@@ -28,17 +28,15 @@ public class TempUserCreationServiceImpl implements TempUserCreationService {
     public void createTempUser(UserInfoDto userInfoDto) {
         String telegramNickname = userInfoDto.getTelegramNickname();
 
-        userRepository.findByTelegramNickname(telegramNickname).ifPresent(user -> {
-            log.debug("User with telegram nickname {} already exists in 'user' table.", telegramNickname);
+        if (userRepository.findByTelegramNickname(telegramNickname).isPresent() ||
+                tempUserRegRepository.findByTelegramNickname(telegramNickname).isPresent()) {
+            log.debug("User with telegram nickname {} already exists.", telegramNickname);
             throw new UserCreationException("User with telegram nickname " + telegramNickname + " already exists!");
-        });
-
-        tempUserRegRepository.findByTelegramNickname(telegramNickname).ifPresent(tempUser -> {
-            log.debug("User with telegram nickname {} already exists in 'temp_user_reg' table.", telegramNickname);
-            throw new UserCreationException("User with telegram nickname " + telegramNickname + " already exists!");
-        });
+        }
 
         TempUserReg tempUserReg = tempUserRegMapper.toTempUserReg(userInfoDto);
+        log.debug("Successfully mapped temp user with telegram nickname: {}", telegramNickname);
+
         TempUserReg savedTempUser = tempUserRegRepository.save(tempUserReg);
 
         eventPublisher.publishEvent(new TempUserSavedEvent(this, savedTempUser));
