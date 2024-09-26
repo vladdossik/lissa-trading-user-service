@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: 24.09.2024_03
+      author: belaquaa@mail.ru
+      changes:
+        - dropTable:
+            tableName: favorite_stocks
+        - dropTable:
+            tableName: operations
+        - dropTable:
+            tableName: positions
+        - dropTable:
+            tableName: posts
+        - dropTable:
+            tableName: subscriptions
+        - dropTable:
+            tableName: users

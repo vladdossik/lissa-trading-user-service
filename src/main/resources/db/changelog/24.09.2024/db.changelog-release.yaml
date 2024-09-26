@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - include:
+      file: "03_delete_unnecessary_tables.yaml"
+      relativeToChangelogFile: true
+  - include:
+      file: "01_update_user_table.yaml"
+      relativeToChangelogFile: true
+  - include:
+      file: "02_update_entities_table.yaml"
+      relativeToChangelogFile: true
+  - include:
+      file: "04_create_user_daily_stats.yaml"
+      relativeToChangelogFile: true
