@@ -26,7 +26,6 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
         return new InternalTokenFilter(internalTokenService);
     }
 
-
     @Override
     protected void configureHttpSecurity(HttpSecurity http) throws Exception {
         http.addFilterBefore(internalTokenFilter(), UsernamePasswordAuthenticationFilter.class);

@@ -10,5 +10,5 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FavouriteStocksDto {
-    List<String> favouriteStocks;
+    private List<String> favouriteStocks;
 }
