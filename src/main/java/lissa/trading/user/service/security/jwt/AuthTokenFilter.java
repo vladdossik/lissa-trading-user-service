@@ -1,4 +1,4 @@
-package lissa.trading.user.service.security;
+package lissa.trading.user.service.security.jwt;
 
 import lissa.trading.lissa.auth.lib.dto.UserInfoDto;
 import lissa.trading.lissa.auth.lib.feign.AuthServiceClient;

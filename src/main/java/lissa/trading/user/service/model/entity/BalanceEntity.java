@@ -17,15 +17,14 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "operations")
+@Table(name = "balances")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = "user")
-public class UserOperationsEntity {
+public class BalanceEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,14 +35,14 @@ public class UserOperationsEntity {
     private User user;
 
     @NotNull
-    @Column(name = "operation_type", nullable = false)
-    private String operationType;
+    @Column(name = "currency", nullable = false)
+    private String currency;
 
     @NotNull
-    @Column(name = "operation_value", nullable = false)
-    private BigDecimal operationValue;
+    @Column(name = "current_balance", nullable = false)
+    private BigDecimal currentBalance;
 
     @NotNull
-    @Column(name = "operation_date", nullable = false)
-    private OffsetDateTime operationDate;
+    @Column(name = "total_amount_balance", nullable = false)
+    private BigDecimal totalAmountBalance;
 }

@@ -39,4 +39,12 @@ public class SwaggerConfig {
                 .pathsToMatch("/v1/users/**")
                 .build();
     }
+
+    @Bean
+    public GroupedOpenApi internalApi() {
+        return GroupedOpenApi.builder()
+                .group("internal")
+                .pathsToMatch("/v1/internal/**")
+                .build();
+    }
 }
