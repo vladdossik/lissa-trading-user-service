@@ -1,11 +1,13 @@
 package lissa.trading.user.service.feign;
 
+import lissa.trading.lissa.auth.lib.dto.UpdateTinkoffTokenResponce;
 import lissa.trading.user.service.dto.tinkoff.Stock;
 import lissa.trading.user.service.dto.tinkoff.account.AccountInfoDto;
 import lissa.trading.user.service.dto.tinkoff.account.BalanceDto;
 import lissa.trading.user.service.dto.tinkoff.account.FavouriteStocksDto;
 import lissa.trading.user.service.dto.tinkoff.account.MarginAttributesDto;
 import lissa.trading.user.service.dto.tinkoff.account.SecurityPositionsDto;
+import lissa.trading.user.service.dto.tinkoff.account.TinkoffTokenDto;
 import lissa.trading.user.service.dto.tinkoff.stock.FigiesDto;
 import lissa.trading.user.service.dto.tinkoff.stock.StocksDto;
 import lissa.trading.user.service.dto.tinkoff.stock.StocksPricesDto;
@@ -20,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface TinkoffAccountClient {
 
     @PostMapping("/set-token")
-    void setTinkoffToken(@RequestBody String tinkoffToken);
+    UpdateTinkoffTokenResponce setTinkoffToken(@RequestBody TinkoffTokenDto tinkoffToken);
 
     @GetMapping("/{ticker}")
     Stock getStockByTicker(@PathVariable("ticker") String ticker);

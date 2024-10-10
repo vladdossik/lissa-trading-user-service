@@ -6,9 +6,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lissa.trading.lissa.auth.lib.dto.UpdateTinkoffTokenResponce;
 import lissa.trading.lissa.auth.lib.dto.UserInfoDto;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
 import lissa.trading.user.service.dto.response.UserResponseDto;
+import lissa.trading.user.service.dto.tinkoff.account.TinkoffTokenDto;
 import lissa.trading.user.service.exception.UnauthorizedException;
 import lissa.trading.user.service.feign.TinkoffAccountClient;
 import lissa.trading.user.service.page.CustomPage;
@@ -115,7 +117,7 @@ public class InternalController {
     }
 
     @PostMapping("/setTinkoffToken")
-    public void setTinkoffToken(@RequestBody String tinkoffToken) {
-        tinkoffAccountClient.setTinkoffToken(tinkoffToken);
+    public UpdateTinkoffTokenResponce setTinkoffToken(@RequestBody TinkoffTokenDto tinkoffToken) {
+        return tinkoffAccountClient.setTinkoffToken(tinkoffToken);
     }
 }

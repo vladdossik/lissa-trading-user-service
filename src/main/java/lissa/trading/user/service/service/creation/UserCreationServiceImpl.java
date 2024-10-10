@@ -6,6 +6,7 @@ import lissa.trading.user.service.dto.tinkoff.account.FavouriteStocksDto;
 import lissa.trading.user.service.dto.tinkoff.account.MarginAttributesDto;
 import lissa.trading.user.service.dto.tinkoff.account.SecurityPosition;
 import lissa.trading.user.service.dto.tinkoff.account.SecurityPositionsDto;
+import lissa.trading.user.service.dto.tinkoff.account.TinkoffTokenDto;
 import lissa.trading.user.service.exception.UserCreationException;
 import lissa.trading.user.service.mapper.UserMapper;
 import lissa.trading.user.service.model.TempUserReg;
@@ -27,13 +28,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -60,7 +57,7 @@ public class UserCreationServiceImpl implements UserCreationService {
             log.info("Starting to create user from TempUserReg: {}", tempUserReg);
 
             User user = userMapper.toUserFromTempUserReg(tempUserReg);
-            tinkoffAccountClient.setTinkoffToken(tempUserReg.getTinkoffToken());
+            tinkoffAccountClient.setTinkoffToken(new TinkoffTokenDto(tempUserReg.getTinkoffToken()));
 
             getTelegramInfo(user);
 
