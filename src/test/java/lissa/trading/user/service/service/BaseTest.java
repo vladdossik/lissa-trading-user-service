@@ -2,19 +2,30 @@ package lissa.trading.user.service.service;
 
 import lissa.trading.lissa.auth.lib.dto.UserInfoDto;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
+import lissa.trading.user.service.feign.TinkoffAccountClient;
 import lissa.trading.user.service.mapper.TempUserRegMapper;
 import lissa.trading.user.service.mapper.UserMapper;
 import lissa.trading.user.service.model.TempUserReg;
 import lissa.trading.user.service.model.User;
+import lissa.trading.user.service.model.entity.BalanceEntity;
+import lissa.trading.user.service.model.entity.FavoriteStocksEntity;
+import lissa.trading.user.service.model.entity.MarginTradingMetricsEntity;
+import lissa.trading.user.service.model.entity.PostsEntity;
+import lissa.trading.user.service.model.entity.UserAccountEntity;
+import lissa.trading.user.service.model.entity.UserOperationsEntity;
+import lissa.trading.user.service.model.entity.UserPositionsEntity;
 import lissa.trading.user.service.repository.TempUserRegRepository;
 import lissa.trading.user.service.repository.UserRepository;
-import lissa.trading.user.service.service.creation.TempUserCreationService;
+import lissa.trading.user.service.repository.entity.BalanceEntityRepository;
+import lissa.trading.user.service.repository.entity.FavoriteStocksEntityRepository;
+import lissa.trading.user.service.repository.entity.MarginTradingMetricsEntityRepository;
+import lissa.trading.user.service.repository.entity.UserAccountEntityRepository;
+import lissa.trading.user.service.repository.entity.UserPositionsEntityRepository;
 import lissa.trading.user.service.service.creation.TempUserCreationServiceImpl;
-import lissa.trading.user.service.service.creation.UserCreationService;
 import lissa.trading.user.service.service.creation.UserCreationServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
@@ -32,15 +43,40 @@ public abstract class BaseTest {
     protected TempUserRegRepository tempUserRegRepository;
 
     @Mock
+    protected FavoriteStocksEntityRepository favoriteStocksRepository;
+
+    @Mock
+    protected UserPositionsEntityRepository userPositionsRepository;
+
+    @Mock
+    protected MarginTradingMetricsEntityRepository marginTradingMetricsRepository;
+
+    @Mock
+    protected TinkoffAccountClient tinkoffAccountClient;
+
+    @Mock
+    protected BalanceEntityRepository balanceRepository;
+
+    @Mock
+    protected UserAccountEntityRepository userAccountRepository;
+
+    @Mock
     protected TempUserRegMapper tempUserRegMapper;
 
     @Mock
     protected ApplicationEventPublisher eventPublisher;
 
+    @Mock
     protected UserMapper userMapper;
-    protected UserService userService;
-    protected UserCreationService userCreationService;
-    protected TempUserCreationService tempUserCreationService;
+
+    @InjectMocks
+    protected UserServiceImpl userService;
+
+    @InjectMocks
+    protected UserCreationServiceImpl userCreationService;
+
+    @InjectMocks
+    protected TempUserCreationServiceImpl tempUserCreationService;
 
     protected User user;
     protected TempUserReg tempUserReg;
@@ -49,10 +85,6 @@ public abstract class BaseTest {
 
     @BeforeEach
     void setUp() {
-        userMapper = Mappers.getMapper(UserMapper.class);
-        userService = new UserServiceImpl(userRepository, userMapper);
-        userCreationService = new UserCreationServiceImpl(userRepository, tempUserRegRepository, userMapper);
-        tempUserCreationService = new TempUserCreationServiceImpl(userRepository, tempUserRegRepository, tempUserRegMapper, eventPublisher);
 
         user = createUser();
         tempUserReg = createTempUserReg();
@@ -62,20 +94,52 @@ public abstract class BaseTest {
 
     private User createUser() {
         User userEntity = new User();
-        userEntity.setId(1L);
         userEntity.setExternalId(UUID.randomUUID());
         userEntity.setFirstName("John");
         userEntity.setLastName("Doe");
         userEntity.setTelegramChatId(12345L);
         userEntity.setTelegramNickname("johndoe");
         userEntity.setTinkoffToken("token");
-        userEntity.setCurrentBalance(new BigDecimal("100.00"));
+
+        BalanceEntity balance = new BalanceEntity();
+        balance.setUser(userEntity);
+        balance.setCurrency("USD");
+        balance.setCurrentBalance(new BigDecimal("100.00"));
+        balance.setTotalAmountBalance(new BigDecimal("100.00"));
+        userEntity.getBalances().add(balance);
+
         userEntity.setPercentageChangeSinceYesterday(new BigDecimal("0.01"));
         userEntity.setMonetaryChangeSinceYesterday(new BigDecimal("1.00"));
+
         userEntity.setAccountCount(1);
         userEntity.setIsMarginTradingEnabled(true);
-        userEntity.setMarginTradingMetrics("metrics");
-        userEntity.setTinkoffInvestmentTariff("tariff");
+
+        MarginTradingMetricsEntity metrics = new MarginTradingMetricsEntity();
+        metrics.setUser(userEntity);
+        metrics.setCurrency("USD");
+        metrics.setLiquidPortfolio(5000.00);
+        userEntity.setMarginTradingMetrics(metrics);
+
+        UserAccountEntity account = new UserAccountEntity();
+        account.setUser(userEntity);
+        userEntity.getUserAccounts().add(account);
+
+        FavoriteStocksEntity favoriteStock = new FavoriteStocksEntity();
+        favoriteStock.setUser(userEntity);
+        userEntity.getFavoriteStocks().add(favoriteStock);
+
+        UserPositionsEntity position = new UserPositionsEntity();
+        position.setUser(userEntity);
+        userEntity.getPositions().add(position);
+
+        UserOperationsEntity operation = new UserOperationsEntity();
+        operation.setUser(userEntity);
+        userEntity.getOperations().add(operation);
+
+        PostsEntity post = new PostsEntity();
+        post.setUser(userEntity);
+        userEntity.getPosts().add(post);
+
         return userEntity;
     }
 

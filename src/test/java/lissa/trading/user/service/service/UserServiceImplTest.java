@@ -1,209 +1,228 @@
 package lissa.trading.user.service.service;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import lissa.trading.user.service.dto.patch.UserPatchDto;
 import lissa.trading.user.service.dto.response.UserResponseDto;
+import lissa.trading.user.service.exception.UserNotFoundException;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.page.CustomPage;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class UserServiceImplTest extends BaseTest {
+public class UserServiceImplTest extends BaseTest {
 
     @Test
-    void testUpdateUser() {
-        when(userRepository.findByExternalId(any(UUID.class))).thenReturn(Optional.of(user));
-        when(userRepository.save(any(User.class))).thenReturn(user);
+    void updateUser_success() {
+        UUID externalId = UUID.randomUUID();
+        UserPatchDto userUpdates = new UserPatchDto();
+        userUpdates.setFirstName("UpdatedFirstName");
+        User existingUser = new User();
+        existingUser.setExternalId(externalId);
+        User updatedUser = new User();
+        updatedUser.setExternalId(externalId);
+        updatedUser.setFirstName("UpdatedFirstName");
+        UserResponseDto userResponseDto = new UserResponseDto();
+        userResponseDto.setFirstName("UpdatedFirstName");
 
-        UserResponseDto result = userService.updateUser(user.getExternalId(), userPatchDto);
+        when(userRepository.findByExternalId(externalId)).thenReturn(Optional.of(existingUser));
+        when(userMapper.updateUserFromDto(userUpdates, existingUser)).thenReturn(updatedUser);
+        when(userRepository.save(updatedUser)).thenReturn(updatedUser);
+        when(userMapper.toUserResponseDto(updatedUser)).thenReturn(userResponseDto);
+
+        UserResponseDto result = userService.updateUser(externalId, userUpdates);
 
         assertNotNull(result);
-        assertEquals("Jane", result.getFirstName());
-        assertEquals("Doe", result.getLastName()); // Изменение проверки на существующее значение
-        verify(userRepository, times(1)).findByExternalId(any(UUID.class));
-        verify(userRepository, times(1)).save(any(User.class));
+        assertEquals("UpdatedFirstName", result.getFirstName());
+        verify(userRepository).findByExternalId(externalId);
+        verify(userMapper).updateUserFromDto(userUpdates, existingUser);
+        verify(userRepository).save(updatedUser);
+        verify(userMapper).toUserResponseDto(updatedUser);
     }
 
     @Test
-    void testBlockUserByTelegramNickname() {
-        when(userRepository.findByTelegramNickname(anyString())).thenReturn(Optional.of(user));
+    void updateUser_userNotFound() {
+        UUID externalId = UUID.randomUUID();
+        UserPatchDto userUpdates = new UserPatchDto();
+        when(userRepository.findByExternalId(externalId)).thenReturn(Optional.empty());
 
-        userService.blockUserByTelegramNickname(user.getTelegramNickname());
+        UserNotFoundException thrown = assertThrows(UserNotFoundException.class, () ->
+                userService.updateUser(externalId, userUpdates));
+
+        assertEquals("User with external id " + externalId + " not found", thrown.getMessage());
+        verify(userRepository, times(1)).findByExternalId(externalId);
+        verify(userMapper, never()).updateUserFromDto(any(), any());
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void blockUserByTelegramNickname_success() {
+        String telegramNickname = "testNickname";
+        User user = new User();
+        user.setIsMarginTradingEnabled(true);
+
+        when(userRepository.findByTelegramNickname(telegramNickname)).thenReturn(Optional.of(user));
+        when(userRepository.save(user)).thenReturn(user);
+
+        userService.blockUserByTelegramNickname(telegramNickname);
 
         assertFalse(user.getIsMarginTradingEnabled());
-        verify(userRepository, times(1)).findByTelegramNickname(anyString());
-        verify(userRepository, times(1)).save(any(User.class));
+        verify(userRepository, times(1)).findByTelegramNickname(telegramNickname);
+        verify(userRepository, times(1)).save(user);
     }
 
     @Test
-    void testDeleteUserByExternalId() {
-        when(userRepository.findByExternalId(any(UUID.class))).thenReturn(Optional.of(user));
-        doNothing().when(userRepository).delete(any(User.class));
+    void blockUserByTelegramNickname_userNotFound() {
+        String telegramNickname = "nonExistentNickname";
+        when(userRepository.findByTelegramNickname(telegramNickname)).thenReturn(Optional.empty());
 
-        userService.deleteUserByExternalId(user.getExternalId());
+        UserNotFoundException thrown = assertThrows(UserNotFoundException.class, () ->
+                userService.blockUserByTelegramNickname(telegramNickname));
 
-        verify(userRepository, times(1)).findByExternalId(any(UUID.class));
-        verify(userRepository, times(1)).delete(any(User.class));
+        assertEquals("User with Telegram nickname " + telegramNickname + " not found", thrown.getMessage());
+        verify(userRepository, times(1)).findByTelegramNickname(telegramNickname);
+        verify(userRepository, never()).save(any());
     }
 
     @Test
-    void testGetUserByExternalId() {
-        when(userRepository.findByExternalId(any(UUID.class))).thenReturn(Optional.of(user));
+    void deleteUserByExternalId_success() {
+        UUID externalId = UUID.randomUUID();
+        User user = new User();
+        user.setExternalId(externalId);
 
-        UserResponseDto result = userService.getUserByExternalId(user.getExternalId());
+        when(userRepository.findByExternalId(externalId)).thenReturn(Optional.of(user));
+        doNothing().when(userRepository).delete(user);
+
+        userService.deleteUserByExternalId(externalId);
+
+        verify(userRepository, times(1)).findByExternalId(externalId);
+        verify(userRepository, times(1)).delete(user);
+    }
+
+    @Test
+    void deleteUserByExternalId_userNotFound() {
+        UUID externalId = UUID.randomUUID();
+        when(userRepository.findByExternalId(externalId)).thenReturn(Optional.empty());
+
+        UserNotFoundException thrown = assertThrows(UserNotFoundException.class, () ->
+                userService.deleteUserByExternalId(externalId));
+
+        assertEquals("User with external id " + externalId + " not found", thrown.getMessage());
+        verify(userRepository, times(1)).findByExternalId(externalId);
+        verify(userRepository, never()).delete((User) any());
+    }
+
+    @Test
+    void getUserByExternalId_success() {
+        UUID externalId = UUID.randomUUID();
+        User user = new User();
+        user.setExternalId(externalId);
+        UserResponseDto userResponseDto = new UserResponseDto();
+        userResponseDto.setExternalId(externalId);
+
+        when(userRepository.findByExternalId(externalId)).thenReturn(Optional.of(user));
+        when(userMapper.toUserResponseDto(user)).thenReturn(userResponseDto);
+
+        UserResponseDto result = userService.getUserByExternalId(externalId);
 
         assertNotNull(result);
-        assertEquals(user.getFirstName(), result.getFirstName());
-        verify(userRepository, times(1)).findByExternalId(any(UUID.class));
+        assertEquals(externalId, result.getExternalId());
+        verify(userRepository, times(1)).findByExternalId(externalId);
+        verify(userMapper, times(1)).toUserResponseDto(user);
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    void testGetUsersWithPaginationAndFilters() {
+    void getUserByExternalId_userNotFound() {
+        UUID externalId = UUID.randomUUID();
+        when(userRepository.findByExternalId(externalId)).thenReturn(Optional.empty());
+
+        UserNotFoundException thrown = assertThrows(UserNotFoundException.class, () ->
+                userService.getUserByExternalId(externalId));
+
+        assertEquals("User with external id " + externalId + " not found", thrown.getMessage());
+        verify(userRepository, times(1)).findByExternalId(externalId);
+        verify(userMapper, never()).toUserResponseDto(any());
+    }
+
+    @Test
+    void getUsersWithPaginationAndFilters_success() {
         Pageable pageable = PageRequest.of(0, 10);
-        List<User> users = List.of(user);
-        Page<User> page = new PageImpl<>(users, pageable, users.size());
+        String firstName = "John";
+        String lastName = "Doe";
+        User user = new User();
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        UserResponseDto userResponseDto = new UserResponseDto();
+        userResponseDto.setFirstName(firstName);
+        userResponseDto.setLastName(lastName);
 
-        when(userRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
+        List<User> users = Collections.singletonList(user);
+        Page<User> userPage = new PageImpl<>(users, pageable, users.size());
 
-        CustomPage<UserResponseDto> result = userService.getUsersWithPaginationAndFilters(pageable, "John", "Doe");
+        when(userRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(userPage);
+        when(userMapper.toUserResponseDto(user)).thenReturn(userResponseDto);
+
+        CustomPage<UserResponseDto> result = userService.getUsersWithPaginationAndFilters(pageable, firstName, lastName);
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
-        verify(userRepository, times(1)).findAll(any(Specification.class), any(Pageable.class));
+        assertEquals(firstName, result.getContent().get(0).getFirstName());
+        verify(userRepository, times(1)).findAll(any(Specification.class), eq(pageable));
+        verify(userMapper, times(1)).toUserResponseDto(user);
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    void testGetUsersWithPaginationAndFilters_OnlyFirstName() {
+    void getUsersWithPaginationAndFilters_noResults() {
         Pageable pageable = PageRequest.of(0, 10);
-        List<User> users = List.of(user);
-        Page<User> page = new PageImpl<>(users, pageable, users.size());
+        String firstName = "NonExistentFirstName";
+        String lastName = "NonExistentLastName";
+        Page<User> emptyPage = new PageImpl<>(Collections.emptyList(), pageable, 0);
 
-        when(userRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
+        when(userRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(emptyPage);
 
-        CustomPage<UserResponseDto> result = userService.getUsersWithPaginationAndFilters(pageable, "John", null);
-
-        assertNotNull(result);
-        assertEquals(1, result.getTotalElements());
-        verify(userRepository, times(1)).findAll(any(Specification.class), any(Pageable.class));
-    }
-
-    @Test
-    void testUpdateUserWithPatchDto() {
-        when(userRepository.findByExternalId(any(UUID.class))).thenReturn(Optional.of(user));
-        when(userRepository.save(any(User.class))).thenReturn(user);
-
-        UserResponseDto result = userService.updateUser(user.getExternalId(), userPatchDto);
+        CustomPage<UserResponseDto> result = userService.getUsersWithPaginationAndFilters(pageable, firstName, lastName);
 
         assertNotNull(result);
-        assertEquals("Jane", result.getFirstName());
-        assertEquals("Doe", result.getLastName());
-        assertEquals(12345L, result.getTelegramChatId());
-        assertNull(result.getTelegramNickname());
-        assertEquals("newToken", result.getTinkoffToken());
-        assertEquals(new BigDecimal("100.00"), result.getCurrentBalance());
-        assertEquals(new BigDecimal("0.01"), result.getPercentageChangeSinceYesterday());
-        assertEquals(new BigDecimal("1.00"), result.getMonetaryChangeSinceYesterday());
-        assertEquals(1, result.getAccountCount().intValue());
-        assertTrue(result.getIsMarginTradingEnabled());
-        assertEquals("metrics", result.getMarginTradingMetrics());
-        assertEquals("tariff", result.getTinkoffInvestmentTariff());
-        verify(userRepository, times(1)).findByExternalId(any(UUID.class));
-        verify(userRepository, times(1)).save(any(User.class));
+        assertEquals(0, result.getTotalElements());
+        verify(userRepository, times(1)).findAll(any(Specification.class), eq(pageable));
+        verify(userMapper, never()).toUserResponseDto(any());
     }
 
     @Test
-    void testUpdateUserWithPatchDto_PartialUpdate() {
-        UserPatchDto partialUpdateDto = new UserPatchDto();
-        partialUpdateDto.setFirstName("Jane");
-        partialUpdateDto.setLastName("");
-        partialUpdateDto.setTelegramNickname(null);
-//        partialUpdateDto.setTinkoffToken("token"); - Если не передадим в качестве параметра
+    void getUsersWithPaginationAndFilters_exception() {
+        Pageable pageable = PageRequest.of(0, 10);
+        String firstName = "John";
+        String lastName = "Doe";
 
-        when(userRepository.findByExternalId(any(UUID.class))).thenReturn(Optional.of(user));
-        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(userRepository.findAll(any(Specification.class), eq(pageable)))
+                .thenThrow(new DataAccessException("Database error") {});
 
-        UserResponseDto result = userService.updateUser(user.getExternalId(), partialUpdateDto);
+        DataAccessException thrown = assertThrows(DataAccessException.class, () ->
+                userService.getUsersWithPaginationAndFilters(pageable, firstName, lastName));
 
-        assertNotNull(result);
-        assertEquals("Jane", result.getFirstName());
-        assertNull(result.getLastName());
-        assertEquals(user.getTelegramChatId(), result.getTelegramChatId());
-        assertEquals(user.getTelegramNickname(), result.getTelegramNickname());
-        assertEquals(user.getTinkoffToken(), result.getTinkoffToken());
-        assertEquals(user.getCurrentBalance(), result.getCurrentBalance());
-        assertEquals(user.getPercentageChangeSinceYesterday(), result.getPercentageChangeSinceYesterday());
-        assertEquals(user.getMonetaryChangeSinceYesterday(), result.getMonetaryChangeSinceYesterday());
-        assertEquals(user.getAccountCount(), result.getAccountCount());
-        assertEquals(user.getIsMarginTradingEnabled(), result.getIsMarginTradingEnabled());
-        assertEquals(user.getMarginTradingMetrics(), result.getMarginTradingMetrics());
-        assertEquals(user.getTinkoffInvestmentTariff(), result.getTinkoffInvestmentTariff());
-        verify(userRepository, times(1)).findByExternalId(any(UUID.class));
-        verify(userRepository, times(1)).save(any(User.class));
-    }
-
-    @Test
-    void testUpdateUserFromDto_SomeFieldsNull() {
-
-        UserPatchDto nullUserPatchDto = new UserPatchDto();
-        nullUserPatchDto.setFirstName("John");
-        nullUserPatchDto.setLastName(null);
-        nullUserPatchDto.setTelegramNickname("johnny");
-        nullUserPatchDto.setTinkoffToken("");
-
-        User user = new User();
-        userMapper.updateUserFromDto(nullUserPatchDto, user);
-
-        assertEquals("John", user.getFirstName());
-        assertNull(user.getLastName());
-        assertNull(user.getTelegramChatId());
-        assertEquals("johnny", user.getTelegramNickname());
-        assertNull(user.getTinkoffToken());
-        assertNull(user.getCurrentBalance());
-        assertNull(user.getPercentageChangeSinceYesterday());
-        assertNull(user.getMonetaryChangeSinceYesterday());
-        assertNull(user.getAccountCount());
-        assertNull(user.getIsMarginTradingEnabled());
-        assertNull(user.getMarginTradingMetrics());
-        assertNull(user.getTinkoffInvestmentTariff());
-    }
-
-    @Test
-    void testUpdateUserFromDto_NullDto() {
-        User user = new User();
-
-        assertNull(user.getFirstName());
-        assertNull(user.getLastName());
-        assertNull(user.getTelegramChatId());
-        assertNull(user.getTelegramNickname());
-        assertNull(user.getTinkoffToken());
-        assertNull(user.getCurrentBalance());
-        assertNull(user.getPercentageChangeSinceYesterday());
-        assertNull(user.getMonetaryChangeSinceYesterday());
-        assertNull(user.getAccountCount());
-        assertNull(user.getIsMarginTradingEnabled());
-        assertNull(user.getMarginTradingMetrics());
-        assertNull(user.getTinkoffInvestmentTariff());
+        assertEquals("Database error", thrown.getMessage());
+        verify(userRepository, times(1)).findAll(any(Specification.class), eq(pageable));
     }
 }
