@@ -192,4 +192,3 @@ class UserCreationServiceImplTest extends BaseTest {
         verify(tempUserRegRepository, times(1)).delete(tempUserReg);
     }
 }
-
