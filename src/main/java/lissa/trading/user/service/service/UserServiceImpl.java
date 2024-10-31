@@ -2,13 +2,14 @@ package lissa.trading.user.service.service;
 
 import jakarta.validation.Valid;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
-import lissa.trading.user.service.mapper.PageMapper;
-import lissa.trading.user.service.mapper.UserMapper;
 import lissa.trading.user.service.dto.response.UserResponseDto;
 import lissa.trading.user.service.exception.UserNotFoundException;
+import lissa.trading.user.service.mapper.PageMapper;
+import lissa.trading.user.service.mapper.UserMapper;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.page.CustomPage;
 import lissa.trading.user.service.repository.UserRepository;
+import lissa.trading.user.service.service.publisher.UserStatsPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -28,12 +29,15 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final UserStatsPublisher userStatsPublisher;
 
     @Override
     @Transactional
     public UserResponseDto updateUser(UUID externalId, @Valid UserPatchDto userUpdates) {
-        return userMapper.toUserResponseDto(userRepository.save(
-                userMapper.updateUserFromDto(userUpdates, findUserByExternalId(externalId))));
+        User savedUser = userRepository.save(
+                userMapper.updateUserFromDto(userUpdates, findUserByExternalId(externalId)));
+        userStatsPublisher.publishUserDataAfterUpdate(savedUser);
+        return userMapper.toUserResponseDto(savedUser);
     }
 
     @Override
@@ -60,7 +64,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public CustomPage<UserResponseDto> getUsersWithPaginationAndFilters(Pageable pageable, String firstName, String lastName) {
+    public CustomPage<UserResponseDto> getUsersWithPaginationAndFilters(Pageable pageable, String firstName,
+                                                                        String lastName) {
         log.info("Fetching users with pagination and filters - firstName: {}, lastName: {}", firstName, lastName);
 
         Specification<User> specification = UserSpecification.withFilters(firstName, lastName);

@@ -16,6 +16,7 @@ import lissa.trading.user.service.feign.TinkoffAccountClient;
 import lissa.trading.user.service.page.CustomPage;
 import lissa.trading.user.service.service.UserService;
 import lissa.trading.user.service.service.creation.TempUserCreationService;
+import lissa.trading.user.service.service.publisher.UserStatsPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +43,7 @@ public class InternalController {
 
     private final TempUserCreationService tempUserCreationService;
     private final UserService userService;
+    private final UserStatsPublisher userStatsPublisher;
     TinkoffAccountClient tinkoffAccountClient;
 
     @Operation(summary = "Регистрация пользователя по токену")
@@ -62,6 +64,15 @@ public class InternalController {
         }
         tempUserCreationService.createTempUser(userInfo);
         return ResponseEntity.ok("User registration successful");
+    }
+
+    @Operation(summary = "Отправка данных по всем пользователям в сервис статистики")
+    @ApiResponse(
+            description = "Данные успешно отправлены"
+    )
+    @PostMapping("/sendUserStats")
+    public void sendUserStats() {
+        userStatsPublisher.publishAllStats();
     }
 
     @Operation(summary = "Получение пользователей с пагинацией и фильтрацией")

@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: 24.09.2024_04
+      author: belaquaa@mail.ru
+      changes:
+        - createTable:
+            tableName: user_daily_stats
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: balance
+                  type: DECIMAL(19, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: monetary_change
+                  type: DECIMAL(19, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: percentage_change
+                  type: DECIMAL(5, 2)
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: user_daily_stats
+            baseColumnNames: user_id
+            constraintName: fk_user_daily_stats_user
+            referencedTableName: users
+            referencedColumnNames: id
