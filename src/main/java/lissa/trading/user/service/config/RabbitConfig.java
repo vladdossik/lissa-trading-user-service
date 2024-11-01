@@ -16,7 +16,7 @@ public class RabbitConfig {
     private String userStatsQueue;
 
     @Bean
-    public Queue allUsersStatsQueue() {
+    public Queue usersStatsQueue() {
         return new Queue(userStatsQueue, true);
     }
 
