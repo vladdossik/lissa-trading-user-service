@@ -30,7 +30,8 @@ public class UserStatsPublisher implements StatsPublisher<User> {
     @Scheduled(cron = "0 0 0 * * ?")
     public void publishAllUsersData() {
         List<UserStatsReportDto> users = userRepository.findAll().stream()
-                .map(userMapper::toUserStatsReportDto).toList();
+                .map(userMapper::toUserStatsReportDto)
+                .toList();
 
         if (CollectionUtils.isEmpty(users)) {
             log.error("Error getting all users");
