@@ -70,9 +70,9 @@ public class InternalController {
     @ApiResponse(
             description = "Данные успешно отправлены"
     )
-    @PostMapping("/sendUserStats")
+    @PostMapping("/export-user-data-to-stats-service")
     public void sendUserStats() {
-        statsPublisher.publishAllStats();
+        statsPublisher.publishAllUsersData();
     }
 
     @Operation(summary = "Получение пользователей с пагинацией и фильтрацией")

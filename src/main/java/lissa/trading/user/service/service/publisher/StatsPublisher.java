@@ -2,9 +2,7 @@ package lissa.trading.user.service.service.publisher;
 
 public interface StatsPublisher<T> {
 
-    void publishAllStats();
+    void publishAllUsersData();
 
-    void publishStatAfterUpdate(T stats);
+    void publishUserData(T data);
 }
-
-

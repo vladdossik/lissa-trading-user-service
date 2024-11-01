@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto updateUser(UUID externalId, @Valid UserPatchDto userUpdates) {
         User savedUser = userRepository.save(
                 userMapper.updateUserFromDto(userUpdates, findUserByExternalId(externalId)));
-        statsPublisher.publishStatAfterUpdate(savedUser);
+        statsPublisher.publishUserData(savedUser);
         return userMapper.toUserResponseDto(savedUser);
     }
 

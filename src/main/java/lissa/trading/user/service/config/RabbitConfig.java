@@ -5,20 +5,19 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitConfig {
 
-    @Bean
-    public Queue allUsersStatsQueue() {
-        return new Queue("all-users-stats-queue", true);
-    }
+    @Value("${integration.rabbit.statistics-service.user-queue}")
+    private String userStatsQueue;
 
     @Bean
-    public Queue updatedUsersStatsQueue() {
-        return new Queue("updated-user-stats-queue", true);
+    public Queue allUsersStatsQueue() {
+        return new Queue(userStatsQueue, true);
     }
 
     @Bean
@@ -33,4 +32,3 @@ public class RabbitConfig {
         return new Jackson2JsonMessageConverter();
     }
 }
-

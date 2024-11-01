@@ -8,8 +8,10 @@ import lissa.trading.user.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -18,28 +20,30 @@ import java.util.List;
 @Slf4j
 public class UserStatsPublisher implements StatsPublisher<User> {
 
+    @Value("${integration.rabbit.statistics-service.user-queue}")
+    private String userStatsQueue;
+
     private final RabbitTemplate rabbitTemplate;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
     @Scheduled(cron = "0 0 0 * * ?")
-    public void publishAllStats() {
+    public void publishAllUsersData() {
         List<UserStatsReportDto> users = userRepository.findAll().stream()
                 .map(userMapper::toUserStatsReportDto).toList();
 
-        if (users.isEmpty() || users == null) {
+        if (CollectionUtils.isEmpty(users)) {
             log.error("Error getting all users");
             throw new UserNotFoundException("Error getting all users");
         }
 
-        rabbitTemplate.convertAndSend("all-users-stats-queue", users);
+        rabbitTemplate.convertAndSend(userStatsQueue, users);
         log.info("Users successfully published");
     }
 
-    public void publishStatAfterUpdate(User user) {
+    public void publishUserData(User user) {
         UserStatsReportDto userStatsReportDto = userMapper.toUserStatsReportDto(user);
-        rabbitTemplate.convertAndSend("updated-user-stats-queue", userStatsReportDto);
+        rabbitTemplate.convertAndSend(userStatsQueue, List.of(userStatsReportDto));
         log.info("User successfully published after update");
     }
 }
-

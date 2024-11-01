@@ -29,5 +29,3 @@ public class UserStatsReportDto {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private OffsetDateTime updatedAt;
 }
-
-
