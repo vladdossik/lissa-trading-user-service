@@ -1,7 +1,6 @@
 package lissa.trading.user.service.service.publisher;
 
 import lissa.trading.user.service.dto.response.UserStatsReportDto;
-import lissa.trading.user.service.exception.UserNotFoundException;
 import lissa.trading.user.service.mapper.UserMapper;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.repository.UserRepository;
@@ -29,16 +28,22 @@ public class UserStatsPublisher implements StatsPublisher<User> {
 
     @Scheduled(cron = "0 0 0 * * ?")
     public void publishAllUsersData() {
+        int batchSize = 200;
         List<UserStatsReportDto> users = userRepository.findAll().stream()
                 .map(userMapper::toUserStatsReportDto)
                 .toList();
 
         if (CollectionUtils.isEmpty(users)) {
-            log.error("Error getting all users");
-            throw new UserNotFoundException("Error getting all users");
+            log.error("Users list is empty");
+            return;
         }
 
-        rabbitTemplate.convertAndSend(userStatsQueue, users);
+        for (int i = 0; i < users.size(); i += batchSize) {
+            int batchEnd = Math.min(users.size() - 1, i + batchSize);
+            List<UserStatsReportDto> batchUsers = users.subList(i, batchEnd);
+            rabbitTemplate.convertAndSend(userStatsQueue, batchUsers);
+            log.info("Successfully published {} batch", i);
+        }
         log.info("Users successfully published");
     }
 
