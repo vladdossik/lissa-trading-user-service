@@ -131,4 +131,3 @@ class UserSpecificationTest {
         assertNull(result);
     }
 }
-
