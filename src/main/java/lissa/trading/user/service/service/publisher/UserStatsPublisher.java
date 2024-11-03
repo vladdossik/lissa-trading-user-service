@@ -21,6 +21,7 @@ public class UserStatsPublisher implements StatsPublisher<User> {
 
     @Value("${integration.rabbit.statistics-service.user-queue}")
     private String userStatsQueue;
+    private Integer offset = 0;
 
     private final RabbitTemplate rabbitTemplate;
     private final UserRepository userRepository;
@@ -29,21 +30,23 @@ public class UserStatsPublisher implements StatsPublisher<User> {
     @Scheduled(cron = "0 0 0 * * ?")
     public void publishAllUsersData() {
         int batchSize = 200;
-        List<UserStatsReportDto> users = userRepository.findAll().stream()
-                .map(userMapper::toUserStatsReportDto)
-                .toList();
+        log.info("batch and offset : {}, {}", batchSize, offset);
 
-        if (CollectionUtils.isEmpty(users)) {
-            log.error("Users list is empty");
-            return;
+        while (true) {
+            List<UserStatsReportDto> users =
+                    userRepository.findAllWithLimitAndOffset(batchSize, offset).stream()
+                            .map(userMapper::toUserStatsReportDto)
+                            .toList();
+
+            if (CollectionUtils.isEmpty(users)) {
+                log.info("All users have been published");
+                break;
+            }
+
+            rabbitTemplate.convertAndSend(userStatsQueue, users);
+            offset += batchSize;
         }
 
-        for (int i = 0; i < users.size(); i += batchSize) {
-            int batchEnd = Math.min(users.size() - 1, i + batchSize);
-            List<UserStatsReportDto> batchUsers = users.subList(i, batchEnd);
-            rabbitTemplate.convertAndSend(userStatsQueue, batchUsers);
-            log.info("Successfully published {} batch", i);
-        }
         log.info("Users successfully published");
     }
 
