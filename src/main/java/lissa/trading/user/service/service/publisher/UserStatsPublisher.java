@@ -28,14 +28,18 @@ public class UserStatsPublisher implements StatsPublisher<User> {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
+    @Override
     @Scheduled(cron = "0 0 0 * * ?")
+    @Transactional(readOnly = true)
     public void publishAllUsersData() {
         List<UserStatsReportDto> users;
         int batchSize = 200;
         log.info("batch and offset : {}, {}", batchSize, defaultOffset);
 
         while (true) {
-            users = findAllWithLimitAndOffset(batchSize, defaultOffset);
+            users = userRepository.findAllWithLimitAndOffset(batchSize, defaultOffset).stream()
+                    .map(userMapper::toUserStatsReportDto)
+                    .toList();
 
             if (CollectionUtils.isEmpty(users)) {
                 log.info("All users have been published");
@@ -49,13 +53,7 @@ public class UserStatsPublisher implements StatsPublisher<User> {
         log.info("Users successfully published");
     }
 
-    @Transactional(readOnly = true)
-    protected List<UserStatsReportDto> findAllWithLimitAndOffset(int batchSize, int defaultOffset) {
-        return userRepository.findAllWithLimitAndOffset(batchSize, defaultOffset).stream()
-                .map(userMapper::toUserStatsReportDto)
-                .toList();
-    }
-
+    @Override
     public void publishUserData(User user) {
         UserStatsReportDto userStatsReportDto = userMapper.toUserStatsReportDto(user);
         rabbitTemplate.convertAndSend(userStatsQueue, List.of(userStatsReportDto));
