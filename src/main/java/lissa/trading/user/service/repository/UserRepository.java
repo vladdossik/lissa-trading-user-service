@@ -20,6 +20,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     @Query("UPDATE User u SET u.accountCount = :accountCount WHERE u.id = :userId")
     int updateAccountCount(@Param("userId") Long userId, @Param("accountCount") int accountCount);
 
-    @Query(nativeQuery = true, value = "select * from user_service_db.users limit ?1 offset ?2")
+    @Query(nativeQuery = true, value = "select * from users limit :limit offset :offset")
     List<User> findAllWithLimitAndOffset(int limit, int offset);
 }

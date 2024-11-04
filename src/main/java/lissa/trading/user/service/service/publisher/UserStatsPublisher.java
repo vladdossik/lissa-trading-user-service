@@ -10,6 +10,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class UserStatsPublisher implements StatsPublisher<User> {
 
     @Value("${integration.rabbit.statistics-service.user-queue}")
     private String userStatsQueue;
-    private Integer offset = 0;
+    private Integer defaultOffset = 0;
 
     private final RabbitTemplate rabbitTemplate;
     private final UserRepository userRepository;
@@ -29,14 +30,12 @@ public class UserStatsPublisher implements StatsPublisher<User> {
 
     @Scheduled(cron = "0 0 0 * * ?")
     public void publishAllUsersData() {
+        List<UserStatsReportDto> users;
         int batchSize = 200;
-        log.info("batch and offset : {}, {}", batchSize, offset);
+        log.info("batch and offset : {}, {}", batchSize, defaultOffset);
 
         while (true) {
-            List<UserStatsReportDto> users =
-                    userRepository.findAllWithLimitAndOffset(batchSize, offset).stream()
-                            .map(userMapper::toUserStatsReportDto)
-                            .toList();
+            users = findAllWithLimitAndOffset(batchSize, defaultOffset);
 
             if (CollectionUtils.isEmpty(users)) {
                 log.info("All users have been published");
@@ -44,10 +43,17 @@ public class UserStatsPublisher implements StatsPublisher<User> {
             }
 
             rabbitTemplate.convertAndSend(userStatsQueue, users);
-            offset += batchSize;
+            defaultOffset += batchSize;
         }
 
         log.info("Users successfully published");
+    }
+
+    @Transactional(readOnly = true)
+    protected List<UserStatsReportDto> findAllWithLimitAndOffset(int batchSize, int defaultOffset) {
+        return userRepository.findAllWithLimitAndOffset(batchSize, defaultOffset).stream()
+                .map(userMapper::toUserStatsReportDto)
+                .toList();
     }
 
     public void publishUserData(User user) {
