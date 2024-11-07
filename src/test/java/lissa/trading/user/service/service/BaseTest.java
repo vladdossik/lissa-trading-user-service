@@ -23,6 +23,7 @@ import lissa.trading.user.service.repository.entity.UserAccountEntityRepository;
 import lissa.trading.user.service.repository.entity.UserPositionsEntityRepository;
 import lissa.trading.user.service.service.creation.TempUserCreationServiceImpl;
 import lissa.trading.user.service.service.creation.UserCreationServiceImpl;
+import lissa.trading.user.service.service.publisher.StatsPublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -68,6 +69,9 @@ public abstract class BaseTest {
 
     @Mock
     protected UserMapper userMapper;
+
+    @Mock
+    protected StatsPublisher<User> statsPublisher;
 
     @InjectMocks
     protected UserServiceImpl userService;
