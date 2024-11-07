@@ -1,0 +1,65 @@
+databaseChangeLog:
+  - changeSet:
+      id: 07.11.2024_01
+      author: belaquaa@mail.ru
+      changes:
+        # 1. Удаляем ненужный столбец current_balance
+        - dropColumn:
+            tableName: users
+            columnName: current_balance
+
+        # 2. Изменяем ограничения столбцов, чтобы они могли принимать NULL значения
+        - modifyDataType:
+            tableName: users
+            columnName: percentage_change_since_yesterday
+            newDataType: DECIMAL(5,2)
+        - dropNotNullConstraint:
+            tableName: users
+            columnName: percentage_change_since_yesterday
+            columnDataType: DECIMAL(5,2)
+
+        - modifyDataType:
+            tableName: users
+            columnName: monetary_change_since_yesterday
+            newDataType: DECIMAL(19,2)
+        - dropNotNullConstraint:
+            tableName: users
+            columnName: monetary_change_since_yesterday
+            columnDataType: DECIMAL(19,2)
+
+        - modifyDataType:
+            tableName: users
+            columnName: account_count
+            newDataType: INTEGER
+        - dropNotNullConstraint:
+            tableName: users
+            columnName: account_count
+            columnDataType: INTEGER
+
+        - modifyDataType:
+            tableName: users
+            columnName: is_margin_trading_enabled
+            newDataType: BOOLEAN
+        - dropNotNullConstraint:
+            tableName: users
+            columnName: is_margin_trading_enabled
+            columnDataType: BOOLEAN
+
+        # 3. Устанавливаем значения по умолчанию для is_margin_trading_enabled (false)
+        - addDefaultValue:
+            tableName: users
+            columnName: is_margin_trading_enabled
+            defaultValueBoolean: false
+
+  - changeSet:
+      id: 07.11.2024_02
+      author: belaquaa@mail.ru
+      changes:
+        # 4. Обновляем существующие записи, где is_margin_trading_enabled равен NULL
+        - update:
+            tableName: users
+            columns:
+              - column:
+                  name: is_margin_trading_enabled
+                  valueBoolean: false
+            where: "is_margin_trading_enabled IS NULL"
