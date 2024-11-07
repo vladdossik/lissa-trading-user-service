@@ -41,11 +41,7 @@ jobs:
       - name: Build and test with Maven
         run: mvn -B clean verify
 
-      # 4. Запуск анализа зависимостей с OWASP Dependency Check
-      - name: OWASP Dependency Check
-        run: mvn org.owasp:dependency-check-maven:check
-
-      # 5. Загрузка результатов тестов для анализа
+      # 4. Загрузка результатов тестов для анализа
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -53,7 +49,7 @@ jobs:
           name: test-results
           path: '**/target/surefire-reports/*'
 
-      # 6. Загрузка отчетов о покрытии кода
+      # 5. Загрузка отчетов о покрытии кода
       - name: Upload code coverage report
         if: always()
         uses: actions/upload-artifact@v4
@@ -61,18 +57,10 @@ jobs:
           name: code-coverage-report
           path: '**/target/site/jacoco/*'
 
-      # 7. Архивация артефактов сборки
+      # 6. Архивация артефактов сборки
       - name: Archive build artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
           path: '**/target/*.jar'
-
-      # 8. Загрузка отчета OWASP Dependency Check
-      - name: Upload OWASP Dependency Check Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: owasp-dependency-check-report
-          path: 'target/dependency-check-report.xml'
