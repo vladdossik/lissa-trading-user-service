@@ -80,7 +80,7 @@ public class InternalController {
             description = "Пользователи успешно получены с пагинацией и фильтрацией",
             content = @Content(schema = @Schema(implementation = CustomPage.class))
     )
-    @GetMapping
+    @GetMapping("/get-users")
     public CustomPage<UserResponseDto> getUsersWithPaginationAndFilters(Pageable pageable,
                                                                         @RequestParam(required = false) String firstName,
                                                                         @RequestParam(required = false) String lastName) {

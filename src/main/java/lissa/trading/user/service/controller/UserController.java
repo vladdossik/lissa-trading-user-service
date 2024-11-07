@@ -40,7 +40,7 @@ public class UserController {
             description = "Пользователи успешно получены с пагинацией и фильтрацией",
             content = @Content(schema = @Schema(implementation = CustomPage.class))
     )
-    @GetMapping
+    @GetMapping("/get-users")
     @PreAuthorize("hasRole('VIP') or hasRole('ADMIN')")
     public CustomPage<UserResponseDto> getUsersWithPaginationAndFilters(Pageable pageable,
                                                                         @RequestParam(required = false) String firstName,
