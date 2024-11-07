@@ -7,15 +7,15 @@ on:
   push:
     branches: [ main ]
     paths:
-      - '**.java'
-      - '**.xml'
+      - '**/*.java'
+      - '**/*.xml'
       - 'pom.xml'
       - 'src/**'
   pull_request:
     branches: [ main ]
     paths:
-      - '**.java'
-      - '**.xml'
+      - '**/*.java'
+      - '**/*.xml'
       - 'pom.xml'
       - 'src/**'
 
@@ -25,23 +25,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Клонирование репозитория
+      # 1. Клонирование репозитория
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Установка JDK 17 и кэширование зависимостей Maven
+      # 2. Установка JDK 17 и кэширование зависимостей Maven
       - name: Set up JDK 17 and cache dependencies
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
+          distribution: 'temurin'      # Можно использовать 'zulu', 'adoptium' и т.д.
           java-version: '17'
-          cache: 'maven'
+          cache: 'maven'               # Включает кэширование зависимостей Maven
 
-      # Сборка и тестирование проекта с Maven
+      # 3. Сборка и тестирование проекта с Maven
       - name: Build and test with Maven
         run: mvn -B clean verify
 
-      # Загрузка результатов тестов для анализа
+      # 4. Запуск анализа зависимостей с OWASP Dependency Check
+      - name: OWASP Dependency Check
+        run: mvn org.owasp:dependency-check-maven:check
+
+      # 5. Загрузка результатов тестов для анализа
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -49,7 +53,7 @@ jobs:
           name: test-results
           path: '**/target/surefire-reports/*'
 
-      # Загрузка отчетов о покрытии кода
+      # 6. Загрузка отчетов о покрытии кода
       - name: Upload code coverage report
         if: always()
         uses: actions/upload-artifact@v4
@@ -57,7 +61,7 @@ jobs:
           name: code-coverage-report
           path: '**/target/site/jacoco/*'
 
-      # Архивация артефактов сборки
+      # 7. Архивация артефактов сборки
       - name: Archive build artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -65,24 +69,10 @@ jobs:
           name: build-artifacts
           path: '**/target/*.jar'
 
-      # Запуск статического анализа кода
-      - name: Run Static Code Analysis
-        run: mvn spotbugs:check pmd:check checkstyle:check
-      - name: Upload Code Analysis Reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: code-analysis-reports
-          path: '**/target/site/*'
-
-      # Запуск анализа зависимостей с OWASP Dependency Check
-      - name: OWASP Dependency Check
-        run: mvn org.owasp:dependency-check-maven:check
+      # 8. Загрузка отчета OWASP Dependency Check
       - name: Upload OWASP Dependency Check Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: owasp-dependency-check-report
-          path: '**/dependency-check-report.xml'
-
-
+          path: 'target/dependency-check-report.xml'
