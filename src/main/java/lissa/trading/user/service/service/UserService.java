@@ -10,8 +10,12 @@ import java.util.UUID;
 
 public interface UserService {
     UserResponseDto updateUser(UUID externalId, @Valid UserPatchDto userUpdates);
+
     void blockUserByTelegramNickname(String telegramNickname);
+
     void deleteUserByExternalId(UUID externalId);
+
     UserResponseDto getUserByExternalId(UUID externalId);
+
     CustomPage<UserResponseDto> getUsersWithPaginationAndFilters(Pageable pageable, String firstName, String lastName);
 }

@@ -44,7 +44,8 @@ class TempUserCreationServiceImplTest extends BaseTest {
         verify(tempUserRegRepository, times(1)).save(any(TempUserReg.class));
         verify(eventPublisher, times(1)).publishEvent(any(TempUserSavedEvent.class));
 
-        doThrow(new DataAccessException("Error saving temp user") {}).when(tempUserRegRepository).save(any(TempUserReg.class));
+        doThrow(new DataAccessException("Error saving temp user") {
+        }).when(tempUserRegRepository).save(any(TempUserReg.class));
 
         Exception exception = assertThrows(DataAccessException.class, () -> tempUserCreationService.createTempUser(userInfoDto));
 

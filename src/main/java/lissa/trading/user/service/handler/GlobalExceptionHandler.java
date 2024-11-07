@@ -5,7 +5,6 @@ import jakarta.validation.ConstraintViolationException;
 import lissa.trading.user.service.exception.UserCreationException;
 import lissa.trading.user.service.exception.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
