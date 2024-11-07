@@ -20,13 +20,12 @@ import java.util.List;
 @Slf4j
 public class UserStatsPublisher implements StatsPublisher<User> {
 
-    @Value("${integration.rabbit.statistics-service.user-queue}")
-    private String userStatsQueue;
-    private Integer defaultOffset = 0;
-
     private final RabbitTemplate rabbitTemplate;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    @Value("${integration.rabbit.statistics-service.user-queue}")
+    private String userStatsQueue;
+    private Integer defaultOffset = 0;
 
     @Override
     @Scheduled(cron = "0 0 0 * * ?")

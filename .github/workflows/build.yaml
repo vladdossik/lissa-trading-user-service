@@ -5,14 +5,14 @@ name: Java CI
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
     paths:
       - '**.java'
       - '**.xml'
       - 'pom.xml'
       - 'src/**'
   pull_request:
-    branches: [main]
+    branches: [ main ]
     paths:
       - '**.java'
       - '**.xml'
@@ -64,3 +64,25 @@ jobs:
         with:
           name: build-artifacts
           path: '**/target/*.jar'
+
+      # Запуск статического анализа кода
+      - name: Run Static Code Analysis
+        run: mvn spotbugs:check pmd:check checkstyle:check
+      - name: Upload Code Analysis Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-analysis-reports
+          path: '**/target/site/*'
+
+      # Запуск анализа зависимостей с OWASP Dependency Check
+      - name: OWASP Dependency Check
+        run: mvn org.owasp:dependency-check-maven:check
+      - name: Upload OWASP Dependency Check Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owasp-dependency-check-report
+          path: '**/dependency-check-report.xml'
+
+

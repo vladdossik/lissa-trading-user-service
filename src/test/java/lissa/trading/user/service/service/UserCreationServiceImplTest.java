@@ -141,7 +141,6 @@ class UserCreationServiceImplTest extends BaseTest {
     }
 
 
-
     @Test
     void createUserFromTempUserReg_ExceptionThrown() {
         User user = new User();
