@@ -1,5 +1,5 @@
-# GitHub Actions Workflow for Java with Maven using Java 17
-# Incorporates modern best practices and optimizations
+# GitHub Actions Workflow для Java с Maven и JDK 17
+# Использует современные лучшие практики и оптимизации
 
 name: Java CI
 
@@ -25,43 +25,42 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository
+      # Клонирование репозитория
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Set up JDK 17 and cache Maven dependencies
+      # Установка JDK 17 и кэширование зависимостей Maven
       - name: Set up JDK 17 and cache dependencies
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
           cache: 'maven'
-          cache-dependency-path: '**/pom.xml'
 
-      # Build and test the project with Maven
+      # Сборка и тестирование проекта с Maven
       - name: Build and test with Maven
         run: mvn -B clean verify
 
-      # Upload test results for analysis
+      # Загрузка результатов тестов для анализа
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: '**/target/surefire-reports/*'
 
-      # Upload code coverage reports
+      # Загрузка отчетов о покрытии кода
       - name: Upload code coverage report
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: code-coverage-report
           path: '**/target/site/jacoco/*'
 
-      # Archive built artifacts
+      # Архивация артефактов сборки
       - name: Archive build artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
           path: '**/target/*.jar'
