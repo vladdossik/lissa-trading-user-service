@@ -3,6 +3,7 @@ package lissa.trading.user.service.service;
 import jakarta.validation.Valid;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
 import lissa.trading.user.service.dto.response.UserResponseDto;
+import lissa.trading.user.service.dto.response.UsersIdResponseDto;
 import lissa.trading.user.service.exception.UserNotFoundException;
 import lissa.trading.user.service.mapper.PageMapper;
 import lissa.trading.user.service.mapper.UserMapper;
@@ -72,6 +73,23 @@ public class UserServiceImpl implements UserService {
         Page<User> usersPage = userRepository.findAll(specification, pageable);
 
         CustomPage<UserResponseDto> customPage = PageMapper.toCustomPage(usersPage, userMapper::toUserResponseDto);
+
+        log.info("Fetched {} users after pagination", customPage.getTotalElements());
+        return customPage;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CustomPage<UsersIdResponseDto> getUsersIdWithPaginationAndFilters(Pageable pageable, String firstName,
+                                                                             String lastName) {
+        log.info("Fetching users with pagination and filters - firstName: {}, lastName: {}", firstName, lastName);
+
+        Specification<User> specification = UserSpecification.withFilters(firstName, lastName);
+        Page<UUID> usersPage = userRepository.findAll(specification, pageable)
+                .map(User::getExternalId);
+
+        CustomPage<UsersIdResponseDto> customPage = PageMapper.toCustomPage(usersPage,
+                userMapper::toUsersIdResponseDto);
 
         log.info("Fetched {} users after pagination", customPage.getTotalElements());
         return customPage;

@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/lissa-trading-db
     username: postgres
-    password: root-password-123
+    password: postgres
     driver-class-name: org.postgresql.Driver
   rabbitmq:
     host: localhost
