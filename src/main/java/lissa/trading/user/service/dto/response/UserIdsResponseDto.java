@@ -10,6 +10,6 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UsersIdResponseDto {
+public class UserIdsResponseDto {
     private List<UUID> externalIds;
 }

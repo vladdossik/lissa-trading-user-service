@@ -3,7 +3,7 @@ package lissa.trading.user.service.service;
 import jakarta.validation.Valid;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
 import lissa.trading.user.service.dto.response.UserResponseDto;
-import lissa.trading.user.service.dto.response.UsersIdResponseDto;
+import lissa.trading.user.service.dto.response.UserIdsResponseDto;
 import lissa.trading.user.service.exception.UserNotFoundException;
 import lissa.trading.user.service.mapper.PageMapper;
 import lissa.trading.user.service.mapper.UserMapper;
@@ -80,18 +80,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public CustomPage<UsersIdResponseDto> getUsersIdWithPaginationAndFilters(Pageable pageable, String firstName,
+    public CustomPage<UserIdsResponseDto> getUserIdsWithPaginationAndFilters(Pageable pageable, String firstName,
                                                                              String lastName) {
-        log.info("Fetching users with pagination and filters - firstName: {}, lastName: {}", firstName, lastName);
+        log.info("Fetching user ids with pagination and filters - firstName: {}, lastName: {}", firstName, lastName);
 
-        Specification<User> specification = UserSpecification.withFilters(firstName, lastName);
-        Page<UUID> usersPage = userRepository.findAll(specification, pageable)
-                .map(User::getExternalId);
+        Page<UUID> usersPage = userRepository.findExternalIdsWithPaginationAndFilters(firstName, lastName, pageable);
+        log.info("Fetched ids: {}", usersPage.getContent());
 
-        CustomPage<UsersIdResponseDto> customPage = PageMapper.toCustomPage(usersPage,
-                userMapper::toUsersIdResponseDto);
+        CustomPage<UserIdsResponseDto> customPage = PageMapper.toCustomPage(usersPage, userMapper::toUserIdsResponseDto);
 
-        log.info("Fetched {} users after pagination", customPage.getTotalElements());
+        log.info("Fetched {} user ids after pagination", customPage.getContent().size());
         return customPage;
     }
 

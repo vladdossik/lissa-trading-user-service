@@ -3,7 +3,7 @@ package lissa.trading.user.service.service;
 import jakarta.validation.Valid;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
 import lissa.trading.user.service.dto.response.UserResponseDto;
-import lissa.trading.user.service.dto.response.UsersIdResponseDto;
+import lissa.trading.user.service.dto.response.UserIdsResponseDto;
 import lissa.trading.user.service.page.CustomPage;
 import org.springframework.data.domain.Pageable;
 
@@ -20,6 +20,6 @@ public interface UserService {
 
     CustomPage<UserResponseDto> getUsersWithPaginationAndFilters(Pageable pageable, String firstName, String lastName);
 
-    CustomPage<UsersIdResponseDto> getUsersIdWithPaginationAndFilters(Pageable pageable, String firstName,
+    CustomPage<UserIdsResponseDto> getUserIdsWithPaginationAndFilters(Pageable pageable, String firstName,
                                                                       String lastName);
 }

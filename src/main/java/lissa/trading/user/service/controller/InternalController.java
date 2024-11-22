@@ -10,7 +10,7 @@ import lissa.trading.lissa.auth.lib.dto.UpdateTinkoffTokenResponce;
 import lissa.trading.lissa.auth.lib.dto.UserInfoDto;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
 import lissa.trading.user.service.dto.response.UserResponseDto;
-import lissa.trading.user.service.dto.response.UsersIdResponseDto;
+import lissa.trading.user.service.dto.response.UserIdsResponseDto;
 import lissa.trading.user.service.dto.tinkoff.account.TinkoffTokenDto;
 import lissa.trading.user.service.exception.UnauthorizedException;
 import lissa.trading.user.service.feign.TinkoffAccountClient;
@@ -93,13 +93,13 @@ public class InternalController {
             description = "External id успешно получены с пагинацией и фильтрацией",
             content = @Content(schema = @Schema(implementation = CustomPage.class))
     )
-    @GetMapping("/get-users-id")
-    public CustomPage<UsersIdResponseDto> getUsersIdWithPaginationAndFilters(Pageable pageable,
+    @GetMapping("/get-user-ids")
+    public CustomPage<UserIdsResponseDto> getUserIdsWithPaginationAndFilters(Pageable pageable,
                                                                              @RequestParam(required = false)
                                                                              String firstName,
                                                                              @RequestParam(required = false)
                                                                              String lastName) {
-        return userService.getUsersIdWithPaginationAndFilters(pageable, firstName, lastName);
+        return userService.getUserIdsWithPaginationAndFilters(pageable, firstName, lastName);
     }
 
     @Operation(summary = "Получение пользователя по внешнему идентификатору")
