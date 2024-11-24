@@ -3,7 +3,6 @@ package lissa.trading.user.service.mapper;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
 import lissa.trading.user.service.dto.response.UserResponseDto;
 import lissa.trading.user.service.dto.response.UserStatsReportDto;
-import lissa.trading.user.service.dto.response.UserIdsResponseDto;
 import lissa.trading.user.service.model.TempUserReg;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.model.entity.BalanceEntity;
@@ -29,10 +28,6 @@ public interface UserMapper {
     @Mapping(target = "externalId")
     @Mapping(target = "totalCurrentBalance", expression = "java(calculateTotalBalance(user.getBalances()))")
     UserResponseDto toUserResponseDto(User user);
-
-    @Mapping(target = "externalIds",
-            expression = "java(java.util.Collections.singletonList(projection" + ".getExternalId()))")
-    UserIdsResponseDto toUserIdsResponseDto(UserExternalIdProjection projection);
 
     @Mapping(target = "externalId")
     @Mapping(target = "totalBalance", expression = "java(calculateTotalBalance(user.getBalances()))")

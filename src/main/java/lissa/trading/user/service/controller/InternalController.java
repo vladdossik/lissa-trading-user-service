@@ -10,7 +10,6 @@ import lissa.trading.lissa.auth.lib.dto.UpdateTinkoffTokenResponce;
 import lissa.trading.lissa.auth.lib.dto.UserInfoDto;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
 import lissa.trading.user.service.dto.response.UserResponseDto;
-import lissa.trading.user.service.dto.response.UserIdsResponseDto;
 import lissa.trading.user.service.dto.tinkoff.account.TinkoffTokenDto;
 import lissa.trading.user.service.exception.UnauthorizedException;
 import lissa.trading.user.service.feign.TinkoffAccountClient;
@@ -33,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -94,11 +94,11 @@ public class InternalController {
             content = @Content(schema = @Schema(implementation = CustomPage.class))
     )
     @GetMapping("/get-user-ids")
-    public CustomPage<UserIdsResponseDto> getUserIdsWithPaginationAndFilters(Pageable pageable,
-                                                                             @RequestParam(required = false)
-                                                                             String firstName,
-                                                                             @RequestParam(required = false)
-                                                                             String lastName) {
+    public List<UUID> getUserIdsWithPaginationAndFilters(Pageable pageable,
+                                                         @RequestParam(required = false)
+                                                         String firstName,
+                                                         @RequestParam(required = false)
+                                                         String lastName) {
         return userService.getUserIdsWithPaginationAndFilters(pageable, firstName, lastName);
     }
 

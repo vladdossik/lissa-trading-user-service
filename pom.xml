@@ -45,11 +45,9 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-<!--        https://github.com/kenpxrk1/specification-with-projection-->
         <dependency>
-            <groupId>th.co.geniustree.springdata.jpa</groupId>
-            <artifactId>specification-with-projections</artifactId>
-            <version>3.3.4</version>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
