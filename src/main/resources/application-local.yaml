@@ -20,6 +20,7 @@ spring:
     properties:
       hibernate:
         default_schema: user_service_db
+        format_sql: true
 
   liquibase:
     enabled: true

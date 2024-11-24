@@ -2,14 +2,14 @@ package lissa.trading.user.service.service;
 
 import jakarta.validation.Valid;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
-import lissa.trading.user.service.dto.response.UserResponseDto;
 import lissa.trading.user.service.dto.response.UserIdsResponseDto;
+import lissa.trading.user.service.dto.response.UserResponseDto;
 import lissa.trading.user.service.exception.UserNotFoundException;
 import lissa.trading.user.service.mapper.PageMapper;
 import lissa.trading.user.service.mapper.UserMapper;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.page.CustomPage;
-import lissa.trading.user.service.repository.UserExternalIdProjection;
+import lissa.trading.user.service.repository.projections.UserExternalIdProjection;
 import lissa.trading.user.service.repository.UserRepository;
 import lissa.trading.user.service.service.publisher.StatsPublisher;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -86,14 +85,14 @@ public class UserServiceImpl implements UserService {
                                                                              String lastName) {
         log.info("Fetching user ids with pagination and filters - firstName: {}, lastName: {}", firstName, lastName);
         Specification<User> spec = UserSpecification.withFilters(firstName, lastName);
-        List<UserExternalIdProjection> usersPage = userRepository.findBy(spec,
-                q -> q.as(UserExternalIdProjection.class).project("externalId").all());
-        log.info("Fetched ids: {}", usersPage);
+        Page<UserExternalIdProjection> usersPage = userRepository.findAll(spec, UserExternalIdProjection.class,
+                pageable);
 
-//        CustomPage<UserIdsResponseDto> customPage = PageMapper.toCustomPage(usersPage, userMapper::toUserIdsResponseDto);
+        CustomPage<UserIdsResponseDto> customPage = PageMapper.toCustomPage(usersPage,
+                userMapper::toUserIdsResponseDto);
 
-        log.info("Fetched {} user ids after pagination", usersPage.size());
-        return new CustomPage<UserIdsResponseDto>(null, 0, 0, 0, null);
+        log.info("Fetched {} users after pagination", customPage.getTotalElements());
+        return customPage;
     }
 
     private User findUserByExternalId(UUID externalId) {
