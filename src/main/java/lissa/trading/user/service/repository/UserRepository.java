@@ -1,17 +1,22 @@
 package lissa.trading.user.service.repository;
 
 import lissa.trading.user.service.model.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import th.co.geniustree.springdata.jpa.repository.JpaSpecificationExecutorWithProjection;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
+public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User>,
+        JpaSpecificationExecutorWithProjection<User, Long> {
     Optional<User> findByTelegramNickname(String telegramNickname);
 
     Optional<User> findByExternalId(UUID externalId);
@@ -22,4 +27,5 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     @Query(nativeQuery = true, value = "select * from users limit :limit offset :offset")
     List<User> findAllWithLimitAndOffset(int limit, int offset);
+
 }

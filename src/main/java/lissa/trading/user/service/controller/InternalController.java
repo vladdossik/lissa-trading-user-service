@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -85,6 +86,20 @@ public class InternalController {
                                                                         @RequestParam(required = false) String firstName,
                                                                         @RequestParam(required = false) String lastName) {
         return userService.getUsersWithPaginationAndFilters(pageable, firstName, lastName);
+    }
+
+    @Operation(summary = "Получение external id пользователей с пагинацией и фильтрацией")
+    @ApiResponse(
+            description = "External id успешно получены с пагинацией и фильтрацией",
+            content = @Content(schema = @Schema(implementation = CustomPage.class))
+    )
+    @GetMapping("/get-user-ids")
+    public List<UUID> getUserIdsWithPaginationAndFilters(Pageable pageable,
+                                                         @RequestParam(required = false)
+                                                         String firstName,
+                                                         @RequestParam(required = false)
+                                                         String lastName) {
+        return userService.getUserIdsWithPaginationAndFilters(pageable, firstName, lastName);
     }
 
     @Operation(summary = "Получение пользователя по внешнему идентификатору")

@@ -6,6 +6,7 @@ import lissa.trading.user.service.dto.response.UserStatsReportDto;
 import lissa.trading.user.service.model.TempUserReg;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.model.entity.BalanceEntity;
+import lissa.trading.user.service.repository.projections.UserExternalIdProjection;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

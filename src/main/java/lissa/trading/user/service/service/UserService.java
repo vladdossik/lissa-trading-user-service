@@ -6,6 +6,7 @@ import lissa.trading.user.service.dto.response.UserResponseDto;
 import lissa.trading.user.service.page.CustomPage;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
@@ -18,4 +19,7 @@ public interface UserService {
     UserResponseDto getUserByExternalId(UUID externalId);
 
     CustomPage<UserResponseDto> getUsersWithPaginationAndFilters(Pageable pageable, String firstName, String lastName);
+
+    List<UUID> getUserIdsWithPaginationAndFilters(Pageable pageable, String firstName,
+                                                              String lastName);
 }
