@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: 01_create_users_partitions.yaml
+      relativeToChangelogFile: true
