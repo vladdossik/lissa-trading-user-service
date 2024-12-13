@@ -2,6 +2,7 @@ package lissa.trading.user.service.handler;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import lissa.trading.user.service.exception.OperationUnsupportedByBrokerException;
 import lissa.trading.user.service.exception.UserCreationException;
 import lissa.trading.user.service.exception.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleUserCreationException(UserCreationException ex) {
         log.error("User creation error: {}", ex.getMessage(), ex);
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(OperationUnsupportedByBrokerException.class)
+    public ResponseEntity<String> handleOperationUnsupportedByBrokerException(
+            OperationUnsupportedByBrokerException ex) {
+        log.error("Operation unsupported by broker: {}", ex.getMessage(), ex);
+        return new ResponseEntity<>("User registration successful\n" + ex.getMessage(),
+                HttpStatus.PARTIAL_CONTENT);
     }
 
     // VALIDATION EXCEPTIONS

@@ -1,12 +1,15 @@
 package lissa.trading.user.service.model;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lissa.trading.user.service.service.creation.factory.SupportedBrokersEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -45,9 +48,12 @@ public class UserReg {
     @Column(name = "telegram_nickname", unique = true)
     private String telegramNickname;
 
-    @NotNull
     @Column(name = "tinkoff_token")
     private String tinkoffToken;
+
+    @Column(name = "broker")
+    @Enumerated(EnumType.STRING)
+    private SupportedBrokersEnum broker;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -56,4 +62,5 @@ public class UserReg {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
+
 }
