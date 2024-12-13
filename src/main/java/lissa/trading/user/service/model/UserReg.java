@@ -41,6 +41,7 @@ public class UserReg {
     @Column(name = "last_name")
     private String lastName;
 
+    @Id
     @NotNull
     @Size(min = 1, max = 50)
     @Column(name = "telegram_nickname", unique = true)
