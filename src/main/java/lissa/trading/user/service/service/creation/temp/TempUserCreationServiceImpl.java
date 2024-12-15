@@ -1,4 +1,4 @@
-package lissa.trading.user.service.service.creation;
+package lissa.trading.user.service.service.creation.temp;
 
 import lissa.trading.lissa.auth.lib.dto.UserInfoDto;
 import lissa.trading.user.service.event.TempUserSavedEvent;

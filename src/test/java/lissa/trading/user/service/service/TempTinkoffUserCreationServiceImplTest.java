@@ -18,7 +18,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class TempUserCreationServiceImplTest extends BaseTest {
+class TempTinkoffUserCreationServiceImplTest extends BaseTest {
 
     @Test
     void createTempUser_UserAlreadyExists_ThrowsUserCreationException() {

@@ -19,6 +19,5 @@ public class TempUserRegPostDto {
     @NotNull
     @Size(min = 1, max = 50)
     private String telegramNickname;
-    @NotNull
     private String tinkoffToken;
 }
