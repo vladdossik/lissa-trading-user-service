@@ -29,7 +29,10 @@ spring:
 
 security:
   internal:
-    token: Iq6Vu8Nz7Xa3Rl9Cm5YbTc2WpDf4Oj5ZfGn1Kh3
+    outbound:
+      token: Iq6Vu8Nz7Xa3Rl9Cm5YbTc2WpDf4Oj5ZfGn1Kh3
+    inbound:
+      statistics-service-token: 4sy0dhDsAKbf9pc2yjgu5k_KA7lXDsXBo-1P9Q3C8bg
 
 logging:
   level:
