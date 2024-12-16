@@ -8,11 +8,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
-public class SimpleCreationServiceFactoryImpl implements SimpleCreationServiceFactory {
+public class UserCreationServiceFactoryImpl implements UserCreationServiceFactory {
 
     private final Map<SupportedBrokersEnum, UserCreationService> userCreationServiceMap;
 
-    public SimpleCreationServiceFactoryImpl(List<UserCreationService> userCreationServiceList) {
+    public UserCreationServiceFactoryImpl(List<UserCreationService> userCreationServiceList) {
         userCreationServiceMap = userCreationServiceList
                 .stream()
                 .collect(Collectors.toMap(
