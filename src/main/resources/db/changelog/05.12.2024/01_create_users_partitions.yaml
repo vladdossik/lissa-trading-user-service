@@ -1,0 +1,412 @@
+databaseChangeLog:
+  - changeSet:
+      id: 05.12.2024_1
+      author: kenpxrkasf@gmail.com
+      changes:
+        # 1. Удаление всех уникальных индексов из users
+        - dropUniqueConstraint:
+            tableName: users
+            constraintName: users_external_id_key
+        - dropUniqueConstraint:
+            tableName: users
+            constraintName: users_telegram_chat_id_key
+        - dropUniqueConstraint:
+            tableName: users
+            constraintName: users_telegram_nickname_key
+        # 2. Удаление всех внешних ключей на users
+        - dropForeignKeyConstraint:
+            constraintName: fk_user_daily_stats_user
+            baseTableName: user_daily_stats
+
+  - changeSet:
+      # 3. изменение primary key в users
+      id: 05.12.2024_2
+      author: kenpxrkasf@gmail.com
+      changes:
+        - renameTable:
+            oldTableName: users
+            newTableName: users_old
+        - dropPrimaryKey:
+            tableName: users_old
+            constraintName: users_pkey
+        - addPrimaryKey:
+            tableName: users_old
+            columnNames: id, telegram_nickname
+            constraintName: users_old_pkey
+
+  - changeSet:
+      #  создание партицированной таблицы
+      id: 05.12.2024_3
+      author: kenpxrkasf@gmail.com
+      changes:
+        - sql:
+            splitStatements: true
+            sql: |
+              CREATE TABLE users (
+                LIKE user_service_db.users_old INCLUDING ALL
+              )
+              PARTITION BY RANGE (telegram_nickname);
+
+  - changeSet:
+      # создание партиций
+      id: 05.12.2024_4
+      author: kenpxrkasf@gmail.com
+      changes:
+        - sql:
+            splitStatements: true
+            sql: |
+              CREATE TABLE user_service_db.users_a_e_upper PARTITION OF user_service_db.users
+              FOR VALUES FROM ('A') TO ('F');
+              
+              CREATE TABLE user_service_db.users_f_j_upper PARTITION OF user_service_db.users
+              FOR VALUES FROM ('F') TO ('K');
+              
+              CREATE TABLE user_service_db.users_k_o_upper PARTITION OF user_service_db.users
+              FOR VALUES FROM ('K') TO ('P');
+              
+              CREATE TABLE user_service_db.users_p_t_upper PARTITION OF user_service_db.users
+              FOR VALUES FROM ('P') TO ('U');
+              
+              CREATE TABLE user_service_db.users_u_z_upper PARTITION OF user_service_db.users
+              FOR VALUES FROM ('U') TO ('[');
+              
+              CREATE TABLE user_service_db.users_a_e_lower PARTITION OF user_service_db.users
+              FOR VALUES FROM ('a') TO ('f');
+              
+              CREATE TABLE user_service_db.users_f_j_lower PARTITION OF user_service_db.users
+              FOR VALUES FROM ('f') TO ('k');
+              
+              CREATE TABLE user_service_db.users_k_o_lower PARTITION OF user_service_db.users
+              FOR VALUES FROM ('k') TO ('p');
+              
+              CREATE TABLE user_service_db.users_p_t_lower PARTITION OF user_service_db.users
+              FOR VALUES FROM ('p') TO ('u');
+              
+              CREATE TABLE user_service_db.users_u_z_lower PARTITION OF user_service_db.users
+              FOR VALUES FROM ('u') TO ('{');
+            
+  - changeSet:
+      id: 05.12.2024_5
+      author: kenpxrkasf@gmail.com
+      # мигрируем данные из старой таблицы users_old в новую партиционную
+      changes:
+        - sql:
+            splitStatements: true
+            sql: |
+              INSERT INTO user_service_db.users (id, external_id, first_name, last_name, telegram_nickname, 
+              telegram_chat_id, tinkoff_token, percentage_change_since_yesterday, monetary_change_since_yesterday,
+              account_count, is_margin_trading_enabled, created_at, updated_at)
+              SELECT id, external_id, first_name, last_name, telegram_nickname, telegram_chat_id, tinkoff_token,
+              percentage_change_since_yesterday, monetary_change_since_yesterday, account_count,
+              is_margin_trading_enabled, created_at, updated_at
+              FROM user_service_db.users_old;
+
+  - changeSet:
+      # Добавляем поле telegram_nickname в таблицы
+      id: 05.12.2024_6
+      author: kenpxrkasf@gmail.com
+      changes:
+        - addColumn:
+            tableName: user_daily_stats
+            columns:
+              - column:
+                  name: telegram_nickname
+                  type: VARCHAR(255)
+        - addColumn:
+            tableName: user_accounts
+            columns:
+              - column:
+                  name: telegram_nickname
+                  type: VARCHAR(255)
+        - addColumn:
+            tableName: posts
+            columns:
+              - column:
+                  name: telegram_nickname
+                  type: VARCHAR(255)
+        - addColumn:
+            tableName: positions
+            columns:
+              - column:
+                  name: telegram_nickname
+                  type: VARCHAR(255)
+        - addColumn:
+            tableName: operations
+            columns:
+              - column:
+                  name: telegram_nickname
+                  type: VARCHAR(255)
+        - addColumn:
+            tableName: margin_trading_metrics
+            columns:
+              - column:
+                  name: telegram_nickname
+                  type: VARCHAR(255)
+        - addColumn:
+            tableName: favorite_stocks
+            columns:
+              - column:
+                  name: telegram_nickname
+                  type: VARCHAR(255)
+        - addColumn:
+            tableName: balances
+            columns:
+              - column:
+                  name: telegram_nickname
+                  type: VARCHAR(255)
+
+  - changeSet:
+      id: 05.12.2024_7
+      author: kenpxrkasf@gmail.com
+      # Добавляем fk в таблицы хранящие user_id
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: user_daily_stats
+            baseColumnNames: user_id, telegram_nickname
+            constraintName: fk_user_daily_stats_users
+            referencedTableName: users
+            referencedColumnNames: id, telegram_nickname
+        - addForeignKeyConstraint:
+            baseTableName: user_accounts
+            baseColumnNames: user_id, telegram_nickname
+            constraintName: fk_user_accounts_users
+            referencedTableName: users
+            referencedColumnNames: id, telegram_nickname
+        - addForeignKeyConstraint:
+            baseTableName: posts
+            baseColumnNames: user_id, telegram_nickname
+            constraintName: fk_posts_users
+            referencedTableName: users
+            referencedColumnNames: id, telegram_nickname
+        - addForeignKeyConstraint:
+            baseTableName: positions
+            baseColumnNames: user_id, telegram_nickname
+            constraintName: fk_positions_users
+            referencedTableName: users
+            referencedColumnNames: id, telegram_nickname
+        - addForeignKeyConstraint:
+            baseTableName: operations
+            baseColumnNames: user_id, telegram_nickname
+            constraintName: fk_operations_users
+            referencedTableName: users
+            referencedColumnNames: id, telegram_nickname
+        - addForeignKeyConstraint:
+            baseTableName: margin_trading_metrics
+            baseColumnNames: user_id, telegram_nickname
+            constraintName: fk_margin_trading_metrics_users
+            referencedTableName: users
+            referencedColumnNames: id, telegram_nickname
+        - addForeignKeyConstraint:
+            baseTableName: favorite_stocks
+            baseColumnNames: user_id, telegram_nickname
+            constraintName: fk_favorite_stocks_users
+            referencedTableName: users
+            referencedColumnNames: id, telegram_nickname
+        - addForeignKeyConstraint:
+            baseTableName: balances
+            baseColumnNames: user_id, telegram_nickname
+            constraintName: fk_balances_users
+            referencedTableName: users
+            referencedColumnNames: id, telegram_nickname
+
+  - changeSet:
+      id: 05.12.2024_8
+      author: kenpxrkasf@gmail.com
+      # циклом проходимся и добавляем значение username в таблицы
+      changes:
+        - sql:
+            splitStatements: true
+            endDelimiter: $$
+            sql: |
+              DO $$
+              DECLARE
+              tbl RECORD;
+              schema_name text;
+              col_exists boolean;
+              BEGIN
+              FOR tbl IN
+              SELECT table_schema, table_name
+              FROM information_schema.columns
+              WHERE column_name = 'telegram_nickname'
+              AND table_schema = 'user_service_db' -- Замените на вашу схему, если используется другая
+              LOOP
+              schema_name := tbl.table_schema;
+              
+              SELECT EXISTS (
+              SELECT 1
+              FROM information_schema.columns
+              WHERE table_schema = schema_name
+              AND table_name = tbl.table_name
+              AND column_name = 'user_id'
+              ) INTO col_exists;
+              
+              IF col_exists THEN
+              EXECUTE format('
+              UPDATE %I.%I
+              SET telegram_nickname = u.telegram_nickname
+              FROM user_service_db.users u
+              WHERE %I.%I.user_id = u.id
+              AND %I.%I.telegram_nickname IS NULL;
+              ', schema_name, tbl.table_name, schema_name, tbl.table_name, schema_name, tbl.table_name);
+            
+                        RAISE NOTICE 'Updated table: %', tbl.table_name;
+                    ELSE
+                        RAISE NOTICE 'Skipping table %: user_id column does not exist', tbl.table_name;
+              END IF;
+              END LOOP;
+              END $$;
+
+  - changeSet:
+      id: 05.12.2024_9
+      author: kenpxrkasf@gmail.com
+      # Добавление уникальных индексов на каждую партицию
+      changes:
+        - addUniqueConstraint:
+            tableName: users_a_e_upper
+            columnNames: external_id
+            constraintName: users_a_e_upper_external_id_key
+
+        - addUniqueConstraint:
+            tableName: users_f_j_upper
+            columnNames: external_id
+            constraintName: users_f_j_upper_external_id_key
+
+        - addUniqueConstraint:
+            tableName: users_k_o_upper
+            columnNames: external_id
+            constraintName: users_k_o_upper_external_id_key
+
+        - addUniqueConstraint:
+            tableName: users_p_t_upper
+            columnNames: external_id
+            constraintName: users_p_t_upper_external_id_key
+
+        - addUniqueConstraint:
+            tableName: users_u_z_upper
+            columnNames: external_id
+            constraintName: users_u_z_upper_external_id_key
+
+        - addUniqueConstraint:
+            tableName: users_a_e_lower
+            columnNames: external_id
+            constraintName: users_a_e_lower_external_id_key
+
+        - addUniqueConstraint:
+            tableName: users_f_j_lower
+            columnNames: external_id
+            constraintName: users_f_j_lower_external_id_key
+
+        - addUniqueConstraint:
+            tableName: users_k_o_lower
+            columnNames: external_id
+            constraintName: users_k_o_lower_external_id_key
+
+        - addUniqueConstraint:
+            tableName: users_p_t_lower
+            columnNames: external_id
+            constraintName: users_p_t_lower_external_id_key
+
+        - addUniqueConstraint:
+            tableName: users_u_z_lower
+            columnNames: external_id
+            constraintName: users_u_z_lower_external_id_key
+
+        - addUniqueConstraint:
+            tableName: users_a_e_upper
+            columnNames: telegram_chat_id
+            constraintName: users_a_e_upper_telegram_chat_id_key
+
+        - addUniqueConstraint:
+            tableName: users_f_j_upper
+            columnNames: telegram_chat_id
+            constraintName: users_f_j_upper_telegram_chat_id_key
+
+        - addUniqueConstraint:
+            tableName: users_k_o_upper
+            columnNames: telegram_chat_id
+            constraintName: users_k_o_upper_telegram_chat_id_key
+
+        - addUniqueConstraint:
+            tableName: users_p_t_upper
+            columnNames: telegram_chat_id
+            constraintName: users_p_t_upper_telegram_chat_id_key
+
+        - addUniqueConstraint:
+            tableName: users_u_z_upper
+            columnNames: telegram_chat_id
+            constraintName: users_u_z_upper_telegram_chat_id_key
+
+        - addUniqueConstraint:
+            tableName: users_a_e_lower
+            columnNames: telegram_chat_id
+            constraintName: users_a_e_lower_telegram_chat_id_key
+
+        - addUniqueConstraint:
+            tableName: users_f_j_lower
+            columnNames: telegram_chat_id
+            constraintName: users_f_j_lower_telegram_chat_id_key
+
+        - addUniqueConstraint:
+            tableName: users_k_o_lower
+            columnNames: telegram_chat_id
+            constraintName: users_k_o_lower_telegram_chat_id_key
+
+        - addUniqueConstraint:
+            tableName: users_p_t_lower
+            columnNames: telegram_chat_id
+            constraintName: users_p_t_lower_telegram_chat_id_key
+
+        - addUniqueConstraint:
+            tableName: users_u_z_lower
+            columnNames: telegram_chat_id
+            constraintName: users_u_z_lower_telegram_chat_id_key
+
+        - addUniqueConstraint:
+            tableName: users_a_e_upper
+            columnNames: telegram_nickname
+            constraintName: users_a_e_upper_telegram_nickname_key
+
+        - addUniqueConstraint:
+            tableName: users_f_j_upper
+            columnNames: telegram_nickname
+            constraintName: users_f_j_upper_telegram_nickname_key
+
+        - addUniqueConstraint:
+            tableName: users_k_o_upper
+            columnNames: telegram_nickname
+            constraintName: users_k_o_upper_telegram_nickname_key
+
+        - addUniqueConstraint:
+            tableName: users_p_t_upper
+            columnNames: telegram_nickname
+            constraintName: users_p_t_upper_telegram_nickname_key
+
+        - addUniqueConstraint:
+            tableName: users_u_z_upper
+            columnNames: telegram_nickname
+            constraintName: users_u_z_upper_telegram_nickname_key
+
+        - addUniqueConstraint:
+            tableName: users_a_e_lower
+            columnNames: telegram_nickname
+            constraintName: users_a_e_lower_telegram_nickname_key
+
+        - addUniqueConstraint:
+            tableName: users_f_j_lower
+            columnNames: telegram_nickname
+            constraintName: users_f_j_lower_telegram_nickname_key
+
+        - addUniqueConstraint:
+            tableName: users_k_o_lower
+            columnNames: telegram_nickname
+            constraintName: users_k_o_lower_telegram_nickname_key
+
+        - addUniqueConstraint:
+            tableName: users_p_t_lower
+            columnNames: telegram_nickname
+            constraintName: users_p_t_lower_telegram_nickname_key
+
+        - addUniqueConstraint:
+            tableName: users_u_z_lower
+            columnNames: telegram_nickname
+            constraintName: users_u_z_lower_telegram_nickname_key
