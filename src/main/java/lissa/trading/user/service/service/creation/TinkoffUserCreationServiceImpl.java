@@ -28,7 +28,7 @@ public class TinkoffUserCreationServiceImpl implements UserCreationService {
     private final TinkoffAccountClient tinkoffAccountClient;
     private final UserMapper userMapper;
     private final UpdateService updateService;
-    private final static SupportedBrokersEnum broker = SupportedBrokersEnum.TINKOFF;
+    private final static SupportedBrokersEnum BROKER = SupportedBrokersEnum.TINKOFF;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
@@ -75,10 +75,9 @@ public class TinkoffUserCreationServiceImpl implements UserCreationService {
         updateService.updateUserPositions(user, tinkoffAccountId);
         log.info("User updated with positions: {}", user);
     }
-
     @Override
     public SupportedBrokersEnum getBroker() {
-        return broker;
+        return BROKER;
     }
 
     private String getTinkoffAccountId(User user) {

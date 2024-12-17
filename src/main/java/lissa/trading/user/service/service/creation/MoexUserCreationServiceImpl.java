@@ -23,7 +23,7 @@ public class MoexUserCreationServiceImpl implements UserCreationService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final TempUserRegRepository tempUserRegRepository;
-    private final static SupportedBrokersEnum broker = SupportedBrokersEnum.MOEX;
+    private final static SupportedBrokersEnum BROKER = SupportedBrokersEnum.MOEX;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW,
             noRollbackFor = OperationUnsupportedByBrokerException.class)
@@ -58,6 +58,6 @@ public class MoexUserCreationServiceImpl implements UserCreationService {
 
     @Override
     public SupportedBrokersEnum getBroker() {
-        return broker;
+        return BROKER;
     }
 }
