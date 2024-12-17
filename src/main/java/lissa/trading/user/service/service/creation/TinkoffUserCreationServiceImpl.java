@@ -12,7 +12,6 @@ import lissa.trading.user.service.service.creation.factory.SupportedBrokersEnum;
 import lissa.trading.user.service.service.creation.update.UpdateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationContext;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -29,21 +28,24 @@ public class TinkoffUserCreationServiceImpl implements UserCreationService {
     private final TinkoffAccountClient tinkoffAccountClient;
     private final UserMapper userMapper;
     private final UpdateService updateService;
+    private final static SupportedBrokersEnum broker = SupportedBrokersEnum.TINKOFF;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public void createUserFromTempUserReg(TempUserReg tempUserReg) {
         try {
             log.info("Starting to create user from TempUserReg: {}", tempUserReg);
-
             User user = userMapper.toUserFromTempUserReg(tempUserReg);
             tinkoffAccountClient.setTinkoffToken(new TinkoffTokenDto(tempUserReg.getTinkoffToken()));
-
             getTelegramInfo(user);
-            updateUser(user);
+            log.info("Received information about the user's telegram:\n" +
+                    "telegram chat id: {}", user.getTelegramChatId());
 
             userRepository.save(user);
+            log.info("Saved user: {}", user);
             tempUserRegRepository.delete(tempUserReg);
+            log.info("Deleted temp user: {}", tempUserReg);
+            updateUser(user);
             log.info("User created and saved successfully: {}", user);
 
         } catch (DataIntegrityViolationException e) {
@@ -76,7 +78,7 @@ public class TinkoffUserCreationServiceImpl implements UserCreationService {
 
     @Override
     public SupportedBrokersEnum getBroker() {
-        return SupportedBrokersEnum.TINKOFF;
+        return broker;
     }
 
     private String getTinkoffAccountId(User user) {

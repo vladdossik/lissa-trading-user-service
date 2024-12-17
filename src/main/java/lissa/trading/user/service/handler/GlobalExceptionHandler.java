@@ -22,7 +22,6 @@ import java.util.Set;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // CUSTOM EXCEPTIONS
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
@@ -44,8 +43,6 @@ public class GlobalExceptionHandler {
                 HttpStatus.PARTIAL_CONTENT);
     }
 
-    // VALIDATION EXCEPTIONS
-    // Controllers only via @Validated annotation
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Map<String, String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
@@ -59,7 +56,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
-    // Other service layer validations
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Map<String, String>> handleConstraintViolationException(ConstraintViolationException ex) {

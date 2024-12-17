@@ -23,6 +23,7 @@ public class MoexUserCreationServiceImpl implements UserCreationService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final TempUserRegRepository tempUserRegRepository;
+    private final static SupportedBrokersEnum broker = SupportedBrokersEnum.MOEX;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW,
             noRollbackFor = OperationUnsupportedByBrokerException.class)
@@ -32,14 +33,15 @@ public class MoexUserCreationServiceImpl implements UserCreationService {
             log.info("Starting to create user from TempUserReg: {}", tempUserReg);
             User user = userMapper.toUserFromTempUserReg(tempUserReg);
             getTelegramInfo(user);
+            log.info("Received information about the user's telegram:\n" +
+                    "telegram chat id: {}", user.getTelegramChatId());
 
             userRepository.save(user);
+            log.info("Saved user: {}", user);
             tempUserRegRepository.delete(tempUserReg);
-
-            log.info("User created and saved successfully: {}", user);
-            log.info("Updating user: {}", user);
-
+            log.info("Deleted temp user: {}", tempUserReg);
             updateUser(user);
+            log.info("User created and saved successfully: {}", user);
         }
         catch (OperationUnsupportedByBrokerException e) {
             throw e;
@@ -56,6 +58,6 @@ public class MoexUserCreationServiceImpl implements UserCreationService {
 
     @Override
     public SupportedBrokersEnum getBroker() {
-        return SupportedBrokersEnum.MOEX;
+        return broker;
     }
 }

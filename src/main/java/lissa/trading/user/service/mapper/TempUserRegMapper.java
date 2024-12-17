@@ -48,8 +48,7 @@ public interface TempUserRegMapper {
         String tinkoffToken = tempUserReg.getTinkoffToken();
         if (tinkoffToken == null || tinkoffToken.isEmpty()) {
             tempUserReg.setBroker(SupportedBrokersEnum.MOEX);
-        }
-        else if (tinkoffToken.startsWith("t.") && tinkoffToken.length() == 88) {
+        } else if (tinkoffToken.startsWith("t.") && tinkoffToken.length() == 88) {
             tempUserReg.setBroker(SupportedBrokersEnum.TINKOFF);
         }
     }

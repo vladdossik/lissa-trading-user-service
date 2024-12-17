@@ -29,6 +29,7 @@ public class TempUserSavedEventListener {
             userCreationService.createUserFromTempUserReg(tempUserReg);
         }
         catch (OperationUnsupportedByBrokerException e) {
+            log.error("Error getting updates from broker: {}", e.getMessage());
             throw e;
         }
         catch (Exception e) {

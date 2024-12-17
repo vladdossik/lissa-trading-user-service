@@ -60,7 +60,6 @@ public class TinkoffUpdateServiceImpl implements UpdateService {
     public void updateUserMarginMetrics(User user, String accountId) {
         try {
             MarginAttributesDto marginAttributesDto = tinkoffAccountClient.getMarginAttributes(accountId);
-
             Optional<MarginTradingMetricsEntity> existingMetricsOpt = marginTradingMetricsRepository.findByUserId(user.getId());
 
             if (existingMetricsOpt.isPresent()) {
