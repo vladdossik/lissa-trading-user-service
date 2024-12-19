@@ -38,7 +38,7 @@ logging:
 integration:
   rest:
     statistics-service:
-      token: 3RhdGlzdGljcy1pbnRlcm5hbC1rZXk=
+      token: c3RhdGlzdGljcy1pbnRlcm5hbC1rZXk=
     auth-service-url: http://localhost:8081
     user-service-url: http://localhost:8080
     tinkoff-api-service-url: http://localhost:8082
