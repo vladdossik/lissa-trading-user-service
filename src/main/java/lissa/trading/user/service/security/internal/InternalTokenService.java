@@ -13,7 +13,7 @@ import java.util.List;
 @Component
 public class InternalTokenService {
 
-    @Value("${security.internal.inbound.statistics-service-token}")
+    @Value("${integration.rest.statistics-service.token}")
     private String statisticsServiceToken;
 
     protected boolean validateInternalToken(String token) {

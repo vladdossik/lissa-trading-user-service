@@ -29,10 +29,7 @@ spring:
 
 security:
   internal:
-    outbound:
-      token: Iq6Vu8Nz7Xa3Rl9Cm5YbTc2WpDf4Oj5ZfGn1Kh3
-    inbound:
-      statistics-service-token: 4sy0dhDsAKbf9pc2yjgu5k_KA7lXDsXBo-1P9Q3C8bg
+    token: dXNlclNlcnZpY2UtaW50ZXJuYWwta2V5
 
 logging:
   level:
@@ -40,6 +37,8 @@ logging:
 
 integration:
   rest:
+    statistics-service:
+      token: 3RhdGlzdGljcy1pbnRlcm5hbC1rZXk=
     auth-service-url: http://localhost:8081
     user-service-url: http://localhost:8080
     tinkoff-api-service-url: http://localhost:8082
