@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class InternalTokenService {
     private String statisticsServiceToken;
 
     protected boolean validateInternalToken(String token) {
-        return statisticsServiceToken.equals(token) && !token.isEmpty();
+        return new String(Base64.getDecoder().decode(statisticsServiceToken)).trim().equals(token) && !token.isEmpty();
     }
 
     protected String getServiceNameFromToken(String token) {
