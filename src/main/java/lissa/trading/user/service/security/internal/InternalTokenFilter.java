@@ -35,4 +35,9 @@ public class InternalTokenFilter extends BaseAuthTokenFilter<String> {
         String requestURI = request.getRequestURI();
         return !requestURI.startsWith("/v1/internal/"); // Фильтр срабатывает только на внутренних запросах
     }
+
+    @Override
+    protected String parseJwt(HttpServletRequest request) {
+        return request.getHeader("Authorization");
+    }
 }
