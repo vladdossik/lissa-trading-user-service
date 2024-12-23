@@ -1,8 +1,10 @@
 package lissa.trading.user.service.handler;
 
 import lissa.trading.user.service.event.TempUserSavedEvent;
+import lissa.trading.user.service.exception.OperationUnsupportedByBrokerException;
 import lissa.trading.user.service.model.TempUserReg;
 import lissa.trading.user.service.service.creation.UserCreationService;
+import lissa.trading.user.service.service.creation.factory.UserCreationServiceFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -15,15 +17,22 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @RequiredArgsConstructor
 public class TempUserSavedEventListener {
 
-    private final UserCreationService userCreationService;
+    private final UserCreationServiceFactory userCreationServiceFactory;
 
     @EventListener
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleTempUserCreatedEvent(TempUserSavedEvent event) {
         TempUserReg tempUserReg = event.getTempUserReg();
+        UserCreationService userCreationService = userCreationServiceFactory
+                .getUserCreationServiceByType(tempUserReg.getBroker());
         try {
             userCreationService.createUserFromTempUserReg(tempUserReg);
-        } catch (Exception e) {
+        }
+        catch (OperationUnsupportedByBrokerException e) {
+            log.error("Error getting updates from broker: {}", e.getMessage());
+            throw e;
+        }
+        catch (Exception e) {
             log.error("Error creating user from temp user: {}", e.getMessage());
         }
     }

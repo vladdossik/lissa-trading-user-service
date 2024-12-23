@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lissa.trading.lissa.auth.lib.dto.UserInfoDto;
 import lissa.trading.user.service.exception.UnauthorizedException;
-import lissa.trading.user.service.service.creation.TempUserCreationService;
+import lissa.trading.user.service.service.creation.temp.TempUserCreationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -35,6 +35,12 @@ public class UserRegController {
     @ApiResponse(
             responseCode = "401",
             description = "Пользователь не авторизован",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "206",
+            description = "Пользователь успешно зарегистрирован, но" +
+                    " брокер не поддерживает получение данных",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))
     )
     @PostMapping("/register")

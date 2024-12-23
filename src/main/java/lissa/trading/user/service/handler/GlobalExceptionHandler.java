@@ -2,6 +2,7 @@ package lissa.trading.user.service.handler;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import lissa.trading.user.service.exception.OperationUnsupportedByBrokerException;
 import lissa.trading.user.service.exception.UserCreationException;
 import lissa.trading.user.service.exception.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,6 @@ import java.util.Set;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // CUSTOM EXCEPTIONS
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
@@ -35,8 +35,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    // VALIDATION EXCEPTIONS
-    // Controllers only via @Validated annotation
+    @ExceptionHandler(OperationUnsupportedByBrokerException.class)
+    public ResponseEntity<String> handleOperationUnsupportedByBrokerException(
+            OperationUnsupportedByBrokerException ex) {
+        log.error("Operation unsupported by broker: {}", ex.getMessage(), ex);
+        return new ResponseEntity<>("User registration successful\n" + ex.getMessage(),
+                HttpStatus.PARTIAL_CONTENT);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Map<String, String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
@@ -50,7 +56,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
-    // Other service layer validations
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Map<String, String>> handleConstraintViolationException(ConstraintViolationException ex) {

@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 09.12.2024_02
+      author: blaskowitzwork@gmail.com
+      changes:
+        - dropNotNullConstraint:
+            tableName: temp_user_reg
+            columnName: tinkoff_token
+            columnDataType: character varying(95)
+        - addColumn:
+            tableName: temp_user_reg
+            columns:
+              - column:
+                  name: broker
+                  type: character varying(30)

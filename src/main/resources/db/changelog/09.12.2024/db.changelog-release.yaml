@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: "01_update_users_table.yaml"
+      relativeToChangelogFile: true
+  - include:
+      file: "02_update_temp_user_reg_table.yaml"
+      relativeToChangelogFile: true

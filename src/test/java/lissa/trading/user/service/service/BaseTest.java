@@ -21,8 +21,8 @@ import lissa.trading.user.service.repository.entity.FavoriteStocksEntityReposito
 import lissa.trading.user.service.repository.entity.MarginTradingMetricsEntityRepository;
 import lissa.trading.user.service.repository.entity.UserAccountEntityRepository;
 import lissa.trading.user.service.repository.entity.UserPositionsEntityRepository;
-import lissa.trading.user.service.service.creation.TempUserCreationServiceImpl;
-import lissa.trading.user.service.service.creation.UserCreationServiceImpl;
+import lissa.trading.user.service.service.creation.TinkoffUserCreationServiceImpl;
+import lissa.trading.user.service.service.creation.temp.TempUserCreationServiceImpl;
 import lissa.trading.user.service.service.publisher.StatsPublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -77,7 +77,7 @@ public abstract class BaseTest {
     protected UserServiceImpl userService;
 
     @InjectMocks
-    protected UserCreationServiceImpl userCreationService;
+    protected TinkoffUserCreationServiceImpl userCreationService;
 
     @InjectMocks
     protected TempUserCreationServiceImpl tempUserCreationService;
