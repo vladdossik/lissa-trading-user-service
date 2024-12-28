@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
@@ -13,11 +14,11 @@ import java.util.List;
 @Component
 public class InternalTokenService {
 
-    @Value("${security.internal.token}")
-    private String internalToken;
+    @Value("${integration.rest.statistics-service.token}")
+    private String statisticsServiceToken;
 
     protected boolean validateInternalToken(String token) {
-        return internalToken.equals(token) && !token.isEmpty();
+        return new String(Base64.getDecoder().decode(statisticsServiceToken)).trim().equals(token) && !token.isEmpty();
     }
 
     protected String getServiceNameFromToken(String token) {
