@@ -8,3 +8,15 @@ databaseChangeLog:
             incrementBy: 1
             cacheSize: 1
             sequenceName: user_seq
+
+  - changeSet:
+      id: 05.01.2025_2
+      author: kenpxrkasf@gmail.com
+      changes:
+        - sql:
+            sql:
+              BEGIN;
+              LOCK TABLE user_service_db.users IN EXCLUSIVE MODE;
+              SELECT setval('user_service_db.user_seq',(SELECT GREATEST(MAX(id), nextval('user_service_db.user_seq')-1) 
+              FROM user_service_db.users))
+              COMMIT;
