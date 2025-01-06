@@ -15,8 +15,4 @@ databaseChangeLog:
       changes:
         - sql:
             sql:
-              BEGIN;
-              LOCK TABLE user_service_db.users IN EXCLUSIVE MODE;
-              SELECT setval('user_service_db.user_seq',(SELECT GREATEST(MAX(id), nextval('user_service_db.user_seq')-1) 
-              FROM user_service_db.users))
-              COMMIT;
+              SELECT setval('user_service_db.user_seq',(SELECT MAX(id) FROM user_service_db.users))
