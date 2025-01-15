@@ -18,33 +18,46 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("API для управления пользователями и временными пользователями")
-                        .description("Этот API предоставляет методы для управления пользователями, включая обновление, блокировку, удаление и получение информации о пользователях. Также доступны методы управления временными пользователями.")
-                        .version("1.0.0")
-                        .contact(new Contact()
-                                .name("Belaquaa")
-                                .url("https://t.me/belaquaa"))
-                        .license(new License()
-                                .name("Apache 2.0")
-                                .url("https://springdoc.org")))
-                .components(new Components().addSecuritySchemes("bearer-key",
-                        new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")))
-                .addSecurityItem(new SecurityRequirement().addList("bearer-key"));
+                              .title("API для управления пользователями и временными пользователями")
+                              .description(
+                                      "Этот API предоставляет методы для управления пользователями, включая обновление, блокировку, удаление и получение информации о пользователях. Также доступны методы управления временными пользователями.")
+                              .version("1.0.0")
+                              .contact(new Contact()
+                                               .name("Belaquaa")
+                                               .url("https://t.me/belaquaa"))
+                              .license(new License()
+                                               .name("Apache 2.0")
+                                               .url("https://springdoc.org")))
+                .components(new Components()
+                                    .addSecuritySchemes("bearer-key", new SecurityScheme()
+                                            .type(SecurityScheme.Type.HTTP)
+                                            .scheme("bearer")
+                                            .bearerFormat("JWT"))
+                                    .addSecuritySchemes("token-key", new SecurityScheme()
+                                            .type(SecurityScheme.Type.APIKEY)
+                                            .in(SecurityScheme.In.HEADER)
+                                            .name("Authorization")));
     }
 
     @Bean
     public GroupedOpenApi userApi() {
-        return GroupedOpenApi.builder()
+        return GroupedOpenApi
+                .builder()
                 .group("users")
                 .pathsToMatch("/v1/users/**")
+                .addOpenApiCustomizer(openApi -> openApi
+                        .addSecurityItem(new SecurityRequirement().addList("bearer-key")))
                 .build();
     }
 
     @Bean
     public GroupedOpenApi internalApi() {
-        return GroupedOpenApi.builder()
+        return GroupedOpenApi
+                .builder()
                 .group("internal")
                 .pathsToMatch("/v1/internal/**")
+                .addOpenApiCustomizer(openApi -> openApi
+                        .addSecurityItem(new SecurityRequirement().addList("token-key")))
                 .build();
     }
 }

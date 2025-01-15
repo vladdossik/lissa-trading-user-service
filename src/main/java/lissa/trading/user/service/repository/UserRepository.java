@@ -1,8 +1,6 @@
 package lissa.trading.user.service.repository;
 
 import lissa.trading.user.service.model.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -20,6 +18,8 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     Optional<User> findByTelegramNickname(String telegramNickname);
 
     Optional<User> findByExternalId(UUID externalId);
+
+    Boolean existsByTelegramNickname(String telegramNickname);
 
     @Modifying
     @Query("UPDATE User u SET u.accountCount = :accountCount WHERE u.id = :userId")

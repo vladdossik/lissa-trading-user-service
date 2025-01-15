@@ -2,9 +2,10 @@ package lissa.trading.user.service.mapper;
 
 import lissa.trading.lissa.auth.lib.dto.UserInfoDto;
 import lissa.trading.lissa.auth.lib.security.EncryptionService;
+import lissa.trading.user.service.dto.notification.UserUpdateNotificationDto;
 import lissa.trading.user.service.dto.response.TempUserRegResponseDto;
 import lissa.trading.user.service.model.TempUserReg;
-import lissa.trading.user.service.service.creation.factory.SupportedBrokersEnum;
+import lissa.trading.user.service.service.update.factory.SupportedBrokersEnum;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -20,18 +21,20 @@ import java.util.UUID;
 public interface TempUserRegMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "externalId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "broker", ignore = true)
     TempUserReg toTempUserReg(UserInfoDto userInfoDto);
+
+    @Mapping(target = "roles", ignore = true)
+    UserInfoDto toUserInfoDto(UserUpdateNotificationDto userUpdateNotificationDto);
 
     @Mapping(target = "externalId")
     TempUserRegResponseDto toTempUserRegResponseDto(TempUserReg tempUserReg);
 
     @AfterMapping
     default void setExternalId(@MappingTarget TempUserReg tempUserReg) {
-        if (tempUserReg.getExternalId() == null) {
+        if (tempUserReg.getExternalId() == null || tempUserReg.getExternalId().toString().isEmpty()) {
             tempUserReg.setExternalId(UUID.randomUUID());
         }
     }

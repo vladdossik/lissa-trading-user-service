@@ -11,12 +11,14 @@ import lissa.trading.lissa.auth.lib.dto.UserInfoDto;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
 import lissa.trading.user.service.dto.response.UserResponseDto;
 import lissa.trading.user.service.dto.tinkoff.account.TinkoffTokenDto;
+import lissa.trading.user.service.dto.tinkoff.stock.StocksPricesDto;
+import lissa.trading.user.service.dto.tinkoff.stock.TickersDto;
 import lissa.trading.user.service.exception.UnauthorizedException;
-import lissa.trading.user.service.feign.TinkoffAccountClient;
+import lissa.trading.user.service.feign.tinkoff.TinkoffAccountClient;
 import lissa.trading.user.service.page.CustomPage;
 import lissa.trading.user.service.service.UserService;
 import lissa.trading.user.service.service.creation.temp.TempUserCreationService;
-import lissa.trading.user.service.service.publisher.StatsPublisher;
+import lissa.trading.user.service.service.publisher.stats.StatsPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -151,5 +153,27 @@ public class InternalController {
     @PostMapping("/setTinkoffToken")
     public UpdateTinkoffTokenResponce setTinkoffToken(@RequestBody TinkoffTokenDto tinkoffToken) {
         return tinkoffAccountClient.setTinkoffToken(tinkoffToken);
+    }
+
+    @Operation(summary = "Обновить или добавить любимые акции пользователя")
+    @ApiResponse(
+            description = "Любимые акции пользователя успешно обновлены",
+            responseCode = "200",
+            content = @Content()
+    )
+    @PostMapping("/update/favouriteStocks/{externalId}")
+    public ResponseEntity<String> updateUserFavoriteStocks(@PathVariable UUID externalId, @RequestBody TickersDto tickersDto) {
+        userService.updateFavoriteStocks(externalId, tickersDto);
+        return ResponseEntity.ok("Successful user favorite stocks update");
+    }
+
+    @Operation(summary = "Получить обновленные цены на любимые акции пользователя")
+    @ApiResponse(
+            description = "Цены на любимые акции успешно получены",
+            content = @Content(contentSchema = @Schema(implementation = StocksPricesDto.class))
+    )
+    @GetMapping("/update/favouriteStocksPrices/{externalId}")
+    public StocksPricesDto getUpdatedFavouriteStocksPrices(@PathVariable UUID externalId) {
+        return userService.getUpdateOnStockPrices(externalId);
     }
 }

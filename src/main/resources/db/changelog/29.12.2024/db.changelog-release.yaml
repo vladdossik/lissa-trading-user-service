@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: "01_update_favourite_stocks_table.yaml"
+      relativeToChangelogFile: true

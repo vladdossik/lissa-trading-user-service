@@ -1,4 +1,4 @@
-package lissa.trading.user.service.service.publisher;
+package lissa.trading.user.service.service.publisher.stats;
 
 import lissa.trading.user.service.dto.response.UserStatsReportDto;
 import lissa.trading.user.service.mapper.UserMapper;

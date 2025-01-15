@@ -2,7 +2,7 @@ package lissa.trading.user.service.service;
 
 import lissa.trading.lissa.auth.lib.dto.UserInfoDto;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
-import lissa.trading.user.service.feign.TinkoffAccountClient;
+import lissa.trading.user.service.feign.tinkoff.TinkoffAccountClient;
 import lissa.trading.user.service.mapper.TempUserRegMapper;
 import lissa.trading.user.service.mapper.UserMapper;
 import lissa.trading.user.service.model.TempUserReg;
@@ -21,9 +21,8 @@ import lissa.trading.user.service.repository.entity.FavoriteStocksEntityReposito
 import lissa.trading.user.service.repository.entity.MarginTradingMetricsEntityRepository;
 import lissa.trading.user.service.repository.entity.UserAccountEntityRepository;
 import lissa.trading.user.service.repository.entity.UserPositionsEntityRepository;
-import lissa.trading.user.service.service.creation.TinkoffUserCreationServiceImpl;
 import lissa.trading.user.service.service.creation.temp.TempUserCreationServiceImpl;
-import lissa.trading.user.service.service.publisher.StatsPublisher;
+import lissa.trading.user.service.service.publisher.stats.StatsPublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

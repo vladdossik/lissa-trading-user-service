@@ -1,12 +1,12 @@
 package lissa.trading.user.service.mapper;
 
+import lissa.trading.user.service.dto.notification.UserUpdateNotificationDto;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
 import lissa.trading.user.service.dto.response.UserResponseDto;
 import lissa.trading.user.service.dto.response.UserStatsReportDto;
 import lissa.trading.user.service.model.TempUserReg;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.model.entity.BalanceEntity;
-import lissa.trading.user.service.repository.projections.UserExternalIdProjection;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -47,12 +47,18 @@ public interface UserMapper {
     @Mapping(target = "posts", ignore = true)
     User toUserFromTempUserReg(TempUserReg tempUserReg);
 
+    @Mapping(target = "operation", ignore = true)
+    UserUpdateNotificationDto toUserUpdateNotificationDto(User user);
+
+    UserPatchDto toUserPatchDto(UserUpdateNotificationDto notificationDto);
+
     @AfterMapping
     default User updateUserFromDto(UserPatchDto userPatchDto, @MappingTarget User user) {
         mapOptionalValue(userPatchDto.getFirstName(), user::setFirstName);
         mapOptionalValue(userPatchDto.getLastName(), user::setLastName);
         mapOptionalValue(userPatchDto.getTelegramNickname(), user::setTelegramNickname);
         mapOptionalValue(userPatchDto.getTinkoffToken(), user::setTinkoffToken);
+        mapOptionalValue(userPatchDto.getExternalId(), user::setExternalId);
         return user;
     }
 
@@ -69,7 +75,6 @@ public interface UserMapper {
         }
     }
 
-    // Метод для подсчета общего баланса пользователя
     default BigDecimal calculateTotalBalance(List<BalanceEntity> balances) {
         return balances.stream()
                 .map(BalanceEntity::getTotalAmountBalance)
