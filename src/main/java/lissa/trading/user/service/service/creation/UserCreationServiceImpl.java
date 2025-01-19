@@ -2,6 +2,7 @@ package lissa.trading.user.service.service.creation;
 
 import lissa.trading.user.service.dto.notification.OperationEnum;
 import lissa.trading.user.service.dto.tinkoff.account.TinkoffTokenDto;
+import lissa.trading.user.service.exception.OperationUnsupportedByBrokerException;
 import lissa.trading.user.service.exception.UserCreationException;
 import lissa.trading.user.service.feign.tinkoff.TinkoffAccountClient;
 import lissa.trading.user.service.mapper.UserMapper;
@@ -33,30 +34,31 @@ public class UserCreationServiceImpl implements UserCreationService {
     private final UserUpdatesPublisher userUpdatesPublisher;
     private final NotificationContext notificationContext;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW,
+            noRollbackFor = OperationUnsupportedByBrokerException.class)
     @Override
     public void createUserFromTempUserReg(TempUserReg tempUserReg) {
         try {
             log.info("Starting to create user from TempUserReg: {}", tempUserReg);
             User user = userMapper.toUserFromTempUserReg(tempUserReg);
-            if(user.getBroker().equals(SupportedBrokersEnum.TINKOFF)) {
+            if (user.getBroker().equals(SupportedBrokersEnum.TINKOFF)) {
                 tinkoffAccountClient.setTinkoffToken(new TinkoffTokenDto(user.getTinkoffToken()));
             }
             getTelegramInfo(user);
             log.info("Received information about the user's telegram:\n" +
-                    "telegram chat id: {}", user.getTelegramChatId());
+                             "telegram chat id: {}", user.getTelegramChatId());
 
             userRepository.save(user);
             log.info("Saved user: {}", user);
             tempUserRegRepository.delete(tempUserReg);
             log.info("Deleted temp user: {}", tempUserReg);
             updateServiceFactory.getUpdateServiceByType(user.getBroker())
-                    .fullUserUpdate(user);
+                    .userEntitiesUpdate(user);
             userUpdatesPublisher.publishUserUpdateNotification(user, OperationEnum.REGISTER);
             notificationContext.clear();
             log.info("User created and saved successfully: {}", user);
-
-
+        } catch(OperationUnsupportedByBrokerException e) {
+            throw e;
         } catch (DataIntegrityViolationException e) {
             log.error("DataIntegrityViolationException while creating user from TempUserReg: {}", tempUserReg, e);
             throw new UserCreationException("Table error creating user from TempUserReg: " + e.getMessage());

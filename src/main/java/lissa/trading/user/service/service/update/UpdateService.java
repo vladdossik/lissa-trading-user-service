@@ -11,8 +11,8 @@ import lissa.trading.user.service.service.update.factory.SupportedBrokersEnum;
 import java.util.List;
 
 public interface UpdateService {
-    default void fullUserUpdate(User user) {
-        throw new OperationUnsupportedByBrokerException("Full user update operation unsupported by: "
+    default void userEntitiesUpdate(User user) {
+        throw new OperationUnsupportedByBrokerException("User entities update operation unsupported by: "
                 + getBroker());
     }
 
@@ -59,6 +59,13 @@ public interface UpdateService {
                                       .stream()
                                       .map(FavoriteStocksEntity::getTicker)
                                       .toList());
+    }
+
+    default List<FavoriteStocksEntity> filterFavoriteStocksByBroker(
+            List<FavoriteStocksEntity> favoriteStocksEntities) {
+        return favoriteStocksEntities.stream()
+                .filter(stock -> stock.getServiceTicker().equals(getBroker().name()))
+                .toList();
     }
 
     SupportedBrokersEnum getBroker();

@@ -1,14 +1,13 @@
 package lissa.trading.user.service.service.update;
 
+import lissa.trading.user.service.dto.tinkoff.Stock;
 import lissa.trading.user.service.dto.tinkoff.stock.StocksPricesDto;
 import lissa.trading.user.service.dto.tinkoff.stock.TickersDto;
-import lissa.trading.user.service.service.publisher.NotificationContext;
 import lissa.trading.user.service.feign.moex.MoexServiceClient;
 import lissa.trading.user.service.mapper.FavoriteStockMapper;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.model.entity.FavoriteStocksEntity;
 import lissa.trading.user.service.repository.UserRepository;
-import lissa.trading.user.service.repository.entity.FavoriteStocksEntityRepository;
 import lissa.trading.user.service.service.publisher.UserUpdatesPublisher;
 import lissa.trading.user.service.service.update.factory.SupportedBrokersEnum;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,9 +26,7 @@ public class MoexUpdateServiceImpl implements UpdateService {
 
     private final MoexServiceClient moexServiceClient;
     private final FavoriteStockMapper favoriteStockMapper;
-    private final FavoriteStocksEntityRepository favoriteStocksEntityRepository;
     private final UserRepository userRepository;
-    private final NotificationContext notificationContext;
     private final UserUpdatesPublisher userUpdatesPublisher;
 
     private final static SupportedBrokersEnum BROKER = SupportedBrokersEnum.MOEX;
@@ -38,44 +38,74 @@ public class MoexUpdateServiceImpl implements UpdateService {
 
     @Override
     public void updateUserFavouriteStocks(User user, TickersDto tickersDto) {
-        userRepository.save(user);
+        if (tickersDto.getTickers() == null || tickersDto.getTickers().isEmpty()) {
+            updateStockInformation(user.getFavoriteStocks());
+            userRepository.save(user);
+            userUpdatesPublisher.publishUserFavoriteStocksUpdateNotification(user);
+            return;
+        }
         log.info("updating favourite stocks for {} using {}", user, BROKER);
         List<FavoriteStocksEntity> favoriteStocks = user.getFavoriteStocks();
         log.info("Before {}", favoriteStocks);
-        favoriteStocks.addAll(fetchFavouriteStocks(getTickersToAdd(favoriteStocks, tickersDto)));
-        log.info("after {}", favoriteStocks);
-        saveFavouriteStocks(favoriteStocks, user);
-        log.info("saved favourite stocks for {}", user);
+        favoriteStocks.addAll(favoriteStockMapper.toFavoriteStocksFromStocks(
+                        fetchStocks(getTickersToAdd(favoriteStocks, tickersDto))));
+        updateStockInformation(favoriteStocks);
+        favoriteStocks.forEach(stock -> stock.setUser(user));
         user.setFavoriteStocks(favoriteStocks);
+        userRepository.save(user);
         userUpdatesPublisher.publishUserFavoriteStocksUpdateNotification(user);
     }
 
     @Override
     public StocksPricesDto getPricesUpdate(User user) {
         log.info("fetching favourite stock prices for {}", user);
-        return moexServiceClient.getStocksPrices(getTickersDto(user.getFavoriteStocks()));
+        return moexServiceClient.getStocksPrices(getTickersDto(filterFavoriteStocksByBroker(
+                user.getFavoriteStocks())));
     }
 
     private TickersDto getTickersToAdd(List<FavoriteStocksEntity> existingStocks, TickersDto tickersDto) {
-        List<String> existingStocksTickers = existingStocks
+        log.info("entering get tickers to add with existing stocks {} and tickers {}", existingStocks, tickersDto);
+        Set<String> existingStocksTickers = existingStocks
                 .stream()
                 .map(FavoriteStocksEntity::getTicker)
+                .collect(Collectors.toSet());
+        log.info("existing stocks tickers {}", existingStocksTickers);
+
+        List<String> filteredTickers = tickersDto.getTickers()
+                .stream()
+                .filter(ticker -> !existingStocksTickers.contains(ticker))
                 .toList();
-        tickersDto.getTickers().removeIf(existingStocksTickers::contains);
-        return tickersDto;
+        log.info("filtered tickers {}", filteredTickers);
+        return new TickersDto(filteredTickers);
     }
 
-    private List<FavoriteStocksEntity> fetchFavouriteStocks(TickersDto tickersDto) {
-         return favoriteStockMapper.toFavoriteStocksFromDto(
-                 moexServiceClient.getStocksByTicker(tickersDto))
-                 .stream()
-                 .toList();
+    private void updateStockInformation(List<FavoriteStocksEntity> favoriteStocksEntities) {
+        if (favoriteStocksEntities.isEmpty()) {
+            return;
+        }
+        List<FavoriteStocksEntity> filteredList = filterFavoriteStocksByBroker(favoriteStocksEntities);
+        if (filteredList.isEmpty()) {
+            return;
+        }
+        List<Stock> fetchedStocks = fetchStocks(getTickersDto(filteredList));
+        Map<String, Stock> stockDtoMap = fetchedStocks.stream()
+                .collect(Collectors.toMap(Stock::getTicker, stock -> stock));
+
+        for (FavoriteStocksEntity favoriteStock : favoriteStocksEntities) {
+            if (favoriteStock.getServiceTicker().equals(getBroker().name())) {
+                Stock updatedStock = stockDtoMap.get(favoriteStock.getTicker());
+                if (updatedStock != null) {
+                    favoriteStockMapper.updateFavoriteStockFromStock(updatedStock, favoriteStock);
+                }
+            }
+        }
     }
 
-    private void saveFavouriteStocks(List<FavoriteStocksEntity> favoriteStocksEntities, User user) {
-        favoriteStocksEntities.stream().forEach(stock -> {
-            stock.setUser(user);
-            favoriteStocksEntityRepository.save(stock);
-        });
+    private List<Stock> fetchStocks(TickersDto tickersDto) {
+        log.info("trying to fetch favourite stocks with dto: {}", tickersDto);
+        return moexServiceClient.getStocksByTicker(tickersDto)
+                .getStocks()
+                .stream()
+                .toList();
     }
 }

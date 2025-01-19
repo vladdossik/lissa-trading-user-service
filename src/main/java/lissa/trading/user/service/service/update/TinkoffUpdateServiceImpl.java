@@ -1,5 +1,6 @@
 package lissa.trading.user.service.service.update;
 
+import lissa.trading.user.service.dto.tinkoff.Stock;
 import lissa.trading.user.service.dto.tinkoff.UserAccount;
 import lissa.trading.user.service.dto.tinkoff.account.BalanceDto;
 import lissa.trading.user.service.dto.tinkoff.account.MarginAttributesDto;
@@ -7,7 +8,6 @@ import lissa.trading.user.service.dto.tinkoff.account.SecurityPosition;
 import lissa.trading.user.service.dto.tinkoff.account.SecurityPositionsDto;
 import lissa.trading.user.service.dto.tinkoff.account.TinkoffTokenDto;
 import lissa.trading.user.service.dto.tinkoff.stock.FigiesDto;
-import lissa.trading.user.service.dto.tinkoff.stock.StocksDto;
 import lissa.trading.user.service.dto.tinkoff.stock.StocksPricesDto;
 import lissa.trading.user.service.dto.tinkoff.stock.TickersDto;
 import lissa.trading.user.service.service.publisher.NotificationContext;
@@ -32,8 +32,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,7 +61,7 @@ public class TinkoffUpdateServiceImpl implements UpdateService {
         return BROKER;
     }
 
-    public void fullUserUpdate(User user) {
+    public void userEntitiesUpdate(User user) {
         user.setAccountCount(updateUserAccounts(user));
         String accountId = getAccountId(user);
         updateUserBalance(user, accountId);
@@ -183,21 +185,25 @@ public class TinkoffUpdateServiceImpl implements UpdateService {
     @Override
     public void updateUserFavouriteStocks(User user, TickersDto tickersDto) {
         try {
-            userRepository.save(user);
             tinkoffAccountClient.setTinkoffToken(new TinkoffTokenDto(user.getTinkoffToken()));
             List<String> favouriteStocksFromApi = tinkoffAccountClient.getFavouriteStocks()
                     .getFavouriteStocks();
+            log.info("Received favorite stocks from API: {}", favouriteStocksFromApi);
+
             List<FavoriteStocksEntity> existingFavouriteStocks = user.getFavoriteStocks();
-            log.info("recieved existent favorite stocks {}", existingFavouriteStocks);
-            List<FavoriteStocksEntity> fetchedFavouriteStocks = fetchFavouriteStocks(new TickersDto(
-                    getTickersToAdd(existingFavouriteStocks, favouriteStocksFromApi)));
-            log.info("fetched favorite stocks to add {}", fetchedFavouriteStocks);
+
+            List<FavoriteStocksEntity> fetchedFavouriteStocks = favoriteStockMapper
+                    .toFavoriteStocksFromStocks(fetchStocks(new TickersDto(
+                    getTickersToAdd(existingFavouriteStocks, favouriteStocksFromApi))));
+            log.info("Stocks to add: {}", fetchedFavouriteStocks);
+
             existingFavouriteStocks.addAll(fetchedFavouriteStocks);
+            removeDuplicates(existingFavouriteStocks);
             updateStockInformation(existingFavouriteStocks);
-            log.info("updated stock information {}", existingFavouriteStocks);
-            saveFavouriteStocks(existingFavouriteStocks, user);
-            log.info("saved favourite stocks for {}", user);
+            existingFavouriteStocks.forEach(stock -> stock.setUser(user));
             user.setFavoriteStocks(existingFavouriteStocks);
+            userRepository.save(user);
+            log.info("user favorite stocks after update: {}", existingFavouriteStocks);
             userUpdatesPublisher.publishUserFavoriteStocksUpdateNotification(user);
         }
         catch (Exception e) {
@@ -208,17 +214,16 @@ public class TinkoffUpdateServiceImpl implements UpdateService {
     @Override
     public StocksPricesDto getPricesUpdate(User user) {
         log.info("fetching favorite stock prices for: {}", user);
+        List<FavoriteStocksEntity> filteredList = filterFavoriteStocksByBroker(user.getFavoriteStocks());
         return tinkoffAccountClient
-                .getPricesStocksByFigies(new FigiesDto(
-                        user.getFavoriteStocks()
-                                .stream()
-                                .map(FavoriteStocksEntity::getFigi)
-                                .toList()));
+                .getPricesStocksByFigies(new FigiesDto(filteredList.stream()
+                                                               .map(FavoriteStocksEntity::getFigi)
+                                                               .toList()));
     }
 
     private List<String> getTickersToAdd(List<FavoriteStocksEntity> existingFavouriteStocks,
                                        List<String> favouriteStocksFromApi) {
-        existingFavouriteStocks.removeIf(stock -> !stock
+        existingFavouriteStocks.removeIf(stock -> stock
                 .getServiceTicker()
                 .equals(BROKER.name()) && !favouriteStocksFromApi.contains(stock.getTicker()));
         Set<String> existingTickers = existingFavouriteStocks.stream()
@@ -231,23 +236,38 @@ public class TinkoffUpdateServiceImpl implements UpdateService {
                 .toList();
     }
 
-    private List<FavoriteStocksEntity> fetchFavouriteStocks(TickersDto tickersDto) {
-        return favoriteStockMapper
-                .toFavoriteStocksFromDto(tinkoffAccountClient.getStocksByTickers(tickersDto))
+    private void updateStockInformation(List<FavoriteStocksEntity> favoriteStocksEntities) {
+        if (favoriteStocksEntities.isEmpty()) {
+            return;
+        }
+        List<FavoriteStocksEntity> filteredList = filterFavoriteStocksByBroker(favoriteStocksEntities);
+        if (filteredList.isEmpty()) {
+            return;
+        }
+        List<Stock> fetchedStocks = fetchStocks(getTickersDto(filteredList));
+        Map<String, Stock> stockDtoMap = fetchedStocks.stream()
+                .collect(Collectors.toMap(Stock::getTicker, stock -> stock));
+
+        for (FavoriteStocksEntity favoriteStock : favoriteStocksEntities) {
+            if (favoriteStock.getServiceTicker().equals(getBroker().name())) {
+                Stock updatedStock = stockDtoMap.get(favoriteStock.getTicker());
+                if (updatedStock != null) {
+                    favoriteStockMapper.updateFavoriteStockFromStock(updatedStock, favoriteStock);
+                }
+            }
+        }
+    }
+
+    private List<Stock> fetchStocks(TickersDto tickersDto) {
+        return tinkoffAccountClient.getStocksByTickers(tickersDto)
+                .getStocks()
                 .stream()
                 .toList();
     }
 
-    private void updateStockInformation(List<FavoriteStocksEntity> favoriteStocksEntities) {
-        StocksDto stocksDto = tinkoffAccountClient.getStocksByTickers(getTickersDto(favoriteStocksEntities));
-        favoriteStockMapper.updateFavoriteStocksFromDto(stocksDto, favoriteStocksEntities);
-    }
-
-    private void saveFavouriteStocks(List<FavoriteStocksEntity> favoriteStocksEntities, User user) {
-        favoriteStocksEntities.stream().forEach(stock -> {
-            stock.setUser(user);
-            favoriteStocksEntityRepository.save(stock);
-        });
+    private void removeDuplicates(List<FavoriteStocksEntity> stocks) {
+        Set<String> uniqueTickers = new HashSet<>();
+        stocks.removeIf(stock -> !uniqueTickers.add(stock.getTicker()));
     }
 
     private BalanceEntity getBalanceFromTinkoff(String tinkoffAccountId) {

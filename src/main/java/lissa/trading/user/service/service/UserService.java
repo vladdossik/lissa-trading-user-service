@@ -1,11 +1,11 @@
 package lissa.trading.user.service.service;
 
 import jakarta.validation.Valid;
-import lissa.trading.user.service.dto.notification.UserUpdateNotificationDto;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
 import lissa.trading.user.service.dto.response.UserResponseDto;
 import lissa.trading.user.service.dto.tinkoff.stock.StocksPricesDto;
 import lissa.trading.user.service.dto.tinkoff.stock.TickersDto;
+import lissa.trading.user.service.model.entity.FavoriteStocksEntity;
 import lissa.trading.user.service.page.CustomPage;
 import org.springframework.data.domain.Pageable;
 
@@ -27,6 +27,8 @@ public interface UserService {
                                                               String lastName);
 
     void updateFavoriteStocks(UUID externalId, TickersDto tickersDto);
+
+    void setUpdatedFavoriteStocksToUser(UUID externalId, List<FavoriteStocksEntity> favoriteStocksEntities);
 
     StocksPricesDto getUpdateOnStockPrices(UUID externalId);
 }

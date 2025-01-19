@@ -2,6 +2,7 @@ package lissa.trading.user.service.service;
 
 import lissa.trading.lissa.auth.lib.dto.UserInfoDto;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
+import lissa.trading.user.service.dto.response.UserResponseDto;
 import lissa.trading.user.service.feign.tinkoff.TinkoffAccountClient;
 import lissa.trading.user.service.mapper.TempUserRegMapper;
 import lissa.trading.user.service.mapper.UserMapper;
@@ -21,8 +22,14 @@ import lissa.trading.user.service.repository.entity.FavoriteStocksEntityReposito
 import lissa.trading.user.service.repository.entity.MarginTradingMetricsEntityRepository;
 import lissa.trading.user.service.repository.entity.UserAccountEntityRepository;
 import lissa.trading.user.service.repository.entity.UserPositionsEntityRepository;
+import lissa.trading.user.service.service.creation.UserCreationServiceImpl;
 import lissa.trading.user.service.service.creation.temp.TempUserCreationServiceImpl;
+import lissa.trading.user.service.service.publisher.NotificationContext;
+import lissa.trading.user.service.service.publisher.UserUpdatesPublisher;
 import lissa.trading.user.service.service.publisher.stats.StatsPublisher;
+import lissa.trading.user.service.service.update.TinkoffUpdateServiceImpl;
+import lissa.trading.user.service.service.update.factory.SupportedBrokersEnum;
+import lissa.trading.user.service.service.update.factory.UpdateServiceFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -67,16 +74,28 @@ public abstract class BaseTest {
     protected ApplicationEventPublisher eventPublisher;
 
     @Mock
+    protected UpdateServiceFactory updateServiceFactory;
+
+    @Mock
+    protected TinkoffUpdateServiceImpl tinkoffUpdateService;
+
+    @Mock
+    protected UserUpdatesPublisher userUpdatesPublisher;
+
+    @Mock
     protected UserMapper userMapper;
 
     @Mock
     protected StatsPublisher<User> statsPublisher;
 
+    @Mock
+    protected NotificationContext notificationContext;
+
     @InjectMocks
     protected UserServiceImpl userService;
 
     @InjectMocks
-    protected TinkoffUserCreationServiceImpl userCreationService;
+    protected UserCreationServiceImpl userCreationService;
 
     @InjectMocks
     protected TempUserCreationServiceImpl tempUserCreationService;
@@ -85,14 +104,17 @@ public abstract class BaseTest {
     protected TempUserReg tempUserReg;
     protected UserPatchDto userPatchDto;
     protected UserInfoDto userInfoDto;
+    protected UserResponseDto userResponseDto;
+    protected User updatedUser;
 
     @BeforeEach
     void setUp() {
-
         user = createUser();
         tempUserReg = createTempUserReg();
         userPatchDto = createUserPatchDto();
         userInfoDto = createUserAuthInfoDto();
+        userResponseDto = createUserResponseDto();
+        updatedUser = createUpdatedUser();
     }
 
     private User createUser() {
@@ -102,7 +124,9 @@ public abstract class BaseTest {
         userEntity.setLastName("Doe");
         userEntity.setTelegramChatId(12345L);
         userEntity.setTelegramNickname("johndoe");
-        userEntity.setTinkoffToken("token");
+        userEntity.setTinkoffToken("t.9zbdzHphp5ZkQzAYFpXmzWS60POh5XCWKUzpluZ2abPPyGtR7" +
+                                           "xWZCRNa2yNNlcukVuLq5hjANhepUNoMfKkPBF");
+        userEntity.setBroker(SupportedBrokersEnum.TINKOFF);
 
         BalanceEntity balance = new BalanceEntity();
         balance.setUser(userEntity);
@@ -153,6 +177,9 @@ public abstract class BaseTest {
         tempUser.setFirstName("John");
         tempUser.setLastName("Doe");
         tempUser.setTelegramNickname("johndoe");
+        tempUser.setTinkoffToken("t.9zbdzHphp5ZkQzAYFpXmzWS60POh5XCWKUzpluZ2abPPyGtR7" +
+                                           "xWZCRNa2yNNlcukVuLq5hjANhepUNoMfKkPBF");
+        tempUser.setBroker(SupportedBrokersEnum.TINKOFF);
         return tempUser;
     }
 
@@ -161,8 +188,20 @@ public abstract class BaseTest {
         dto.setFirstName("Jane");
         dto.setLastName(null);
         dto.setTelegramNickname("");
-        dto.setTinkoffToken("newToken");
+        dto.setTinkoffToken("t.0zbdzHphp5ZkQzAYFpXmzWS60POh5XCWKUzpluZ2abPPyGtR7" +
+                                    "XWZCRNa2yNNlcukVuLq5hjANhepUNoMfKkPBF");
         return dto;
+    }
+
+    private User createUpdatedUser() {
+        User updatedUser = new User();
+        updatedUser.setFirstName("Jane");
+        updatedUser.setLastName("Doe");
+        updatedUser.setTelegramChatId(12345L);
+        updatedUser.setTelegramNickname("");
+        updatedUser.setTinkoffToken("t.0zbdzHphp5ZkQzAYFpXmzWS60POh5XCWKUzpluZ2abPPyGtR7" +
+                                    "XWZCRNa2yNNlcukVuLq5hjANhepUNoMfKkPBF");
+        return updatedUser;
     }
 
     private UserInfoDto createUserAuthInfoDto() {
@@ -170,7 +209,19 @@ public abstract class BaseTest {
         dto.setFirstName("John");
         dto.setLastName("Doe");
         dto.setTelegramNickname("johndoe");
-        dto.setTinkoffToken("token");
+        dto.setTinkoffToken("t.9zbdzHphp5ZkQzAYFpXmzWS60POh5XCWKUzpluZ2abPPyGtR7" +
+                                           "XWZCRNa2yNNlcukVuLq5hjANhepUNoMfKkPBF");
+        return dto;
+    }
+
+    private UserResponseDto createUserResponseDto() {
+        UserResponseDto dto = new UserResponseDto();
+        dto.setFirstName("jane");
+        dto.setLastName("Doe");
+        dto.setTelegramChatId(12345L);
+        dto.setTelegramNickname("");
+        dto.setTinkoffToken("t.0zbdzHphp5ZkQzAYFpXmzWS60POh5XCWKUzpluZ2abPPyGtR7" +
+                                    "XWZCRNa2yNNlcukVuLq5hjANhepUNoMfKkPBF");
         return dto;
     }
 }

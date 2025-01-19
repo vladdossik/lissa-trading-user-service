@@ -1,11 +1,17 @@
 package lissa.trading.user.service.service;
 
+import lissa.trading.user.service.dto.notification.OperationEnum;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
 import lissa.trading.user.service.dto.response.UserResponseDto;
 import lissa.trading.user.service.exception.UserNotFoundException;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.page.CustomPage;
+import lissa.trading.user.service.service.update.MoexUpdateServiceImpl;
+import lissa.trading.user.service.service.update.TinkoffUpdateServiceImpl;
+import lissa.trading.user.service.service.update.factory.SupportedBrokersEnum;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -25,37 +31,31 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class UserServiceImplTest extends BaseTest {
 
     @Test
     void updateUser_success() {
         UUID externalId = UUID.randomUUID();
-        UserPatchDto userUpdates = new UserPatchDto();
-        userUpdates.setFirstName("UpdatedFirstName");
-        User existingUser = new User();
-        existingUser.setExternalId(externalId);
-        User updatedUser = new User();
-        updatedUser.setExternalId(externalId);
-        updatedUser.setFirstName("UpdatedFirstName");
-        UserResponseDto userResponseDto = new UserResponseDto();
-        userResponseDto.setFirstName("UpdatedFirstName");
-
-        when(userRepository.findByExternalId(externalId)).thenReturn(Optional.of(existingUser));
-        when(userMapper.updateUserFromDto(userUpdates, existingUser)).thenReturn(updatedUser);
+        when(updateServiceFactory.getUpdateServiceByType(SupportedBrokersEnum.TINKOFF))
+                .thenReturn(mock(TinkoffUpdateServiceImpl.class));
+        when(userRepository.findByExternalId(externalId)).thenReturn(Optional.of(user));
+        when(userMapper.updateUserFromDto(userPatchDto, user)).thenReturn(updatedUser);
         when(userRepository.save(updatedUser)).thenReturn(updatedUser);
         when(userMapper.toUserResponseDto(updatedUser)).thenReturn(userResponseDto);
 
-        UserResponseDto result = userService.updateUser(externalId, userUpdates);
+        UserResponseDto result = userService.updateUser(externalId, userPatchDto);
 
         assertNotNull(result);
-        assertEquals("UpdatedFirstName", result.getFirstName());
+        assertEquals("jane", result.getFirstName());
         verify(userRepository).findByExternalId(externalId);
-        verify(userMapper).updateUserFromDto(userUpdates, existingUser);
+        verify(userMapper).updateUserFromDto(userPatchDto, user);
         verify(userRepository).save(updatedUser);
         verify(userMapper).toUserResponseDto(updatedUser);
     }

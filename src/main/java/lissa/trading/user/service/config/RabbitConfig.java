@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitConfig {
 
-    @Value("${integration.rabbit.statistics-service.user-queue}")
+    @Value("${integration.rabbit.statistics-service.user-queue.name}")
     private String userStatsQueue;
 
     @Value("${integration.rabbit.user-service.exchange.name}")
@@ -24,6 +24,12 @@ public class RabbitConfig {
 
     @Value("${integration.rabbit.user-service.favourite-stocks-queue.name}")
     private String userFavoriteStocksQueue;
+
+    @Value("${integration.rabbit.user-service.favourite-stocks-queue.template}")
+    private String favoriteStocksQueueTemplate;
+
+    @Value("${integration.rabbit.user-service.user-update-queue.template}")
+    private String userUpdateQueueTemplate;
 
     @Value("${integration.rabbit.user-service.user-update-queue.name}")
     private String userUpdateQueue;
@@ -51,14 +57,14 @@ public class RabbitConfig {
     public Binding favoriteStocksBinding(Queue userFavoriteStocksQueue, TopicExchange userExchange) {
         return BindingBuilder.bind(userFavoriteStocksQueue)
                 .to(userExchange)
-                .with("*.favourite-stocks");
+                .with(favoriteStocksQueueTemplate);
     }
 
     @Bean
     public Binding userUpdateBinding(Queue userUpdateQueue, TopicExchange userExchange) {
         return BindingBuilder.bind(userUpdateQueue)
                 .to(userExchange)
-                .with("*.user-update");
+                .with(userUpdateQueueTemplate);
     }
 
     @Bean

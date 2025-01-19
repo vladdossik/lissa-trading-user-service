@@ -45,13 +45,16 @@ integration:
     moex-api-service-url: http://localhost:8086
   rabbit:
     statistics-service:
-      user-queue: user-stats-queue
+      user-queue:
+        name: user-stats-queue
     user-service:
       exchange:
         name: user-notifications-exchange;
       favourite-stocks-queue:
         name: favourite-stocks
         routing-key: userService.favourite-stocks
+        template: "*.favourite-stocks"
       user-update-queue:
         name: user-update
         routing-key: userService.user-update
+        template: "*.user-update"

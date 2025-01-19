@@ -6,6 +6,7 @@ import lissa.trading.user.service.dto.notification.UserUpdateNotificationDto;
 import lissa.trading.user.service.dto.response.TempUserRegResponseDto;
 import lissa.trading.user.service.model.TempUserReg;
 import lissa.trading.user.service.service.update.factory.SupportedBrokersEnum;
+import lissa.trading.user.service.utils.Tokens;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -41,18 +42,11 @@ public interface TempUserRegMapper {
 
     @AfterMapping
     default void decryptTinkoffToken(@MappingTarget TempUserReg tempUserReg) {
-        if (tempUserReg.getTinkoffToken() != null) {
-            tempUserReg.setTinkoffToken(EncryptionService.decrypt(tempUserReg.getTinkoffToken()));
-        }
+        tempUserReg.setTinkoffToken(Tokens.decryptToken(tempUserReg.getTinkoffToken()));
     }
 
     @AfterMapping
     default void setBroker(@MappingTarget TempUserReg tempUserReg) {
-        String tinkoffToken = tempUserReg.getTinkoffToken();
-        if (tinkoffToken == null || tinkoffToken.isEmpty()) {
-            tempUserReg.setBroker(SupportedBrokersEnum.MOEX);
-        } else if (tinkoffToken.startsWith("t.") && tinkoffToken.length() == 88) {
-            tempUserReg.setBroker(SupportedBrokersEnum.TINKOFF);
-        }
+        tempUserReg.setBroker(Tokens.determineTokenKind(tempUserReg.getTinkoffToken()));
     }
 }

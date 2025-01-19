@@ -1,6 +1,5 @@
 package lissa.trading.user.service.dto.notification;
 
-import lissa.trading.user.service.model.entity.FavoriteStocksEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,5 +14,5 @@ import java.util.UUID;
 @Builder
 public class UserFavoriteStocksUpdateDto {
     private UUID externalId;
-    List<FavoriteStocksEntity> favoriteStocksEntity;
+    private List<NotificationFavouriteStockDto> favoriteStocks;
 }
