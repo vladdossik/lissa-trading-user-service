@@ -1,5 +1,6 @@
 package lissa.trading.user.service;
 
+import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
@@ -14,6 +15,7 @@ import th.co.geniustree.springdata.jpa.repository.support.JpaSpecificationExecut
 @EnableJpaRepositories(repositoryBaseClass = JpaSpecificationExecutorWithProjectionImpl.class)
 @ComponentScan(basePackages = "lissa.trading")
 @EnableScheduling
+@EnableSchedulerLock(defaultLockAtMostFor = "PT30S")
 @EnableAsync
 public class LissaTradingUserServiceApplication {
 

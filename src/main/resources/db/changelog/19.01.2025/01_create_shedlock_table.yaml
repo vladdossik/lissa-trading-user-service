@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: 19.01.2025_1
+      author: kenpxrkasf@gmail.com
+      changes:
+        - createTable:
+            tableName: shedlock
+            columns:
+              - column:
+                  name: name
+                  type: VARCHAR(64)
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: lock_until
+                  type: TIMESTAMP(3) NULL
+              - column:
+                  name: locked_at
+                  type: TIMESTAMP(3) NULL
+              - column:
+                  name: locked_by
+                  type: VARCHAR(255)
+
+
+

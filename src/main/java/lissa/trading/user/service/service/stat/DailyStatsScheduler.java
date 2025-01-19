@@ -1,6 +1,7 @@
 package lissa.trading.user.service.service.stat;
 
 import lombok.RequiredArgsConstructor;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -12,7 +13,9 @@ public class DailyStatsScheduler {
 
     private final UserDailyStatsService userDailyStatsService;
 
-    @Scheduled(cron = "0 0 0 * * *")  // Каждый день в полночь
+    @Scheduled(cron = "0 0 0 * * *")
+    @SchedulerLock(name = "TaskScheduler_performDailyStatsUpdate",
+            lockAtLeastFor = "PT15S", lockAtMostFor = "PT1M")
     public void performDailyStatsUpdate() {
         userDailyStatsService.updateAllUsersDailyStats();
     }
