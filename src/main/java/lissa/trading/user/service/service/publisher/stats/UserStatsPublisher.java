@@ -23,7 +23,7 @@ public class UserStatsPublisher implements StatsPublisher<User> {
     private final RabbitTemplate rabbitTemplate;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    @Value("${integration.rabbit.statistics-service.user-queue}")
+    @Value("${integration.rabbit.statistics-service.user-queue.name}")
     private String userStatsQueue;
     private Integer defaultOffset = 0;
 
