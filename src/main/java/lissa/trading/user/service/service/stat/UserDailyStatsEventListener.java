@@ -22,8 +22,6 @@ public class UserDailyStatsEventListener {
     private final UserDailyStatsRepository userDailyStatsRepository;
     private final UserRepository userRepository;
 
-    @Async
-    @Transactional
     @EventListener
     public void handleUserDailyStatsUpdate(UserDailyStatsUpdateEvent event) {
         User user = event.getUser();

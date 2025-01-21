@@ -1,5 +1,6 @@
 package lissa.trading.user.service.service.stat;
 
+import jakarta.transaction.Transactional;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ public class UserDailyStatsServiceImpl implements UserDailyStatsService {
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
 
+    @Transactional
     @Override
     public void updateAllUsersDailyStats() {
         List<User> users = userRepository.findAll();
