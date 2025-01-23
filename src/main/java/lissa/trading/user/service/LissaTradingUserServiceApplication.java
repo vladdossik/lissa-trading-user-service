@@ -15,7 +15,7 @@ import th.co.geniustree.springdata.jpa.repository.support.JpaSpecificationExecut
 @EnableJpaRepositories(repositoryBaseClass = JpaSpecificationExecutorWithProjectionImpl.class)
 @ComponentScan(basePackages = "lissa.trading")
 @EnableScheduling
-@EnableSchedulerLock(defaultLockAtMostFor = "PT30S")
+@EnableSchedulerLock(defaultLockAtMostFor = "PT15S")
 @EnableAsync
 public class LissaTradingUserServiceApplication {
 

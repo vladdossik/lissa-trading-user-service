@@ -16,7 +16,7 @@ public class DailyStatsScheduler {
 
     @Scheduled(cron = "0 0 0 * * *")
     @SchedulerLock(name = "TaskScheduler_performDailyStatsUpdate",
-            lockAtLeastFor = "PT15S", lockAtMostFor = "PT1M")
+            lockAtLeastFor = "PT3S", lockAtMostFor = "PT15S")
     public void performDailyStatsUpdate() {
         userDailyStatsService.updateAllUsersDailyStats();
     }
