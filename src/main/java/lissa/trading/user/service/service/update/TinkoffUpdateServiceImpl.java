@@ -10,7 +10,7 @@ import lissa.trading.user.service.dto.tinkoff.account.TinkoffTokenDto;
 import lissa.trading.user.service.dto.tinkoff.stock.FigiesDto;
 import lissa.trading.user.service.dto.tinkoff.stock.StocksPricesDto;
 import lissa.trading.user.service.dto.tinkoff.stock.TickersDto;
-import lissa.trading.user.service.service.publisher.NotificationContext;
+import lissa.trading.user.service.service.consumer.NotificationContext;
 import lissa.trading.user.service.feign.tinkoff.TinkoffAccountClient;
 import lissa.trading.user.service.mapper.FavoriteStockMapper;
 import lissa.trading.user.service.model.User;
@@ -43,6 +43,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TinkoffUpdateServiceImpl implements UpdateService {
 
+    private final static SupportedBrokersEnum BROKER = SupportedBrokersEnum.TINKOFF;
+
     private final TinkoffAccountClient tinkoffAccountClient;
     private final BalanceEntityRepository balanceRepository;
     private final UserAccountEntityRepository userAccountRepository;
@@ -52,8 +54,6 @@ public class TinkoffUpdateServiceImpl implements UpdateService {
     private final FavoriteStockMapper favoriteStockMapper;
     private final UserUpdatesPublisher userUpdatesPublisher;
     private final NotificationContext notificationContext;
-
-    private final static SupportedBrokersEnum BROKER = SupportedBrokersEnum.TINKOFF;
     private final UserRepository userRepository;
 
     @Override
@@ -88,7 +88,7 @@ public class TinkoffUpdateServiceImpl implements UpdateService {
             balanceRepository.save(newBalance);
             user.getBalances().add(newBalance);
         }
-        log.info("User updated with balance: {}", user);
+        log.info("User updated with balance: {}", newBalance);
     }
 
     @Override
@@ -110,7 +110,7 @@ public class TinkoffUpdateServiceImpl implements UpdateService {
                 marginTradingMetricsRepository.save(newMetrics);
                 user.setMarginTradingMetrics(newMetrics);
             }
-            log.info("User updated with margin metrics: {}", user);
+            log.info("User updated with margin metrics: {}", user.getMarginTradingMetrics());
         } catch (Exception e) {
             log.error("Error updating margin metrics. Proceeding with empty metrics.", e);
         }
@@ -148,7 +148,7 @@ public class TinkoffUpdateServiceImpl implements UpdateService {
                     user.getPositions().add(newPosition);
                 }
             }
-            log.info("User updated with positions: {}", user);
+            log.info("User updated with positions: {}", user.getPositions());
         } catch (Exception e) {
             log.warn("No positions found for user: {}", user.getId(), e);
         }
@@ -203,8 +203,8 @@ public class TinkoffUpdateServiceImpl implements UpdateService {
             existingFavouriteStocks.forEach(stock -> stock.setUser(user));
             user.setFavoriteStocks(existingFavouriteStocks);
             userRepository.save(user);
-            log.info("user favorite stocks after update: {}", existingFavouriteStocks);
             userUpdatesPublisher.publishUserFavoriteStocksUpdateNotification(user);
+            log.info("successfully updated user favorite stocks {}", existingFavouriteStocks);
         }
         catch (Exception e) {
             log.error("Error updating favourite stocks from Tinkoff API.", e);

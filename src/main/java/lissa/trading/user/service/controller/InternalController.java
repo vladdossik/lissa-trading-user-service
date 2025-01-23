@@ -120,16 +120,6 @@ public class InternalController {
         return userService.getUserByExternalId(externalId);
     }
 
-    @Operation(summary = "Обновление пользователя")
-    @ApiResponse(
-            description = "Пользователь успешно обновлен",
-            content = @Content(schema = @Schema(implementation = UserResponseDto.class))
-    )
-    @PatchMapping("/{externalId}")
-    public UserResponseDto updateUser(@PathVariable UUID externalId, @Valid @RequestBody UserPatchDto userUpdates) {
-        return userService.updateUser(externalId, userUpdates);
-    }
-
     @Operation(summary = "Удаление пользователя по внешнему идентификатору")
     @ApiResponse(
             description = "Пользователь успешно удален",

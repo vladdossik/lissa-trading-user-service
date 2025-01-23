@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 @Component
 public class UpdateServiceFactory {
 
-    private final Map<SupportedBrokersEnum, UpdateService> UpdateServiceMap;
+    private final Map<SupportedBrokersEnum, UpdateService> updateServiceMap;
 
     public UpdateServiceFactory(List<UpdateService> UpdateServiceList) {
-        UpdateServiceMap = UpdateServiceList
+        updateServiceMap = UpdateServiceList
                 .stream()
                 .collect(Collectors.toMap(
                         UpdateService::getBroker,
@@ -21,6 +21,6 @@ public class UpdateServiceFactory {
     }
 
     public UpdateService getUpdateServiceByType(SupportedBrokersEnum supportedBroker) {
-        return UpdateServiceMap.get(supportedBroker);
+        return updateServiceMap.get(supportedBroker);
     }
 }

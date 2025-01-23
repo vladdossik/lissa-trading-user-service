@@ -7,7 +7,7 @@ import lissa.trading.user.service.dto.response.UserStatsReportDto;
 import lissa.trading.user.service.model.TempUserReg;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.model.entity.BalanceEntity;
-import lissa.trading.user.service.utils.Tokens;
+import lissa.trading.user.service.utils.TokenUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -60,7 +60,7 @@ public interface UserMapper {
         mapOptionalValue(userPatchDto.getTelegramNickname(), user::setTelegramNickname);
         mapOptionalValue(userPatchDto.getTinkoffToken(), user::setTinkoffToken);
         mapOptionalValue(userPatchDto.getExternalId(), user::setExternalId);
-        user.setTinkoffToken(Tokens.decryptToken(user.getTinkoffToken()));
+        user.setTinkoffToken(TokenUtils.decryptToken(user.getTinkoffToken()));
         return user;
     }
 

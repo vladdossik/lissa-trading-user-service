@@ -9,7 +9,7 @@ import lissa.trading.user.service.dto.tinkoff.stock.TickersDto;
 import lissa.trading.user.service.exception.OperationUnsupportedByBrokerException;
 import lissa.trading.user.service.mapper.FavoriteStockMapper;
 import lissa.trading.user.service.model.entity.FavoriteStocksEntity;
-import lissa.trading.user.service.service.publisher.NotificationContext;
+import lissa.trading.user.service.service.consumer.NotificationContext;
 import lissa.trading.user.service.exception.UserNotFoundException;
 import lissa.trading.user.service.mapper.PageMapper;
 import lissa.trading.user.service.mapper.UserMapper;
@@ -21,7 +21,7 @@ import lissa.trading.user.service.service.publisher.UserUpdatesPublisher;
 import lissa.trading.user.service.service.publisher.stats.StatsPublisher;
 import lissa.trading.user.service.service.update.factory.SupportedBrokersEnum;
 import lissa.trading.user.service.service.update.factory.UpdateServiceFactory;
-import lissa.trading.user.service.utils.Tokens;
+import lissa.trading.user.service.utils.TokenUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -53,11 +53,11 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponseDto updateUser(UUID externalId, @Valid UserPatchDto userUpdates) {
-        log.info("updating user {}", externalId);
+        log.info("updating user with externalId {}", externalId);
         User user = userMapper.updateUserFromDto(userUpdates, findUserByExternalId(externalId));
         updateUserBroker(user);
         userRepository.save(user);
-        log.info("updated user {}", user);
+        log.info("updated user with externalId {}", externalId);
         userUpdatesPublisher.publishUserUpdateNotification(user, OperationEnum.UPDATE);
         notificationContext.clear();
         statsPublisher.publishUserData(user);
@@ -77,10 +77,9 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUserByExternalId(UUID externalId) {
         log.info("deleting user {}", externalId);
-        userRepository.delete(findUserByExternalId(externalId));
-        User deletedUser = new User();
-        deletedUser.setExternalId(externalId);
-        userUpdatesPublisher.publishUserUpdateNotification(deletedUser, OperationEnum.DELETE);
+        User user = findUserByExternalId(externalId);
+        userRepository.delete(user);
+        userUpdatesPublisher.publishUserUpdateNotification(user, OperationEnum.DELETE);
         notificationContext.clear();
         log.info("User with external ID {} deleted", externalId);
     }
@@ -155,9 +154,7 @@ public class UserServiceImpl implements UserService {
                     })
                     .toList();
 
-            user.getFavoriteStocks().clear();
-            user.getFavoriteStocks().addAll(updatedStocks);
-
+            user.clearAndSetFavoriteStocks(updatedStocks);
             userRepository.save(user);
 
             log.info("User {} updated with {} favourite stocks",
@@ -177,16 +174,14 @@ public class UserServiceImpl implements UserService {
     }
 
     private void updateUserBroker(User user) {
-        SupportedBrokersEnum broker = Tokens.determineTokenKind(user.getTinkoffToken());
-        {
-            user.setBroker(broker);
-            try {
-                userUpdateServiceFactory
-                        .getUpdateServiceByType(broker)
-                        .userEntitiesUpdate(user);
-            } catch(OperationUnsupportedByBrokerException e) {
-                log.error("error while updating user broker, {}", e.getMessage());
-            }
+        SupportedBrokersEnum broker = TokenUtils.determineTokenKind(user.getTinkoffToken());
+        user.setBroker(broker);
+        try {
+            userUpdateServiceFactory
+                    .getUpdateServiceByType(broker)
+                    .userEntitiesUpdate(user);
+        } catch(OperationUnsupportedByBrokerException e) {
+            log.error("error while updating user broker, {}", e.getMessage());
         }
     }
 

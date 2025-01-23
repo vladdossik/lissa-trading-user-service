@@ -3,7 +3,7 @@ package lissa.trading.user.service.utils;
 import lissa.trading.lissa.auth.lib.security.EncryptionService;
 import lissa.trading.user.service.service.update.factory.SupportedBrokersEnum;
 
-public class Tokens {
+public class TokenUtils {
 
     private final static String TINKOFF_TOKEN_STARTS_WITH = "t.";
     private final static int TINKOFF_TOKEN_LENGTH = 88;

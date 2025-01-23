@@ -3,7 +3,6 @@ package lissa.trading.user.service.service.consumer;
 import lissa.trading.user.service.dto.notification.UserFavoriteStocksUpdateDto;
 import lissa.trading.user.service.dto.notification.UserUpdateNotificationDto;
 import lissa.trading.user.service.mapper.FavoriteStockMapper;
-import lissa.trading.user.service.service.publisher.NotificationContext;
 import lissa.trading.user.service.mapper.TempUserRegMapper;
 import lissa.trading.user.service.mapper.UserMapper;
 import lissa.trading.user.service.repository.UserRepository;
@@ -12,8 +11,6 @@ import lissa.trading.user.service.service.creation.temp.TempUserCreationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,30 +26,17 @@ public class UserUpdatesNotificationConsumerImpl implements UserUpdatesNotificat
     private final FavoriteStockMapper favoriteStockMapper;
     private final UserRepository userRepository;
 
-    @Value("${integration.rabbit.user-service.user-update-queue.routing-key}")
-    private String userUpdateRoutingKey;
-
-    @Value("${integration.rabbit.user-service.favourite-stocks-queue.routing-key}")
-    private String userFavoriteStocksRoutingKey;
-
-    @RabbitListener(queues = "${integration.rabbit.user-service.user-update-queue.name}")
+    @RabbitListener(queues = "${integration.rabbit.tg-bot.queues.user-update-queue.name}")
     @Override
-    public void receiveUserUpdateNotification(UserUpdateNotificationDto userUpdateDto, @Header("amqp_receivedRoutingKey") String routingKey) {
+    public void receiveUserUpdateNotification(UserUpdateNotificationDto userUpdateDto) {
         log.info("received user update notification: {}", userUpdateDto);
-        if (routingKey.equals(userUpdateRoutingKey)) {
-            return;
-        }
         notificationContext.setFromExternalSource(true);
         processUpdateNotification(userUpdateDto);
     }
 
-    @RabbitListener(queues = "${integration.rabbit.user-service.favourite-stocks-queue.name}")
+    @RabbitListener(queues = "${integration.rabbit.tg-bot.queues.favorite-stocks-queue.name}")
     @Override
-    public void receiveUserFavoriteStocksUpdateNotification(UserFavoriteStocksUpdateDto userFavoriteStocksUpdateDto,
-                                                            @Header("amqp_receivedRoutingKey") String routingKey) {
-        if (routingKey.equals(userFavoriteStocksRoutingKey)) {
-            return;
-        }
+    public void receiveUserFavoriteStocksUpdateNotification(UserFavoriteStocksUpdateDto userFavoriteStocksUpdateDto) {
         log.info("received user favorite stocks update notification: {}", userFavoriteStocksUpdateDto);
         notificationContext.setFromExternalSource(true);
         processFavoriteStocksUpdateNotification(userFavoriteStocksUpdateDto);

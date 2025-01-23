@@ -1,12 +1,10 @@
 package lissa.trading.user.service.mapper;
 
 import lissa.trading.lissa.auth.lib.dto.UserInfoDto;
-import lissa.trading.lissa.auth.lib.security.EncryptionService;
 import lissa.trading.user.service.dto.notification.UserUpdateNotificationDto;
 import lissa.trading.user.service.dto.response.TempUserRegResponseDto;
 import lissa.trading.user.service.model.TempUserReg;
-import lissa.trading.user.service.service.update.factory.SupportedBrokersEnum;
-import lissa.trading.user.service.utils.Tokens;
+import lissa.trading.user.service.utils.TokenUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -42,11 +40,11 @@ public interface TempUserRegMapper {
 
     @AfterMapping
     default void decryptTinkoffToken(@MappingTarget TempUserReg tempUserReg) {
-        tempUserReg.setTinkoffToken(Tokens.decryptToken(tempUserReg.getTinkoffToken()));
+        tempUserReg.setTinkoffToken(TokenUtils.decryptToken(tempUserReg.getTinkoffToken()));
     }
 
     @AfterMapping
     default void setBroker(@MappingTarget TempUserReg tempUserReg) {
-        tempUserReg.setBroker(Tokens.determineTokenKind(tempUserReg.getTinkoffToken()));
+        tempUserReg.setBroker(TokenUtils.determineTokenKind(tempUserReg.getTinkoffToken()));
     }
 }

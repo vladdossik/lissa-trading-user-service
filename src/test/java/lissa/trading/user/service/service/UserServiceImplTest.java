@@ -4,14 +4,33 @@ import lissa.trading.user.service.dto.notification.OperationEnum;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
 import lissa.trading.user.service.dto.response.UserResponseDto;
 import lissa.trading.user.service.exception.UserNotFoundException;
+import lissa.trading.user.service.feign.tinkoff.TinkoffAccountClient;
+import lissa.trading.user.service.mapper.TempUserRegMapper;
+import lissa.trading.user.service.mapper.UserMapper;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.page.CustomPage;
+import lissa.trading.user.service.repository.TempUserRegRepository;
+import lissa.trading.user.service.repository.UserRepository;
+import lissa.trading.user.service.repository.entity.BalanceEntityRepository;
+import lissa.trading.user.service.repository.entity.FavoriteStocksEntityRepository;
+import lissa.trading.user.service.repository.entity.MarginTradingMetricsEntityRepository;
+import lissa.trading.user.service.repository.entity.UserAccountEntityRepository;
+import lissa.trading.user.service.repository.entity.UserPositionsEntityRepository;
+import lissa.trading.user.service.service.consumer.NotificationContext;
+import lissa.trading.user.service.service.creation.UserCreationServiceImpl;
+import lissa.trading.user.service.service.creation.temp.TempUserCreationServiceImpl;
+import lissa.trading.user.service.service.publisher.UserUpdatesPublisher;
+import lissa.trading.user.service.service.publisher.stats.StatsPublisher;
 import lissa.trading.user.service.service.update.MoexUpdateServiceImpl;
 import lissa.trading.user.service.service.update.TinkoffUpdateServiceImpl;
 import lissa.trading.user.service.service.update.factory.SupportedBrokersEnum;
+import lissa.trading.user.service.service.update.factory.UpdateServiceFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -38,7 +57,28 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceImplTest extends BaseTest {
+class UserServiceImplTest extends AbstractInitialization {
+
+    @Mock
+    protected UserRepository userRepository;
+
+    @Mock
+    protected UpdateServiceFactory updateServiceFactory;
+
+    @Mock
+    protected UserMapper userMapper;
+
+    @Mock
+    protected UserUpdatesPublisher userUpdatesPublisher;
+
+    @Mock
+    protected NotificationContext notificationContext;
+
+    @Mock
+    protected StatsPublisher statsPublisher;
+
+    @InjectMocks
+    protected UserServiceImpl userService;
 
     @Test
     void updateUser_success() {

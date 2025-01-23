@@ -3,14 +3,37 @@ package lissa.trading.user.service.service;
 import lissa.trading.user.service.dto.notification.OperationEnum;
 import lissa.trading.user.service.dto.tinkoff.account.TinkoffTokenDto;
 import lissa.trading.user.service.exception.UserCreationException;
+import lissa.trading.user.service.feign.tinkoff.TinkoffAccountClient;
+import lissa.trading.user.service.mapper.TempUserRegMapper;
+import lissa.trading.user.service.mapper.UserMapper;
 import lissa.trading.user.service.model.TempUserReg;
 import lissa.trading.user.service.model.User;
+import lissa.trading.user.service.repository.TempUserRegRepository;
+import lissa.trading.user.service.repository.UserRepository;
+import lissa.trading.user.service.repository.entity.BalanceEntityRepository;
+import lissa.trading.user.service.repository.entity.FavoriteStocksEntityRepository;
+import lissa.trading.user.service.repository.entity.MarginTradingMetricsEntityRepository;
+import lissa.trading.user.service.repository.entity.UserAccountEntityRepository;
+import lissa.trading.user.service.repository.entity.UserPositionsEntityRepository;
+import lissa.trading.user.service.service.consumer.NotificationContext;
+import lissa.trading.user.service.service.creation.UserCreationServiceImpl;
+import lissa.trading.user.service.service.creation.temp.TempUserCreationServiceImpl;
+import lissa.trading.user.service.service.publisher.UserUpdatesPublisher;
+import lissa.trading.user.service.service.publisher.stats.StatsPublisher;
+import lissa.trading.user.service.service.update.TinkoffUpdateServiceImpl;
 import lissa.trading.user.service.service.update.factory.SupportedBrokersEnum;
+import lissa.trading.user.service.service.update.factory.UpdateServiceFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
+
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -24,7 +47,34 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Slf4j
-class TinkoffUserCreationServiceImplTest extends BaseTest {
+class TinkoffUserCreationServiceImplTest extends AbstractInitialization {
+
+    @Mock
+    protected UserRepository userRepository;
+
+    @Mock
+    protected TempUserRegRepository tempUserRegRepository;
+
+    @Mock
+    protected TinkoffAccountClient tinkoffAccountClient;
+
+    @Mock
+    protected UpdateServiceFactory updateServiceFactory;
+
+    @Mock
+    protected TinkoffUpdateServiceImpl tinkoffUpdateService;
+
+    @Mock
+    protected UserUpdatesPublisher userUpdatesPublisher;
+
+    @Mock
+    protected UserMapper userMapper;
+
+    @Mock
+    protected NotificationContext notificationContext;
+
+    @InjectMocks
+    protected UserCreationServiceImpl userCreationService;
 
     @Test
     void createUserFromTempUserReg_success() {

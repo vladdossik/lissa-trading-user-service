@@ -1,8 +1,7 @@
-package lissa.trading.user.service.service.publisher;
+package lissa.trading.user.service.service.consumer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 @Component

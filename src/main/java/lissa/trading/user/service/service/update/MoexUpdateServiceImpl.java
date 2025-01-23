@@ -13,6 +13,7 @@ import lissa.trading.user.service.service.update.factory.SupportedBrokersEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -24,12 +25,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MoexUpdateServiceImpl implements UpdateService {
 
+    private final static SupportedBrokersEnum BROKER = SupportedBrokersEnum.MOEX;
+
     private final MoexServiceClient moexServiceClient;
     private final FavoriteStockMapper favoriteStockMapper;
     private final UserRepository userRepository;
     private final UserUpdatesPublisher userUpdatesPublisher;
-
-    private final static SupportedBrokersEnum BROKER = SupportedBrokersEnum.MOEX;
 
     @Override
     public SupportedBrokersEnum getBroker() {
@@ -38,15 +39,14 @@ public class MoexUpdateServiceImpl implements UpdateService {
 
     @Override
     public void updateUserFavouriteStocks(User user, TickersDto tickersDto) {
-        if (tickersDto.getTickers() == null || tickersDto.getTickers().isEmpty()) {
+        if (CollectionUtils.isEmpty(tickersDto.getTickers())) {
             updateStockInformation(user.getFavoriteStocks());
             userRepository.save(user);
             userUpdatesPublisher.publishUserFavoriteStocksUpdateNotification(user);
             return;
         }
-        log.info("updating favourite stocks for {} using {}", user, BROKER);
+        log.info("updating favourite stocks for {} using {}", user.getExternalId(), BROKER);
         List<FavoriteStocksEntity> favoriteStocks = user.getFavoriteStocks();
-        log.info("Before {}", favoriteStocks);
         favoriteStocks.addAll(favoriteStockMapper.toFavoriteStocksFromStocks(
                         fetchStocks(getTickersToAdd(favoriteStocks, tickersDto))));
         updateStockInformation(favoriteStocks);
@@ -54,6 +54,7 @@ public class MoexUpdateServiceImpl implements UpdateService {
         user.setFavoriteStocks(favoriteStocks);
         userRepository.save(user);
         userUpdatesPublisher.publishUserFavoriteStocksUpdateNotification(user);
+        log.info("successfully updated user favorite stocks {}", favoriteStocks);
     }
 
     @Override
@@ -64,18 +65,15 @@ public class MoexUpdateServiceImpl implements UpdateService {
     }
 
     private TickersDto getTickersToAdd(List<FavoriteStocksEntity> existingStocks, TickersDto tickersDto) {
-        log.info("entering get tickers to add with existing stocks {} and tickers {}", existingStocks, tickersDto);
         Set<String> existingStocksTickers = existingStocks
                 .stream()
                 .map(FavoriteStocksEntity::getTicker)
                 .collect(Collectors.toSet());
-        log.info("existing stocks tickers {}", existingStocksTickers);
 
         List<String> filteredTickers = tickersDto.getTickers()
                 .stream()
                 .filter(ticker -> !existingStocksTickers.contains(ticker))
                 .toList();
-        log.info("filtered tickers {}", filteredTickers);
         return new TickersDto(filteredTickers);
     }
 
@@ -93,9 +91,9 @@ public class MoexUpdateServiceImpl implements UpdateService {
 
         for (FavoriteStocksEntity favoriteStock : favoriteStocksEntities) {
             if (favoriteStock.getServiceTicker().equals(getBroker().name())) {
-                Stock updatedStock = stockDtoMap.get(favoriteStock.getTicker());
-                if (updatedStock != null) {
-                    favoriteStockMapper.updateFavoriteStockFromStock(updatedStock, favoriteStock);
+                if (stockDtoMap.get(favoriteStock.getTicker()) != null) {
+                    favoriteStockMapper.updateFavoriteStockFromStock(
+                            stockDtoMap.get(favoriteStock.getTicker()), favoriteStock);
                 }
             }
         }

@@ -10,7 +10,7 @@ import lissa.trading.user.service.model.TempUserReg;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.repository.TempUserRegRepository;
 import lissa.trading.user.service.repository.UserRepository;
-import lissa.trading.user.service.service.publisher.NotificationContext;
+import lissa.trading.user.service.service.consumer.NotificationContext;
 import lissa.trading.user.service.service.publisher.UserUpdatesPublisher;
 import lissa.trading.user.service.service.update.factory.SupportedBrokersEnum;
 import lissa.trading.user.service.service.update.factory.UpdateServiceFactory;

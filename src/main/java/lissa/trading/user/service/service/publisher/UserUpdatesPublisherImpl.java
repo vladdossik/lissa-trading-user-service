@@ -7,6 +7,7 @@ import lissa.trading.user.service.dto.notification.UserUpdateNotificationDto;
 import lissa.trading.user.service.mapper.FavoriteStockMapper;
 import lissa.trading.user.service.mapper.UserMapper;
 import lissa.trading.user.service.model.User;
+import lissa.trading.user.service.service.consumer.NotificationContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -15,25 +16,24 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class UserUpdatesPublisherImpl implements UserUpdatesPublisher {
 
+    @Value("${integration.rabbit.exchanges.user-notifications}")
+    private String exchangeName;
+
+    @Value("${integration.rabbit.user-service.queues.user-update-queue.routing-key}")
+    private String userServiceUpdateQueueRoutingKey;
+
+    @Value("${integration.rabbit.user-service.queues.favourite-stocks-queue.routing-key}")
+    private String userServiceFavouriteStocksQueueRoutingKey;
+
     private final RabbitTemplate rabbitTemplate;
     private final NotificationContext notificationContext;
     private final UserMapper userMapper;
     private final FavoriteStockMapper favoriteStockMapper;
-
-    @Value("${integration.rabbit.user-service.exchange.name}")
-    private String exchangeName;
-
-    @Value("${integration.rabbit.user-service.favourite-stocks-queue.routing-key}")
-    private String favouriteStocksRoutingKey;
-
-    @Value("${integration.rabbit.user-service.user-update-queue.routing-key}")
-    private String userUpdateRoutingKey;
 
     @Override
     public void publishUserUpdateNotification(User user, OperationEnum operationEnum) {
@@ -42,8 +42,10 @@ public class UserUpdatesPublisherImpl implements UserUpdatesPublisher {
         }
         UserUpdateNotificationDto updateDto = userMapper.toUserUpdateNotificationDto(user);
         updateDto.setOperation(operationEnum);
-        rabbitTemplate.convertAndSend(exchangeName, userUpdateRoutingKey, updateDto);
-        log.info("published user update notification: {}", updateDto);
+        rabbitTemplate.convertAndSend(exchangeName,
+                                      userServiceUpdateQueueRoutingKey,
+                                      updateDto);
+        log.info("published user update notification for: {}", user.getExternalId());
     }
 
     @Override
@@ -51,11 +53,11 @@ public class UserUpdatesPublisherImpl implements UserUpdatesPublisher {
         List<NotificationFavouriteStockDto> notificationFavouriteStockDtoList = favoriteStockMapper
                 .toNotificationFavouriteStockDtoList(user.getFavoriteStocks());
         log.info("favorite stock size = {}", notificationFavouriteStockDtoList.size());
-        rabbitTemplate.convertAndSend(exchangeName, favouriteStocksRoutingKey,
+        rabbitTemplate.convertAndSend(exchangeName, userServiceFavouriteStocksQueueRoutingKey,
                                       UserFavoriteStocksUpdateDto.builder()
                                               .favoriteStocks(notificationFavouriteStockDtoList)
                                               .externalId(user.getExternalId())
                                               .build());
-        log.info("published user favorite stocks update notification for: {}", user);
+        log.info("published user favorite stocks update notification for: {}", user.getExternalId());
     }
 }
