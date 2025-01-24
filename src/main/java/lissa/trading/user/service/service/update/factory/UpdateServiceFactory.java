@@ -12,8 +12,8 @@ public class UpdateServiceFactory {
 
     private final Map<SupportedBrokersEnum, UpdateService> updateServiceMap;
 
-    public UpdateServiceFactory(List<UpdateService> UpdateServiceList) {
-        updateServiceMap = UpdateServiceList
+    public UpdateServiceFactory(List<UpdateService> updateServiceList) {
+        updateServiceMap = updateServiceList
                 .stream()
                 .collect(Collectors.toMap(
                         UpdateService::getBroker,
