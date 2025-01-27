@@ -5,10 +5,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lissa.trading.lissa.auth.lib.dto.UpdateTinkoffTokenResponce;
 import lissa.trading.lissa.auth.lib.dto.UserInfoDto;
-import lissa.trading.user.service.dto.patch.UserPatchDto;
 import lissa.trading.user.service.dto.response.UserResponseDto;
 import lissa.trading.user.service.dto.tinkoff.account.TinkoffTokenDto;
 import lissa.trading.user.service.dto.tinkoff.stock.StocksPricesDto;
@@ -151,7 +149,7 @@ public class InternalController {
             responseCode = "200",
             content = @Content()
     )
-    @PostMapping("/update/favouriteStocks/{externalId}")
+    @PatchMapping("/favouriteStocks/{externalId}")
     public ResponseEntity<String> updateUserFavoriteStocks(@PathVariable UUID externalId, @RequestBody TickersDto tickersDto) {
         userService.updateFavoriteStocks(externalId, tickersDto);
         return ResponseEntity.ok("Successful user favorite stocks update");
@@ -162,8 +160,8 @@ public class InternalController {
             description = "Цены на любимые акции успешно получены",
             content = @Content(contentSchema = @Schema(implementation = StocksPricesDto.class))
     )
-    @GetMapping("/update/favouriteStocksPrices/{externalId}")
-    public StocksPricesDto getUpdatedFavouriteStocksPrices(@PathVariable UUID externalId) {
+    @GetMapping("/favouriteStocksPrices/{externalId}")
+    public StocksPricesDto getFavouriteStocksPrices(@PathVariable UUID externalId) {
         return userService.getUpdateOnStockPrices(externalId);
     }
 }

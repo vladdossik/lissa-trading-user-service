@@ -26,7 +26,7 @@ public class UserUpdatesNotificationConsumerImpl implements UserUpdatesNotificat
     private final FavoriteStockMapper favoriteStockMapper;
     private final UserRepository userRepository;
 
-    @RabbitListener(queues = "${integration.rabbit.tg-bot.queues.user-update-queue.name}")
+    @RabbitListener(queues = "${integration.rabbit.inbound.tg-bot.user-update.queue}")
     @Override
     public void receiveUserUpdateNotification(UserUpdateNotificationDto userUpdateDto) {
         log.info("received user update notification: {}", userUpdateDto);
@@ -34,7 +34,7 @@ public class UserUpdatesNotificationConsumerImpl implements UserUpdatesNotificat
         processUpdateNotification(userUpdateDto);
     }
 
-    @RabbitListener(queues = "${integration.rabbit.tg-bot.queues.favorite-stocks-queue.name}")
+    @RabbitListener(queues = "${integration.rabbit.inbound.tg-bot.favourite-stocks.queue}")
     @Override
     public void receiveUserFavoriteStocksUpdateNotification(UserFavoriteStocksUpdateDto userFavoriteStocksUpdateDto) {
         log.info("received user favorite stocks update notification: {}", userFavoriteStocksUpdateDto);

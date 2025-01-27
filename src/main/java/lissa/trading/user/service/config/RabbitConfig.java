@@ -16,34 +16,34 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitConfig {
 
-    @Value("${integration.rabbit.statistics-service.queues.user-queue.name}")
+    @Value("${integration.rabbit.outbound.statistics-service.user.queue}")
     private String userStatsQueue;
 
-    @Value("${integration.rabbit.user-service.queues.favourite-stocks-queue.name}")
+    @Value("${integration.rabbit.outbound.user-service.favourite-stocks.queue}")
     private String userServiceFavoriteStocksQueue;
 
-    @Value("${integration.rabbit.user-service.queues.user-update-queue.name}")
+    @Value("${integration.rabbit.outbound.user-service.user-update.queue}")
     private String userServiceUpdateQueue;
 
-    @Value("${integration.rabbit.tg-bot.queues.favorite-stocks-queue.name}")
+    @Value("${integration.rabbit.inbound.tg-bot.favourite-stocks.queue}")
     private String tgBotFavoriteStocksQueue;
 
-    @Value("${integration.rabbit.tg-bot.queues.user-update-queue.name}")
+    @Value("${integration.rabbit.inbound.tg-bot.user-update.queue}")
     private String tgBotUserUpdateQueue;
 
-    @Value("${integration.rabbit.exchanges.user-notifications}")
+    @Value("${integration.rabbit.outbound.user-notifications.exchange}")
     private String exchange;
 
-    @Value("${integration.rabbit.user-service.queues.favourite-stocks-queue.routing-key}")
+    @Value("${integration.rabbit.outbound.user-service.favourite-stocks.routing-key}")
     private String userServiceFavouriteStocksQueueRoutingKey;
 
-    @Value("${integration.rabbit.user-service.queues.user-update-queue.routing-key}")
+    @Value("${integration.rabbit.outbound.user-service.user-update.routing-key}")
     private String userServiceUpdateQueueRoutingKey;
 
-    @Value("${integration.rabbit.tg-bot.queues.favorite-stocks-queue.routing-key}")
+    @Value("${integration.rabbit.inbound.tg-bot.favourite-stocks.routing-key}")
     private String tgBotFavouriteStocksQueueRoutingKey;
 
-    @Value("${integration.rabbit.tg-bot.queues.user-update-queue.routing-key}")
+    @Value("${integration.rabbit.inbound.tg-bot.user-update.routing-key}")
     private String tgBotUpdateQueueRoutingKey;
 
     @Bean

@@ -45,25 +45,24 @@ integration:
     moex-api-service-url: http://localhost:8086
 
   rabbit:
-    exchanges:
-      user-notifications: user-notifications-exchange
-    user-service:
-      queues:
-        favourite-stocks-queue:
-          name: user-service-favourite-stocks
-          routing-key: userService.favourite-stocks
-        user-update-queue:
-          name: user-service-user-update
-          routing-key: userService.user-update
-    tg-bot:
-      queues:
-        favorite-stocks-queue:
-          name: tg-bot-favorite-stocks
+    inbound:
+      tg-bot:
+        favourite-stocks:
+          queue: tg-bot-favorite-stocks
           routing-key: tgBot.favourite-stocks
-        user-update-queue:
-          name: tg-bot-user-update
+        user-update:
+          queue: tg-bot-user-update
           routing-key: tgBot.user-update
-    statistics-service:
-      queues:
-        user-queue:
-          name: user-stats-queue
+    outbound:
+      user-service:
+        favourite-stocks:
+          queue: user-service-favourite-stocks
+          routing-key: userService.favourite-stocks
+        user-update:
+          queue: user-service-user-update
+          routing-key: userService.user-update
+      statistics-service:
+        user:
+          queue: user-stats-queue
+      user-notifications:
+        exchange: user-notifications-exchange

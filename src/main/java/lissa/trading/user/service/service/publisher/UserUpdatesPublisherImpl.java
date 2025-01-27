@@ -21,13 +21,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserUpdatesPublisherImpl implements UserUpdatesPublisher {
 
-    @Value("${integration.rabbit.exchanges.user-notifications}")
+    @Value("${integration.rabbit.outbound.user-notifications.exchange}")
     private String exchangeName;
 
-    @Value("${integration.rabbit.user-service.queues.user-update-queue.routing-key}")
+    @Value("${integration.rabbit.outbound.user-service.user-update.routing-key}")
     private String userServiceUpdateQueueRoutingKey;
 
-    @Value("${integration.rabbit.user-service.queues.favourite-stocks-queue.routing-key}")
+    @Value("${integration.rabbit.outbound.user-service.favourite-stocks.routing-key}")
     private String userServiceFavouriteStocksQueueRoutingKey;
 
     private final RabbitTemplate rabbitTemplate;
