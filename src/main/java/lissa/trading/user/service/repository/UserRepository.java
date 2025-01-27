@@ -1,6 +1,9 @@
 package lissa.trading.user.service.repository;
 
 import lissa.trading.user.service.model.User;
+import lissa.trading.user.service.repository.projections.UserExternalIdProjection;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -28,4 +31,11 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     @Query(nativeQuery = true, value = "select * from users limit :limit offset :offset")
     List<User> findAllWithLimitAndOffset(int limit, int offset);
 
+    List<UserExternalIdProjection> findAllProjectedBy();
+
+    @Query("SELECT u FROM User u "
+            + "LEFT JOIN FETCH u.balances b "
+            + "LEFT JOIN FETCH u.marginTradingMetrics m "
+            + "WHERE u.externalId IN :ids")
+    List<User> findAllWithBalancesAndMarginTradingMetricsByExternalIds(@Param("ids") List<UUID> ids);
 }
