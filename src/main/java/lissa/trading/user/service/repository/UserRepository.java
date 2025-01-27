@@ -22,6 +22,8 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     Optional<User> findByExternalId(UUID externalId);
 
+    Boolean existsByTelegramNickname(String telegramNickname);
+
     @Modifying
     @Query("UPDATE User u SET u.accountCount = :accountCount WHERE u.id = :userId")
     int updateAccountCount(@Param("userId") Long userId, @Param("accountCount") int accountCount);

@@ -2,9 +2,7 @@ package lissa.trading.user.service.service;
 
 import lissa.trading.lissa.auth.lib.dto.UserInfoDto;
 import lissa.trading.user.service.dto.patch.UserPatchDto;
-import lissa.trading.user.service.feign.TinkoffAccountClient;
-import lissa.trading.user.service.mapper.TempUserRegMapper;
-import lissa.trading.user.service.mapper.UserMapper;
+import lissa.trading.user.service.dto.response.UserResponseDto;
 import lissa.trading.user.service.model.TempUserReg;
 import lissa.trading.user.service.model.User;
 import lissa.trading.user.service.model.entity.BalanceEntity;
@@ -14,96 +12,44 @@ import lissa.trading.user.service.model.entity.PostsEntity;
 import lissa.trading.user.service.model.entity.UserAccountEntity;
 import lissa.trading.user.service.model.entity.UserOperationsEntity;
 import lissa.trading.user.service.model.entity.UserPositionsEntity;
-import lissa.trading.user.service.repository.TempUserRegRepository;
-import lissa.trading.user.service.repository.UserRepository;
-import lissa.trading.user.service.repository.entity.BalanceEntityRepository;
-import lissa.trading.user.service.repository.entity.FavoriteStocksEntityRepository;
-import lissa.trading.user.service.repository.entity.MarginTradingMetricsEntityRepository;
-import lissa.trading.user.service.repository.entity.UserAccountEntityRepository;
-import lissa.trading.user.service.repository.entity.UserPositionsEntityRepository;
-import lissa.trading.user.service.service.creation.TinkoffUserCreationServiceImpl;
-import lissa.trading.user.service.service.creation.temp.TempUserCreationServiceImpl;
-import lissa.trading.user.service.service.publisher.StatsPublisher;
-import org.junit.jupiter.api.BeforeEach;
+import lissa.trading.user.service.service.update.factory.SupportedBrokersEnum;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
-public abstract class BaseTest {
+public abstract class AbstractInitialization {
 
-    @Mock
-    protected UserRepository userRepository;
+    protected static User user;
+    protected static TempUserReg tempUserReg;
+    protected static UserPatchDto userPatchDto;
+    protected static UserInfoDto userInfoDto;
+    protected static UserResponseDto userResponseDto;
+    protected static User updatedUser;
 
-    @Mock
-    protected TempUserRegRepository tempUserRegRepository;
-
-    @Mock
-    protected FavoriteStocksEntityRepository favoriteStocksRepository;
-
-    @Mock
-    protected UserPositionsEntityRepository userPositionsRepository;
-
-    @Mock
-    protected MarginTradingMetricsEntityRepository marginTradingMetricsRepository;
-
-    @Mock
-    protected TinkoffAccountClient tinkoffAccountClient;
-
-    @Mock
-    protected BalanceEntityRepository balanceRepository;
-
-    @Mock
-    protected UserAccountEntityRepository userAccountRepository;
-
-    @Mock
-    protected TempUserRegMapper tempUserRegMapper;
-
-    @Mock
-    protected ApplicationEventPublisher eventPublisher;
-
-    @Mock
-    protected UserMapper userMapper;
-
-    @Mock
-    protected StatsPublisher<User> statsPublisher;
-
-    @InjectMocks
-    protected UserServiceImpl userService;
-
-    @InjectMocks
-    protected TinkoffUserCreationServiceImpl userCreationService;
-
-    @InjectMocks
-    protected TempUserCreationServiceImpl tempUserCreationService;
-
-    protected User user;
-    protected TempUserReg tempUserReg;
-    protected UserPatchDto userPatchDto;
-    protected UserInfoDto userInfoDto;
-
-    @BeforeEach
-    void setUp() {
-
+    @BeforeAll
+    public static void init() {
         user = createUser();
         tempUserReg = createTempUserReg();
         userPatchDto = createUserPatchDto();
         userInfoDto = createUserAuthInfoDto();
+        userResponseDto = createUserResponseDto();
+        updatedUser = createUpdatedUser();
     }
 
-    private User createUser() {
+    private static User createUser() {
         User userEntity = new User();
         userEntity.setExternalId(UUID.randomUUID());
         userEntity.setFirstName("John");
         userEntity.setLastName("Doe");
         userEntity.setTelegramChatId(12345L);
         userEntity.setTelegramNickname("johndoe");
-        userEntity.setTinkoffToken("token");
+        userEntity.setTinkoffToken("t.9zbdzHphp5ZkQzAYFpXmzWS60POh5XCWKUzpluZ2abPPyGtR7" +
+                                           "xWZCRNa2yNNlcukVuLq5hjANhepUNoMfKkPBF");
+        userEntity.setBroker(SupportedBrokersEnum.TINKOFF);
 
         BalanceEntity balance = new BalanceEntity();
         balance.setUser(userEntity);
@@ -147,31 +93,58 @@ public abstract class BaseTest {
         return userEntity;
     }
 
-    private TempUserReg createTempUserReg() {
+    private static TempUserReg createTempUserReg() {
         TempUserReg tempUser = new TempUserReg();
         tempUser.setId(1L);
         tempUser.setExternalId(UUID.randomUUID());
         tempUser.setFirstName("John");
         tempUser.setLastName("Doe");
         tempUser.setTelegramNickname("johndoe");
+        tempUser.setTinkoffToken("t.9zbdzHphp5ZkQzAYFpXmzWS60POh5XCWKUzpluZ2abPPyGtR7" +
+                                         "xWZCRNa2yNNlcukVuLq5hjANhepUNoMfKkPBF");
+        tempUser.setBroker(SupportedBrokersEnum.TINKOFF);
         return tempUser;
     }
 
-    private UserPatchDto createUserPatchDto() {
+    private static UserPatchDto createUserPatchDto() {
         UserPatchDto dto = new UserPatchDto();
         dto.setFirstName("Jane");
         dto.setLastName(null);
         dto.setTelegramNickname("");
-        dto.setTinkoffToken("newToken");
+        dto.setTinkoffToken("t.0zbdzHphp5ZkQzAYFpXmzWS60POh5XCWKUzpluZ2abPPyGtR7" +
+                                    "XWZCRNa2yNNlcukVuLq5hjANhepUNoMfKkPBF");
         return dto;
     }
 
-    private UserInfoDto createUserAuthInfoDto() {
+    private static User createUpdatedUser() {
+        User updatedUser = new User();
+        updatedUser.setFirstName("Jane");
+        updatedUser.setLastName("Doe");
+        updatedUser.setTelegramChatId(12345L);
+        updatedUser.setTelegramNickname("");
+        updatedUser.setTinkoffToken("t.0zbdzHphp5ZkQzAYFpXmzWS60POh5XCWKUzpluZ2abPPyGtR7" +
+                                            "XWZCRNa2yNNlcukVuLq5hjANhepUNoMfKkPBF");
+        return updatedUser;
+    }
+
+    private static UserInfoDto createUserAuthInfoDto() {
         UserInfoDto dto = new UserInfoDto();
         dto.setFirstName("John");
         dto.setLastName("Doe");
         dto.setTelegramNickname("johndoe");
-        dto.setTinkoffToken("token");
+        dto.setTinkoffToken("t.9zbdzHphp5ZkQzAYFpXmzWS60POh5XCWKUzpluZ2abPPyGtR7" +
+                                    "XWZCRNa2yNNlcukVuLq5hjANhepUNoMfKkPBF");
+        return dto;
+    }
+
+    private static UserResponseDto createUserResponseDto() {
+        UserResponseDto dto = new UserResponseDto();
+        dto.setFirstName("jane");
+        dto.setLastName("Doe");
+        dto.setTelegramChatId(12345L);
+        dto.setTelegramNickname("");
+        dto.setTinkoffToken("t.0zbdzHphp5ZkQzAYFpXmzWS60POh5XCWKUzpluZ2abPPyGtR7" +
+                                    "XWZCRNa2yNNlcukVuLq5hjANhepUNoMfKkPBF");
         return dto;
     }
 }

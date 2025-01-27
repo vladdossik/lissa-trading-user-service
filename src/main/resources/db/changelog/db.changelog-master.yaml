@@ -18,6 +18,9 @@ databaseChangeLog:
       file: "09.12.2024/db.changelog-release.yaml"
       relativeToChangelogFile: true
   - include:
+      file: "29.12.2024/db.changelog-release.yaml"
+      relativeToChangelogFile: true
+  - include:
       file: "05.01.2025/db.changelog-release.yaml"
       relativeToChangelogFile: true
   - include:

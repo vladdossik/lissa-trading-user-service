@@ -1,4 +1,4 @@
-package lissa.trading.user.service.service.publisher;
+package lissa.trading.user.service.service.publisher.stats;
 
 import lissa.trading.user.service.dto.response.UserStatsReportDto;
 import lissa.trading.user.service.mapper.UserMapper;
@@ -23,7 +23,7 @@ public class UserStatsPublisher implements StatsPublisher<User> {
     private final RabbitTemplate rabbitTemplate;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    @Value("${integration.rabbit.statistics-service.user-queue}")
+    @Value("${integration.rabbit.outbound.statistics-service.user.queue}")
     private String userStatsQueue;
     private Integer defaultOffset = 0;
 

@@ -42,6 +42,27 @@ integration:
     auth-service-url: http://localhost:8081
     user-service-url: http://localhost:8080
     tinkoff-api-service-url: http://localhost:8082
+    moex-api-service-url: http://localhost:8086
+
   rabbit:
-    statistics-service:
-      user-queue: user-stats-queue
+    inbound:
+      tg-bot:
+        favourite-stocks:
+          queue: tg-bot-favorite-stocks
+          routing-key: tgBot.favourite-stocks
+        user-update:
+          queue: tg-bot-user-update
+          routing-key: tgBot.user-update
+    outbound:
+      user-service:
+        favourite-stocks:
+          queue: user-service-favourite-stocks
+          routing-key: userService.favourite-stocks
+        user-update:
+          queue: user-service-user-update
+          routing-key: userService.user-update
+      statistics-service:
+        user:
+          queue: user-stats-queue
+      user-notifications:
+        exchange: user-notifications-exchange

@@ -1,4 +1,4 @@
-package lissa.trading.user.service.service.publisher;
+package lissa.trading.user.service.service.publisher.stats;
 
 public interface StatsPublisher<T> {
 
