@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -149,7 +150,7 @@ public class InternalController {
             responseCode = "200",
             content = @Content()
     )
-    @PatchMapping("/favouriteStocks/{externalId}")
+    @PutMapping("/favouriteStocks/{externalId}")
     public ResponseEntity<String> updateUserFavoriteStocks(@PathVariable UUID externalId, @RequestBody TickersDto tickersDto) {
         userService.updateFavoriteStocks(externalId, tickersDto);
         return ResponseEntity.ok("Successful user favorite stocks update");
