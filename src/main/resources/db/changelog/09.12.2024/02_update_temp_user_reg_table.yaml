@@ -6,7 +6,6 @@ databaseChangeLog:
         - dropNotNullConstraint:
             tableName: temp_user_reg
             columnName: tinkoff_token
-            columnDataType: character varying(95)
         - addColumn:
             tableName: temp_user_reg
             columns:

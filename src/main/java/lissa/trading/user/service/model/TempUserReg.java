@@ -10,7 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lissa.trading.user.service.service.creation.factory.SupportedBrokersEnum;
+import lissa.trading.user.service.service.update.factory.SupportedBrokersEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

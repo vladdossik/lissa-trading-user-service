@@ -1,4 +1,4 @@
-package lissa.trading.user.service.feign;
+package lissa.trading.user.service.feign.tinkoff;
 
 import lissa.trading.lissa.auth.lib.dto.UpdateTinkoffTokenResponce;
 import lissa.trading.user.service.dto.tinkoff.Stock;

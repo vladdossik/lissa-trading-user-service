@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: 29.12.2024_01
+      author: blaskowitzwork@gmail.com
+      changes:
+        - addColumn:
+            tableName: favorite_stocks
+            columns:
+              - column:
+                  name: ticker
+                  type: VARCHAR(50)
+
+              - column:
+                  name: figi
+                  type: VARCHAR(50)
+
+              - column:
+                  name: service_ticker
+                  type: VARCHAR(50)
+
+              - column:
+                  name: instrument_type
+                  type: VARCHAR(50)
+
+              - column:
+                  name: currency
+                  type: VARCHAR(3)
+                  defaultValue: 'RUB'
+                  constraints:
+                    nullable: false
+
+
+        - renameColumn:
+            tableName: favorite_stocks
+            oldColumnName: stock_name
+            newColumnName: name
+
+        - dropNotNullConstraint:
+            tableName: favorite_stocks
+            columnName: name
+

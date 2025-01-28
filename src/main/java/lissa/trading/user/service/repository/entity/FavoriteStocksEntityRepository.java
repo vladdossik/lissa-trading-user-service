@@ -10,9 +10,9 @@ public interface FavoriteStocksEntityRepository extends JpaRepository<FavoriteSt
 
     List<FavoriteStocksEntity> findByUserId(Long userId);
 
-    Optional<FavoriteStocksEntity> findByStockNameAndUserId(String stockName, Long userId);
+    Optional<FavoriteStocksEntity> findByNameAndUserId(String stockName, Long userId);
 
     void deleteByUserId(Long userId);
 
-    void deleteByStockNameAndUserId(String stockName, Long userId);
+    void deleteByNameAndUserId(String stockName, Long userId);
 }

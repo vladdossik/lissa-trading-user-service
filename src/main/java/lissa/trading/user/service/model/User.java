@@ -68,4 +68,9 @@ public class User extends UserReg {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<PostsEntity> posts = new ArrayList<>();
+
+    public void clearAndSetFavoriteStocks(List<FavoriteStocksEntity> updatedFavoriteStocks) {
+        favoriteStocks.clear();
+        favoriteStocks.addAll(updatedFavoriteStocks);
+    }
 }
