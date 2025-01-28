@@ -10,3 +10,4 @@ data:
   AUTH_SERVICE_URL: "http://lissa-trading-auth-service:8081"
   USER_SERVICE_URL: "http://lissa-trading-user-service:8080"
   TINKOFF_API_SERVICE_URL: "http://lissa-trading-tinkoff-api-service:8082"
+  ZIPKIN_URL: "http://103.249.132.74:9411/api/v2/spans"
