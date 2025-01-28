@@ -49,13 +49,13 @@ public class UserCreationServiceImpl implements UserCreationService {
                              "telegram chat id: {}", user.getTelegramChatId());
 
             userRepository.save(user);
+            userUpdatesPublisher.publishUserUpdateNotification(user, OperationEnum.REGISTER);
+            notificationContext.clear();
             log.info("Saved user: {}", user);
             tempUserRegRepository.delete(tempUserReg);
             log.info("Deleted temp user: {}", tempUserReg);
             updateServiceFactory.getUpdateServiceByType(user.getBroker())
                     .userEntitiesUpdate(user);
-            userUpdatesPublisher.publishUserUpdateNotification(user, OperationEnum.REGISTER);
-            notificationContext.clear();
             log.info("User created and saved successfully: {}", user);
         } catch(OperationUnsupportedByBrokerException e) {
             throw e;
