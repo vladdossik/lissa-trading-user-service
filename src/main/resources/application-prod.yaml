@@ -35,4 +35,14 @@ integration:
     user-service-url: ${USER_SERVICE_URL}
     tinkoff-api-service-url: ${TINKOFF_API_SERVICE_URL}
 
-  rabbit:
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        exclude: '*'
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL}
