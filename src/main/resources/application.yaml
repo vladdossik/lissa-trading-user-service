@@ -1,3 +1,27 @@
 spring:
   profiles:
-    active: prod
+    active: local
+
+integration:
+  rabbit:
+    inbound:
+      tg-bot:
+        favourite-stocks:
+          queue: tg-bot-favorite-stocks
+          routing-key: tgBot.favourite-stocks
+        user-update:
+          queue: tg-bot-user-update
+          routing-key: tgBot.user-update
+    outbound:
+      user-service:
+        favourite-stocks:
+          queue: user-service-favourite-stocks
+          routing-key: userService.favourite-stocks
+        user-update:
+          queue: user-service-user-update
+          routing-key: userService.user-update
+      statistics-service:
+        user:
+          queue: user-stats-queue
+      user-notifications:
+        exchange: user-notifications-exchange
