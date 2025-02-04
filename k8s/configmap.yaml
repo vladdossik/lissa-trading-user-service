@@ -7,6 +7,12 @@ data:
   SPRING_DATASOURCE_URL: "jdbc:postgresql://lissa-trading-db:5432/lissa-trading-db"
   SPRING_DATASOURCE_USERNAME: "postgres"
   SPRING_DATA_DEFAULT_SCHEMA: "user_service_db"
+
+  SPRING_RABBITMQ_HOST: "rabbitmq"
+  SPRING_RABBITMQ_PORT: "5672"
+  SPRING_RABBITMQ_USERNAME: "lissa_user"
+  SPRING_RABBITMQ_PASSWORD: "secure_password"
+
   AUTH_SERVICE_URL: "http://lissa-trading-auth-service:8081"
-  USER_SERVICE_URL: "http://lissa-trading-user-service:8080"
   TINKOFF_API_SERVICE_URL: "http://lissa-trading-tinkoff-api-service:8082"
+  MOEX_API_SERVICE_URL: "http://lissa-trading-moex-api-service:8086"

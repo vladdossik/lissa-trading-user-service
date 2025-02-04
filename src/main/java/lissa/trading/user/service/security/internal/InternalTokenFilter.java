@@ -33,7 +33,7 @@ public class InternalTokenFilter extends BaseAuthTokenFilter<String> {
     @Override
     protected boolean shouldSkipFilter(HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        return !requestURI.startsWith("/v1/internal/"); // Фильтр срабатывает только на внутренних запросах
+        return !requestURI.startsWith("/v1/internal/");
     }
 
     @Override

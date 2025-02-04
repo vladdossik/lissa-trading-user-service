@@ -37,32 +37,11 @@ logging:
 
 integration:
   rest:
-    statistics-service:
-      token: YzNSaGRHbHpkR2xqY3kxcGJuUmxjbTVoYkMxclpYaz0K
     auth-service-url: http://localhost:8081
-    user-service-url: http://localhost:8080
-    tinkoff-api-service-url: http://localhost:8082
-    moex-api-service-url: http://localhost:8086
-
-  rabbit:
-    inbound:
-      tg-bot:
-        favourite-stocks:
-          queue: tg-bot-favorite-stocks
-          routing-key: tgBot.favourite-stocks
-        user-update:
-          queue: tg-bot-user-update
-          routing-key: tgBot.user-update
-    outbound:
-      user-service:
-        favourite-stocks:
-          queue: user-service-favourite-stocks
-          routing-key: userService.favourite-stocks
-        user-update:
-          queue: user-service-user-update
-          routing-key: userService.user-update
-      statistics-service:
-        user:
-          queue: user-stats-queue
-      user-notifications:
-        exchange: user-notifications-exchange
+    services:
+      tinkoff-api:
+        url: http://localhost:8082
+        token: ZEdsdWEyOW1aa0Z3YVMxcGJuUmxjbTVoYkMxclpYaz0K
+      moex-api:
+        url: http://localhost:8086
+        token: Ylc5bGVFRndhUzFwYm5SbGNtNWhiQzFyWlhrPQ==

@@ -7,6 +7,11 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST}
+    port: ${SPRING_RABBITMQ_PORT}
+    username: ${SPRING_RABBITMQ_USERNAME}
+    password: ${SPRING_RABBITMQ_PASSWORD}
 
   jpa:
     hibernate:
@@ -15,24 +20,28 @@ spring:
     properties:
       hibernate:
         default_schema: ${SPRING_DATA_DEFAULT_SCHEMA}
+        format_sql: true
 
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
     default-schema: ${SPRING_DATA_DEFAULT_SCHEMA}
 
-logging:
-  level:
-    lissa.trading.user.service.aspect: INFO
-
 security:
   internal:
     token: ${SECURITY_INTERNAL_TOKEN}
 
+logging:
+  level:
+    lissa.trading.user.service.aspect: INFO
+
 integration:
   rest:
     auth-service-url: ${AUTH_SERVICE_URL}
-    user-service-url: ${USER_SERVICE_URL}
-    tinkoff-api-service-url: ${TINKOFF_API_SERVICE_URL}
-
-  rabbit:
+    services:
+      tinkoff-api:
+        url: ${TINKOFF_API_SERVICE_URL}
+        token: ${TINKOFF_API_SERVICE_TOKEN}
+      moex-api:
+        url: ${MOEX_API_SERVICE_URL}
+        token: ${MOEX_API_SERVICE_TOKEN}
