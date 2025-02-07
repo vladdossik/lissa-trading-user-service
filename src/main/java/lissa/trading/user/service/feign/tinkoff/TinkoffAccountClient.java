@@ -1,6 +1,7 @@
 package lissa.trading.user.service.feign.tinkoff;
 
 import lissa.trading.lissa.auth.lib.dto.UpdateTinkoffTokenResponce;
+import lissa.trading.user.service.config.InternalFeignConfig;
 import lissa.trading.user.service.dto.tinkoff.Stock;
 import lissa.trading.user.service.dto.tinkoff.account.AccountInfoDto;
 import lissa.trading.user.service.dto.tinkoff.account.BalanceDto;
@@ -18,7 +19,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "tinkoff-service", url = "${integration.rest.tinkoff-api-service-url}/v1/internal")
+@FeignClient(
+        name = "tinkoff-service",
+        url = "${integration.rest.services.tinkoff-api.url}/v1/internal",
+        configuration = InternalFeignConfig.class)
 public interface TinkoffAccountClient {
 
     @PostMapping("/set-token")

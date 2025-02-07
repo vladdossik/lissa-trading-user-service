@@ -55,7 +55,8 @@ public class SwaggerConfig {
         return GroupedOpenApi
                 .builder()
                 .group("internal")
-                .pathsToMatch("/v1/internal/**")
+                .pathsToMatch("/v1/internal/**").addOpenApiCustomizer(openApi -> openApi
+                        .addSecurityItem(new SecurityRequirement().addList("token-key")))
                 .addOpenApiCustomizer(openApi -> openApi
                         .addSecurityItem(new SecurityRequirement().addList("token-key")))
                 .build();

@@ -13,6 +13,7 @@ import lissa.trading.user.service.model.entity.UserAccountEntity;
 import lissa.trading.user.service.model.entity.UserOperationsEntity;
 import lissa.trading.user.service.model.entity.UserPositionsEntity;
 import lissa.trading.user.service.service.update.factory.SupportedBrokersEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
+@Slf4j
 public abstract class AbstractInitialization {
 
     protected static User user;
@@ -32,6 +34,7 @@ public abstract class AbstractInitialization {
 
     @BeforeAll
     public static void init() {
+        log.info("INIIIIIIIIIIIIIIT");
         user = createUser();
         tempUserReg = createTempUserReg();
         userPatchDto = createUserPatchDto();
