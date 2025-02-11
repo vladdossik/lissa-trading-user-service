@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: user-service
   profiles:
     active: prod
 
@@ -25,3 +27,13 @@ integration:
           queue: user-stats-queue
       user-notifications:
         exchange: user-notifications-exchange
+
+management:
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: "/v1/internal/actuator"
