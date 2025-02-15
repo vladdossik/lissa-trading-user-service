@@ -15,5 +15,6 @@ data:
 
   AUTH_SERVICE_URL: "http://lissa-trading-auth-service:8081"
   TINKOFF_API_SERVICE_URL: "http://lissa-trading-tinkoff-api-service:8082"
+  LOKI_URL: "http://loki:3100"
   ZIPKIN_URL: "http://103.249.132.74:9411/api/v2/spans"
   MOEX_API_SERVICE_URL: "http://lissa-trading-moex-api-service:8086"
