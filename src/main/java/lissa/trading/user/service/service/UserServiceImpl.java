@@ -117,7 +117,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = "usersIdsWithPaginationAndFilters",
+    @Cacheable(value = "usersPagination",
             key = "{#pageable.pageNumber, #pageable.pageSize, #firstName, #lastName}")
     @Transactional(readOnly = true)
     public CustomPage<UserResponseDto> getUsersWithPaginationAndFilters(Pageable pageable, String firstName,
@@ -134,7 +134,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = "usersIdsWithPaginationAndFilters",
+    @Cacheable(value = "userIdsPagination",
             key = "{#pageable.pageNumber, #pageable.pageSize, #firstName, #lastName}")
     @Transactional(readOnly = true)
     public List<UUID> getUserIdsWithPaginationAndFilters(Pageable pageable, String firstName,
