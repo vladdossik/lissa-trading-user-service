@@ -120,7 +120,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Cacheable(value = "usersPage",
-            key = "{#pageable.pageNumber, #pageable.pageSize, #firstName, #lastName}")
+            key = "{#pageable.pageNumber, #pageable.pageSize, #pageable.sort.toString(), #firstName, #lastName}")
     @Transactional(readOnly = true)
     public CustomPage<UserResponseDto> getUsersWithPaginationAndFilters(Pageable pageable, String firstName,
                                                                         String lastName) {
@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Cacheable(value = "userIdsPage",
-            key = "{#pageable.pageNumber, #pageable.pageSize, #firstName, #lastName}")
+            key = "{#pageable.pageNumber, #pageable.pageSize, #pageable.sort.toString(), #firstName, #lastName}")
     @Transactional(readOnly = true)
     public List<UUID> getUserIdsWithPaginationAndFilters(Pageable pageable, String firstName,
                                                                              String lastName) {
