@@ -64,9 +64,7 @@ public class UserServiceImpl implements UserService {
     private final RedisCacheManager redisCacheManager;
 
     @Override
-    @Caching(evict = {
-            @CacheEvict(value = "users", key = "#externalId"),
-    })
+    @CacheEvict(value = "users", key = "#externalId")
     @Transactional
     public UserResponseDto updateUser(UUID externalId, @Valid UserPatchDto userUpdates) {
         log.info("updating user with externalId {}", externalId);
@@ -81,9 +79,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Caching(evict = {
-            @CacheEvict(value = "users", allEntries = true),
-    })
+    @CacheEvict(value = "users", allEntries = true)
     @Transactional
     public void blockUserByTelegramNickname(String telegramNickname) {
         User user = findUserByTelegramNickname(telegramNickname);
@@ -93,9 +89,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Caching(evict = {
-            @CacheEvict(value = "users", key = "#externalId"),
-    })
+    @CacheEvict(value = "users", key = "#externalId")
     @Transactional
     public void deleteUserByExternalId(UUID externalId) {
         log.info("deleting user {}", externalId);
