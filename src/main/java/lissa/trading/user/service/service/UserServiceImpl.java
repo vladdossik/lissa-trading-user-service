@@ -25,13 +25,15 @@ import lissa.trading.user.service.service.update.factory.UpdateServiceFactory;
 import lissa.trading.user.service.utils.TokenUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.cache.Cache;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -49,6 +51,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private static final String STOCK_PRICES_KEY = "stockPrices";
+    private static final String USERS_KEY = "users";
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -57,14 +60,14 @@ public class UserServiceImpl implements UserService {
     private final UserUpdatesPublisher userUpdatesPublisher;
     private final NotificationContext notificationContext;
     private final FavoriteStockMapper favoriteStockMapper;
-    private final HashOperations<String, String, StockPrice> stockPricesHashOperations;
     private final UpdateServiceFactory updateServiceFactory;
+    private final RedisCacheManager redisCacheManager;
 
     @Override
     @Caching(evict = {
             @CacheEvict(value = "users", key = "#externalId"),
-            @CacheEvict(value = "usersPagination", allEntries = true),
-            @CacheEvict(value = "userIdsPagination", allEntries = true)
+            @CacheEvict(value = "usersPage", allEntries = true),
+            @CacheEvict(value = "userIdsPage", allEntries = true)
     })
     @Transactional
     public UserResponseDto updateUser(UUID externalId, @Valid UserPatchDto userUpdates) {
@@ -82,8 +85,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Caching(evict = {
             @CacheEvict(value = "users", allEntries = true),
-            @CacheEvict(value = "usersPagination", allEntries = true),
-            @CacheEvict(value = "userIdsPagination", allEntries = true)
+            @CacheEvict(value = "usersPage", allEntries = true),
+            @CacheEvict(value = "userIdsPage", allEntries = true)
     })
     @Transactional
     public void blockUserByTelegramNickname(String telegramNickname) {
@@ -96,8 +99,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Caching(evict = {
             @CacheEvict(value = "users", key = "#externalId"),
-            @CacheEvict(value = "usersPagination", allEntries = true),
-            @CacheEvict(value = "userIdsPagination", allEntries = true)
+            @CacheEvict(value = "usersPage", allEntries = true),
+            @CacheEvict(value = "userIdsPage", allEntries = true)
     })
     @Transactional
     public void deleteUserByExternalId(UUID externalId) {
@@ -110,14 +113,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = "users", key = "#externalId")
     @Transactional(readOnly = true)
     public UserResponseDto getUserByExternalId(UUID externalId) {
         return userMapper.toUserResponseDto(findUserByExternalId(externalId));
     }
 
     @Override
-    @Cacheable(value = "usersPagination",
+    @Cacheable(value = "usersPage",
             key = "{#pageable.pageNumber, #pageable.pageSize, #firstName, #lastName}")
     @Transactional(readOnly = true)
     public CustomPage<UserResponseDto> getUsersWithPaginationAndFilters(Pageable pageable, String firstName,
@@ -134,7 +136,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = "userIdsPagination",
+    @Cacheable(value = "userIdsPage",
             key = "{#pageable.pageNumber, #pageable.pageSize, #firstName, #lastName}")
     @Transactional(readOnly = true)
     public List<UUID> getUserIdsWithPaginationAndFilters(Pageable pageable, String firstName,
@@ -227,8 +229,16 @@ public class UserServiceImpl implements UserService {
     }
 
     private User findUserByExternalId(UUID externalId) {
-        return userRepository.findByExternalId(externalId)
+        Cache usersCache = redisCacheManager.getCache(USERS_KEY);
+        User cachedUser = usersCache.get(externalId, User.class);
+        if (cachedUser != null) {
+            return cachedUser;
+        }
+
+        User user = userRepository.findByExternalId(externalId)
                 .orElseThrow(() -> new UserNotFoundException("User with external id " + externalId + " not found"));
+        usersCache.put(externalId, user);
+        return user;
     }
 
     private User findUserByTelegramNickname(String telegramNickname) {
@@ -237,14 +247,15 @@ public class UserServiceImpl implements UserService {
     }
 
     private List<StockPrice> getStockPricesFromCache(List<String> figies) {
-        Map<String, StockPrice> cachedPrices = stockPricesHashOperations.entries(STOCK_PRICES_KEY);
+        Cache stockPricesCache = redisCacheManager.getCache(STOCK_PRICES_KEY);
         return figies.stream()
-                .map(cachedPrices::get)
+                .map(figi -> stockPricesCache.get(figi, StockPrice.class))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
     private void cacheStockPrice(StockPrice stockPrice) {
-        stockPricesHashOperations.put(STOCK_PRICES_KEY, stockPrice.getFigi(), stockPrice);
+        redisCacheManager.getCache(STOCK_PRICES_KEY)
+                .put(stockPrice.getFigi(), stockPrice);
     }
 }
