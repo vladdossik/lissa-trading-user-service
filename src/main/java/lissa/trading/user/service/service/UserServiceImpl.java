@@ -66,8 +66,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Caching(evict = {
             @CacheEvict(value = "users", key = "#externalId"),
-            @CacheEvict(value = "usersPage", allEntries = true),
-            @CacheEvict(value = "userIdsPage", allEntries = true)
     })
     @Transactional
     public UserResponseDto updateUser(UUID externalId, @Valid UserPatchDto userUpdates) {
@@ -85,8 +83,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Caching(evict = {
             @CacheEvict(value = "users", allEntries = true),
-            @CacheEvict(value = "usersPage", allEntries = true),
-            @CacheEvict(value = "userIdsPage", allEntries = true)
     })
     @Transactional
     public void blockUserByTelegramNickname(String telegramNickname) {
@@ -99,8 +95,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Caching(evict = {
             @CacheEvict(value = "users", key = "#externalId"),
-            @CacheEvict(value = "usersPage", allEntries = true),
-            @CacheEvict(value = "userIdsPage", allEntries = true)
     })
     @Transactional
     public void deleteUserByExternalId(UUID externalId) {
@@ -119,8 +113,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = "usersPage",
-            key = "{#pageable.pageNumber, #pageable.pageSize, #pageable.sort.toString(), #firstName, #lastName}")
     @Transactional(readOnly = true)
     public CustomPage<UserResponseDto> getUsersWithPaginationAndFilters(Pageable pageable, String firstName,
                                                                         String lastName) {
@@ -136,8 +128,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = "userIdsPage",
-            key = "{#pageable.pageNumber, #pageable.pageSize, #pageable.sort.toString(), #firstName, #lastName}")
     @Transactional(readOnly = true)
     public List<UUID> getUserIdsWithPaginationAndFilters(Pageable pageable, String firstName,
                                                                              String lastName) {

@@ -51,8 +51,6 @@ public class RedisCacheConfig {
                                                RedisCacheConfiguration shortTermCacheConfiguration) {
         Map<String, RedisCacheConfiguration> cacheConfigurations = Map.of(
                 "users", defaultCacheConfiguration,
-                "usersPage", defaultCacheConfiguration,
-                "userIdsPage", defaultCacheConfiguration,
                 "stockPrices", shortTermCacheConfiguration
         );
 
