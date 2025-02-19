@@ -12,7 +12,6 @@ spring:
     port: 5672
     username: guest
     password: guest
-
   jpa:
     hibernate:
       ddl-auto: none
@@ -26,6 +25,17 @@ spring:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
     default-schema: user_service_db
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 5000ms
+      password: root-password-123
+
+cache:
+  redis:
+    default-expiration: 30m
+    short-term-expiration: 5s
 
 security:
   internal:
